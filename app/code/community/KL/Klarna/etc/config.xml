@@ -5,4 +5,36 @@
             <version>0.1.0</version>
         </KL_Klarna>
     </modules>
+    <global>
+        <helpers>
+            <klarna>
+                <class>KL_Klarna_Helper</class>
+            </klarna>
+        </helpers>
+        <models>
+            <klarna>
+                <class>KL_Klarna_Model</class>
+            </klarna>
+        </models>
+    </global>
+    <adminhtml>
+        <translate>
+            <modules>
+                <klarna>
+                    <files>
+                        <default>KL_Klarna.csv</default>
+                    </files>
+                </klarna>
+            </modules>
+        </translate>
+    </adminhtml>
+    <default>
+        <payment>
+            <klarna>
+                <active>0</active>
+                <model>klarna/invoice</model>
+                <title>Klarna Invoice</title>
+            </klarna>
+        </payment>
+    </default>
 </config>
