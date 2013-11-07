@@ -32,6 +32,7 @@
         <payment>
             <klarna>
                 <active>0</active>
+                <debug>0</debug>
                 <model>klarna/invoice</model>
                 <title>Klarna Invoice</title>
             </klarna>
