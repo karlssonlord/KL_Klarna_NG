@@ -4,6 +4,9 @@
         <KL_Klarna>
             <active>true</active>
             <codePool>community</codePool>
+            <depends>
+                <Mage_Payment />
+            </depends>
         </KL_Klarna>
     </modules>
 </config>
