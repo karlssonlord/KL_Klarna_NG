@@ -31,12 +31,22 @@ class KL_Klarna_Model_Invoice extends Mage_Payment_Model_Method_Abstract
     public function authorize(Varien_Object $payment, $amount)
     {
         $this->_debug("authorize");
-        return parent::authorize($payment, $amount);
+
+        $transactionId = uniqid(); // Just a random ID for now
+        $payment
+            ->setTransactionId($transactionId)
+            ->setIsTransactionClosed(false);
+
+        return $this;
     }
 
     public function capture(Varien_Object $payment, $amount)
     {
         $this->_debug("capture");
+
+        $transactionId = uniqid(); // Just a random ID for now
+        $payment->setTransactionId($transactionId);
+
         return parent::capture($payment, $amount);
     }
 
@@ -54,10 +64,11 @@ class KL_Klarna_Model_Invoice extends Mage_Payment_Model_Method_Abstract
 
     public function refund(Varien_Object $payment, $amount)
     {
-        /*
-         * NOTE: Online refund requires a transaction ID!
-         */
         $this->_debug("refund");
+
+        $transactionId = uniqid(); // Just a random ID for now
+        $payment->setTransactionId($transactionId);
+
         return parent::refund($payment, $amount);
     }
 }
