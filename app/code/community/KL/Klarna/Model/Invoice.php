@@ -32,10 +32,10 @@ class KL_Klarna_Model_Invoice extends Mage_Payment_Model_Method_Abstract
     {
         $this->_debug("authorize");
 
-        $transactionId = uniqid(); // Just a random ID for now
-        $payment
-            ->setTransactionId($transactionId)
-            ->setIsTransactionClosed(false);
+        $authorization = Mage::getModel('klarna/invoice_authorize')
+            ->setPayment($payment)
+            ->setAmount($amount)
+            ->authorize();
 
         return $this;
     }
