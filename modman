@@ -2,3 +2,4 @@ app/etc/modules/*.xml             app/etc/modules/
 app/code/community/KL/Klarna/*    app/code/community/KL/Klarna/
 app/locale/en_US/*.csv            app/locale/en_US/
 app/locale/sv_SE/*.csv            app/locale/sv_SE/
+lib/Klarna/*                      lib/Klarna/
