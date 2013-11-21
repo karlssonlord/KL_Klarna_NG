@@ -160,7 +160,12 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
 
     protected function getServer()
     {
-        return Klarna::BETA;
+        if (Mage::getStoreConfigFlag('payment/klarna_invoice/live')) {
+            return Klarna::LIVE;
+        }
+        else {
+            return Klarna::BETA;
+        }
     }
 
     protected function getPclassStorage()

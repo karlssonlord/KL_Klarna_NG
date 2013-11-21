@@ -33,6 +33,7 @@
             <klarna_invoice>
                 <title>Klarna Invoice</title>
                 <active>0</active>
+                <live>0</live>
                 <debug>0</debug>
                 <model>klarna/invoice</model>
                 <payment_action>authorize</payment_action>
