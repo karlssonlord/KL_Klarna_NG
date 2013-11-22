@@ -49,7 +49,11 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
     public function setBillingAddress($address)
     {
         $this->setAddress('billing_address', $address);
-        $this->setCountry(KlarnaCountry::fromCode($address->getCountry()));
+
+        $klarnaCountry = KlarnaCountry::fromCode($address->getCountry());
+        $klarnaLanguage = KlarnaCountry::getLanguage($klarnaCountry);
+        $this->setCountry($klarnaCountry);
+        $this->setLanguage($klarnaLanguage);
 
         return $this;
     }
@@ -160,11 +164,6 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         else {
             throw new Exception("Missing shared secret");
         }
-    }
-
-    protected function getLanguage()
-    {
-        return KlarnaLanguage::SV;
     }
 
     protected function getServer()
