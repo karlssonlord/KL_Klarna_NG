@@ -6,6 +6,20 @@ require_once('Klarna/2.4.3/transport/xmlrpc-3.0.0.beta/lib/xmlrpc_wrappers.inc')
 
 class KL_Klarna_Model_Api_Request extends Varien_Object
 {
+    public function setCurrency($currency)
+    {
+        $klarnaCurrency = KlarnaCurrency::fromCode($currency->getCode());
+
+        if (!is_null($klarnaCurrency)) {
+            $this->setData('currency', $klarnaCurrency);
+        }
+        else {
+            throw new Exception("Klarna does not support payments in " . $currency->getCode());
+        }
+
+        return $this;
+    }
+
     public function addProducts($products)
     {
         foreach ($products as $product) {
@@ -151,11 +165,6 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
     protected function getLanguage()
     {
         return KlarnaLanguage::SV;
-    }
-
-    protected function getCurrency()
-    {
-        return KlarnaCurrency::SEK;
     }
 
     protected function getServer()

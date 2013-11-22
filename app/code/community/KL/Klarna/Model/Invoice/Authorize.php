@@ -9,6 +9,7 @@ class KL_Klarna_Model_Invoice_Authorize extends KL_Klarna_Model_Invoice_Abstract
         $products   = $order->getAllVisibleItems();
 
         $this->request()->setOrderId($order->getIncrementId());
+        $this->request()->setCurrency($order->getOrderCurrency());
         $this->request()->setNationalId('4103219202');
         $this->request()->setEmail($order->getCustomerEmail());
         $this->request()->setBillingAddress($order->getBillingAddress());
