@@ -141,6 +141,15 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         return $result;
     }
 
+    public function creditInvoice() {
+        $result = $this->api()->creditInvoice(
+            $this->getInvoiceId(),
+            false
+        );
+
+        return $result;
+    }
+
     protected function api()
     {
         if (!$this->getApi()) {

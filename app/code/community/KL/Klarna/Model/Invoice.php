@@ -68,9 +68,11 @@ class KL_Klarna_Model_Invoice extends Mage_Payment_Model_Method_Abstract
     {
         $this->_debug("refund");
 
-        $transactionId = uniqid(); // Just a random ID for now
-        $payment->setTransactionId($transactionId);
+        $refund = Mage::getModel('klarna/invoice_refund')
+            ->setPayment($payment)
+            ->setAmount($amount)
+            ->refund();
 
-        return parent::refund($payment, $amount);
+        return $this;
     }
 }
