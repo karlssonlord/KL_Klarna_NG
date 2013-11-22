@@ -44,10 +44,12 @@ class KL_Klarna_Model_Invoice extends Mage_Payment_Model_Method_Abstract
     {
         $this->_debug("capture");
 
-        $transactionId = uniqid(); // Just a random ID for now
-        $payment->setTransactionId($transactionId);
+        $capture = Mage::getModel('klarna/invoice_capture')
+            ->setPayment($payment)
+            ->setAmount($amount)
+            ->capture();
 
-        return parent::capture($payment, $amount);
+        return $this;
     }
 
     public function cancel(Varien_Object $payment)

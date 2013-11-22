@@ -88,7 +88,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         $this->setData($dataKey, $klarnaAddress);
     }
 
-    public function createReservation()
+    public function setupReservation()
     {
         $this->api()->setAddress(KlarnaFlags::IS_BILLING, $this->getBillingAddress());
         $this->api()->setAddress(KlarnaFlags::IS_SHIPPING, $this->getShippingAddress());
@@ -110,11 +110,30 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
                 KlarnaFlags::INC_VAT
             );
         }
+    }
+
+    public function createReservation() {
+        $this->setupReservation();
 
         $result = $this->api()->reserveAmount(
             $this->getNationalId(),
             null,   // Gender
             -1,     // -1 = Calculate amount from items
+            KlarnaFlags::NO_FLAG,   // I have no idea
+            KlarnaPClass::INVOICE   // Sounds reasonable
+        );
+
+        return $result;
+    }
+
+    public function activateReservation() {
+        $this->setupReservation();
+
+        $result = $this->api()->activateReservation(
+            $this->getNationalId(),
+            $this->getReservationNumber(),
+            null,   // Gender
+            null,   // OCR (if there is a reserved OCR)
             KlarnaFlags::NO_FLAG,   // I have no idea
             KlarnaPClass::INVOICE   // Sounds reasonable
         );
