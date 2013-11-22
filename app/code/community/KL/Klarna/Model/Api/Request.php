@@ -141,6 +141,14 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         return $result;
     }
 
+    public function cancelReservation() {
+        $result = $this->api()->cancelReservation(
+            $this->getReservationNumber()
+        );
+
+        return $result;
+    }
+
     public function creditInvoice() {
         $result = $this->api()->creditInvoice(
             $this->getInvoiceId(),

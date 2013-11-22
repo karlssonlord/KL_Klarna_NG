@@ -55,7 +55,12 @@ class KL_Klarna_Model_Invoice extends Mage_Payment_Model_Method_Abstract
     public function cancel(Varien_Object $payment)
     {
         $this->_debug("cancel");
-        return parent::cancel($payment);
+
+        $cancellation = Mage::getModel('klarna/invoice_cancel')
+            ->setPayment($payment)
+            ->cancel();
+
+        return $this;
     }
 
     public function void(Varien_Object $payment)
