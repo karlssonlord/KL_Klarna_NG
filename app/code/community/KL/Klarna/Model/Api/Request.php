@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This class wraps Klarna's PHP library in a more "lazy" interface. Rather
+ * than the procedural mess Klarna suggest in their documentation, you can
+ * instantiate this class and add information about the transaction in (almost)
+ * any order. When you call one of the request methods, this class will handle
+ * the procedural mess for you. This prevents most of Klarna's bad design from
+ * leaking into your code.
+ */
+
 require_once('Klarna/2.4.3/Klarna.php');
 require_once('Klarna/2.4.3/transport/xmlrpc-3.0.0.beta/lib/xmlrpc.inc');
 require_once('Klarna/2.4.3/transport/xmlrpc-3.0.0.beta/lib/xmlrpc_wrappers.inc');
@@ -38,6 +47,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
             $products = array();
         }
 
+        // Get a decorated object for the current product type
         $klarnaProduct = Mage::getModel("klarna/api_product")->forProduct($product);
         array_push($products, $klarnaProduct);
 
@@ -50,6 +60,10 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
     {
         $this->setAddress('billing_address', $address);
 
+        /*
+         * Use the billing address to set country and language for the
+         * transaction, or else we can't instantiate Klarna.
+         */
         $klarnaCountry = KlarnaCountry::fromCode($address->getCountry());
         $klarnaLanguage = KlarnaCountry::getLanguage($klarnaCountry);
         $this->setCountry($klarnaCountry);

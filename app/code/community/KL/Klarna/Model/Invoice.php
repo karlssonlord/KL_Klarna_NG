@@ -1,4 +1,12 @@
 <?php
+
+/*
+ * This class defines a Magento payment method for Klarna Invoice. In order
+ * to keep this class reasonably short and concise, most methods are delegated
+ * to method objects. This helps keep responsibilities clear and should also
+ * help with testing.
+ */
+
 class KL_Klarna_Model_Invoice extends Mage_Payment_Model_Method_Abstract
 {
     protected $_code = "klarna_invoice";

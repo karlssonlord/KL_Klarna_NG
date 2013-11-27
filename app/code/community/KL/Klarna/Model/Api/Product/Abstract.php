@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * This class and its subclasses wrap around a Magento order item and exposes
+ * methods to retrieve the data needed to create a reservation.
+ */
+
 class KL_Klarna_Model_Api_Product_Abstract extends Varien_Object
 {
     public function getQuantity()
