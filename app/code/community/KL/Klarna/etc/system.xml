@@ -27,6 +27,22 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </title>
+                        <merchant_id translate="label">
+                            <label>Merchant id</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </merchant_id>
+                        <shared_secret translate="label">
+                            <label>Shared secret</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>22</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </shared_secret>
                         <live translate="label">
                             <label>Live mode</label>
                             <frontend_type>select</frontend_type>
