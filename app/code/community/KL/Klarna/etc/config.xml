@@ -5,6 +5,22 @@
             <version>0.1.0</version>
         </KL_Klarna>
     </modules>
+    <klarna>
+        <countries>
+            <se>
+                <code>SE</code>
+                <currency>SEK</currency>
+                <name>Sweden</name>
+                <can_search_address>1</can_search_address>
+            </se>
+            <fi>
+                <code>FI</code>
+                <currency>EUR</currency>
+                <name>Finland</name>
+                <can_search_address>0</can_search_address>
+            </fi>
+        </countries>
+    </klarna>
     <global>
         <helpers>
             <klarna>

@@ -26,8 +26,7 @@ class KL_Klarna_Model_Invoice extends Mage_Payment_Model_Method_Abstract
 
     public function canUseForCountry($countryCode)
     {
-        $this->_debug(array("canUseForCountry", $countryCode));
-        return parent::canUseForCountry($countryCode);
+        return Mage::getModel('klarna/api_countries')->getCountry($countryCode);
     }
 
     public function canUseForCurrency($currencyCode)
