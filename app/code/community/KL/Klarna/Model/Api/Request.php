@@ -38,19 +38,37 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         return $this;
     }
 
+    public function getProducts()
+    {
+        if (!parent::getProducts()) {
+            $this->setProducts(array());
+        }
+
+        return parent::getProducts();
+    }
+
     public function addProduct($product)
     {
-        if ($this->getProducts()) {
-            $products = $this->getProducts();
-        }
-        else {
-            $products = array();
-        }
+        $products = $this->getProducts();
 
         // Get a decorated object for the current product type
         $klarnaProduct = Mage::getModel("klarna/api_product")->forProduct($product);
         array_push($products, $klarnaProduct);
 
+        $this->setProducts($products);
+
+        return $this;
+    }
+
+    public function addShippingFee($amount, $taxAmount, $description)
+    {
+        $shippingFee = Mage::getModel("klarna/api_product_shippingfee");
+        $shippingFee->setAmount($amount);
+        $shippingFee->setTaxAmount($taxAmount);
+        $shippingFee->setDescription($description);
+
+        $products = $this->getProducts();
+        array_push($products, $shippingFee);
         $this->setProducts($products);
 
         return $this;
@@ -121,7 +139,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
                 $product->getPriceInclTax(),
                 $product->getTaxPercent(),
                 $product->getDiscountPercent(),
-                KlarnaFlags::INC_VAT
+                $product->getFlags()
             );
         }
     }

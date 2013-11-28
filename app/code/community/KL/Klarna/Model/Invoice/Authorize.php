@@ -15,6 +15,11 @@ class KL_Klarna_Model_Invoice_Authorize extends KL_Klarna_Model_Invoice_Abstract
         $this->request()->setBillingAddress($order->getBillingAddress());
         $this->request()->setShippingAddress($order->getShippingAddress());
         $this->request()->addProducts($products);
+        $this->request()->addShippingfee(
+            $order->getShippingAmount(),
+            $order->getShippingTaxAmount(),
+            $order->getShippingDescription()
+        );
 
         $result = $this->request()->createReservation();
 
