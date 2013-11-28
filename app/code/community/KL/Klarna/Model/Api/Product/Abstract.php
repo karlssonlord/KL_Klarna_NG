@@ -36,7 +36,7 @@ class KL_Klarna_Model_Api_Product_Abstract extends Varien_Object
 
     public function getDiscountPercent()
     {
-        return 0;
+        return $this->getProduct()->getDiscountPercent();
     }
 
     public function getFlags()

@@ -19,17 +19,6 @@ the Klarna client with the details.
 See `KL_Klarna_Model_Api_Request`, methods `getPclassStorage()` and
 `getPclassStorageUri()`.
 
-## Discounts
-
-No support for discounts is implemented yet. The decorator classes for
-products, `KL_Klarna_Model_Api_Product_*` respond to a
-`getDiscountPercent()` message. It currently returns 0, but should be
-modified to return the correct discount *percentage* for each product.
-
-It may suffice to implement this in the abstract class, but if certain
-Magento product types deal with discounts differently, it needs to be
-overridden in the respective product type class.
-
 ## Partial captures and refunds
 
 There is currently no support for partial captures and refunds. For this
