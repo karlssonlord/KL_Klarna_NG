@@ -4,7 +4,7 @@ class KL_Klarna_Model_Api_Product_Shippingfee extends Kl_Klarna_Model_Api_Produc
 {
     public function getPriceInclTax()
     {
-        return $this->getData("amount");
+        return $this->getAmount() + $this->getTaxAmount();
     }
 
     public function getTaxPercent()
