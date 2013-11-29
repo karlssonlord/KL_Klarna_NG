@@ -39,7 +39,7 @@ class KL_Klarna_Model_Payment extends Mage_Payment_Model_Method_Abstract
     {
         $this->_debug("authorize");
 
-        $authorization = Mage::getModel('klarna/invoice_authorize')
+        $authorization = $this->getMethodObject('authorize')
             ->setPayment($payment)
             ->setAmount($amount)
             ->authorize();
@@ -51,7 +51,7 @@ class KL_Klarna_Model_Payment extends Mage_Payment_Model_Method_Abstract
     {
         $this->_debug("capture");
 
-        $capture = Mage::getModel('klarna/invoice_capture')
+        $capture = $this->getMethodObject('capture')
             ->setPayment($payment)
             ->setAmount($amount)
             ->capture();
@@ -63,7 +63,7 @@ class KL_Klarna_Model_Payment extends Mage_Payment_Model_Method_Abstract
     {
         $this->_debug("cancel");
 
-        $cancellation = Mage::getModel('klarna/invoice_cancel')
+        $cancellation = $this->getMethodObject('cancel')
             ->setPayment($payment)
             ->cancel();
 
@@ -80,7 +80,7 @@ class KL_Klarna_Model_Payment extends Mage_Payment_Model_Method_Abstract
     {
         $this->_debug("refund");
 
-        $refund = Mage::getModel('klarna/invoice_refund')
+        $refund = $this->getMethodObject('refund')
             ->setPayment($payment)
             ->setAmount($amount)
             ->refund();
@@ -91,9 +91,17 @@ class KL_Klarna_Model_Payment extends Mage_Payment_Model_Method_Abstract
     public function validate()
     {
         $paymentInfo = $this->getInfoInstance();
-        $validation = Mage::getModel('klarna/invoice_validate')
+        $validation = $this->getMethodObject('validate')
             ->setPayment($paymentInfo)
             ->validate();
         return $this;
+    }
+    
+    protected function getMethodObject($methodName)
+    {
+        $methodObject = Mage::getModel('klarna/invoice_' . $methodName);
+        $methodObject->setPaymentMethodInstance($this);
+        
+        return $methodObject;
     }
 }
