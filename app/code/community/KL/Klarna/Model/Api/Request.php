@@ -246,12 +246,19 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
 
     protected function getPclassStorage()
     {
-        return 'json';
+        return 'mysql';
     }
 
     protected function getPclassStorageUri()
     {
-        return '/srv/pclasses.json';
+        $config = Mage::getConfig()->getResourceConnectionConfig("default_setup")->asArray();
+        return array(
+            "user"      => $config["username"],
+            "passwd"    => $config["password"],
+            "dsn"       => $config["host"],
+            "db"        => $config["dbname"],
+            "table"     => "klarna_pclass"
+        );
     }
 
     protected function useSsl()
