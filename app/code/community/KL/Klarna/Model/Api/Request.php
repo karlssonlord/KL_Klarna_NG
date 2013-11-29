@@ -152,7 +152,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
             null,   // Gender
             -1,     // -1 = Calculate amount from items
             KlarnaFlags::NO_FLAG,   // I have no idea
-            KlarnaPClass::INVOICE   // Sounds reasonable
+            $this->getPclass()
         );
 
         return $result;
@@ -167,7 +167,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
             null,   // Gender
             null,   // OCR (if there is a reserved OCR)
             KlarnaFlags::NO_FLAG,   // I have no idea
-            KlarnaPClass::INVOICE   // Sounds reasonable
+            $this->getPclass()
         );
 
         return $result;
