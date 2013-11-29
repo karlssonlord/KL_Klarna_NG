@@ -56,6 +56,12 @@
                 <model>klarna/invoice</model>
                 <payment_action>authorize</payment_action>
             </klarna_invoice>
+            <klarna_partpayment>
+                <title>Klarna Part Payment</title>
+                <active>0</active>
+                <model>klarna/partpayment</model>
+                <payment_action>authorize</payment_action>
+            </klarna_partpayment>
         </payment>
     </default>
 </config>
