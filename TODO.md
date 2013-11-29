@@ -19,6 +19,13 @@ the Klarna client with the details.
 See `KL_Klarna_Model_Api_Request`, methods `getPclassStorage()` and
 `getPclassStorageUri()`.
 
+-- 
+The pclass file, that is used to calculate the monthly cost for campaigns,
+can be downloaded from Klarna Online (www.klarna.com). Go to "view store" 
+in the menu on the left. In the store view, click "Click here to view 
+campaigns" and download the pclass file as a php, asp, asp.net or java file.
+--
+
 ## Partial captures and refunds
 
 There is currently no support for partial captures and refunds. For this
@@ -59,7 +66,12 @@ Important validations:
 * Does the billing country and currency match up? SEK for Sweden, etc.
 * Is there a national ID number present?
 
+Validation of national ID numbers in Validate.php For Sweden asume the 
+that the number has been used to fetch the customer address in the 
+registration fase. 
+- Create differenct regexp for differernt countries
+- Handle Klarna errror codes for
+
 ### authorize & capture
 
 * Use national ID number from checkout (it is hardcoded for now).
-* Add shipping/handling fees.
