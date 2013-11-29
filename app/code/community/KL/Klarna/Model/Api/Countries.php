@@ -21,8 +21,8 @@ class KL_Klarna_Model_Api_Countries
                 return $country;
             }
         }
-
-        return null;
+        // Returns a empty country if no country found by $code
+        return Mage::getModel('klarna/api_country');
     }
 
     public function toOptionArray()

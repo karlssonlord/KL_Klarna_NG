@@ -87,4 +87,13 @@ class KL_Klarna_Model_Invoice extends Mage_Payment_Model_Method_Abstract
 
         return $this;
     }
+
+    public function validate()
+    {
+        $paymentInfo = $this->getInfoInstance();
+        $validation = Mage::getModel('klarna/invoice_validate')
+            ->setPayment($paymentInfo)
+            ->validate();
+        return $this;
+    }
 }
