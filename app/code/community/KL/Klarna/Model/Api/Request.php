@@ -216,7 +216,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
 
     protected function getMerchantId()
     {
-        if ($merchantId = Mage::getStoreConfig('payment/klarna_invoice/merchant_id')) {
+        if ($merchantId = Mage::getStoreConfig('payment/klarna/merchant_id')) {
             return $merchantId;
         }
         else {
@@ -226,7 +226,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
 
     protected function getSharedSecret()
     {
-        if ($sharedSecret = Mage::getStoreConfig('payment/klarna_invoice/shared_secret')) {
+        if ($sharedSecret = Mage::getStoreConfig('payment/klarna/shared_secret')) {
             return $sharedSecret;
         }
         else {
@@ -236,7 +236,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
 
     protected function getServer()
     {
-        if (Mage::getStoreConfigFlag('payment/klarna_invoice/live')) {
+        if (Mage::getStoreConfigFlag('payment/klarna/live')) {
             return Klarna::LIVE;
         }
         else {
