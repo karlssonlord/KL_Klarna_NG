@@ -10,6 +10,8 @@
  */
 
 require_once('Klarna/2.4.3/Klarna.php');
+require_once('Klarna/2.4.3/Country.php');
+require_once('Klarna/2.4.3/Exceptions.php');
 require_once('Klarna/2.4.3/transport/xmlrpc-3.0.0.beta/lib/xmlrpc.inc');
 require_once('Klarna/2.4.3/transport/xmlrpc-3.0.0.beta/lib/xmlrpc_wrappers.inc');
 
@@ -27,6 +29,15 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         }
 
         return $this;
+    }
+
+    public function setCurrencyByCode($code)
+    {
+        try {
+            $this->setData('currency', $code);
+        } catch (Exception $ex) {
+            throw new Exception("Klarna does not support payments in " . $code);
+        }
     }
 
     public function addProducts($products)
@@ -190,17 +201,27 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         return $result;
     }
 
-    protected function api()
+    protected function api(array $params = null)
     {
         if (!$this->getApi()) {
             $api = new Klarna();
 
+            if (!is_null($params)) {
+                $country = $params['country'];
+                $language = $params['language'];
+                $currency = $params['currency'];
+            } else {
+                $country = $this->getCountry();
+                $language = $this->getLanguage();
+                $currency = $this->getCurrency();
+            }
+
             $api->config(
                 $this->getMerchantId(),
                 $this->getSharedSecret(),
-                $this->getCountry(),
-                $this->getLanguage(),
-                $this->getCurrency(),
+                $country,
+                $language,
+                $currency,
                 $this->getServer(),
                 $this->getPclassStorage(),
                 $this->getPclassStorageUri(),
@@ -246,6 +267,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
 
     protected function getPclassStorage()
     {
+        //return 'mysql';
         return 'mysql';
     }
 
@@ -257,7 +279,7 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
             "passwd"    => $config["password"],
             "dsn"       => $config["host"],
             "db"        => $config["dbname"],
-            "table"     => "klarna_pclass"
+            "table"     => "klarna_pclass" // Mage::getSingleton('core/resource')->getTableName('catalog/product');
         );
     }
 
@@ -269,5 +291,15 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
     protected function useRemoteResponseTimeLogging()
     {
         return true;
+    }
+
+    public function getPClasses(array $params)
+    {
+        try {
+            $result = $this->api($params)->fetchPClasses($params['country'], $params['language'], $params['currency']);
+        } catch (KlarnaException $ex) {
+            print $ex->getMessage() . PHP_EOL;
+            $this->debug($ex->getMessage());
+        }
     }
 }
