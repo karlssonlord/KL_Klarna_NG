@@ -49,7 +49,7 @@ $table = $installer->getConnection()
     ->setComment('Klarna PClasses');
 
 // Set old school charset and collate
-$table->setOption('charset', 'latin2');
-$table->setOption('collate', 'latin2_general_ci');
+$table->setOption('charset', 'latin1');
+$table->setOption('collate', 'latin1_swedish_ci');
 
 $installer->getConnection()->createTable($table);
