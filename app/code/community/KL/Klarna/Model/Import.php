@@ -1,11 +1,5 @@
 <?php
 
-require_once('Klarna/2.4.3/Klarna.php');
-require_once('Klarna/2.4.3/Country.php');
-require_once('Klarna/2.4.3/Language.php');
-require_once('Klarna/2.4.3/Currency.php');
-require_once('Klarna/2.4.3/Exceptions.php');
-
 /**
  * Class KL_Klarna_Model_Import
  *

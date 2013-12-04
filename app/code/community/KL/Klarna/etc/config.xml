@@ -31,6 +31,17 @@
         </countries>
     </klarna>
     <global>
+        <events>
+            <admin_system_config_section_save_after>
+                <observers>
+                    <klarna>
+                        <type>singleton</type>
+                        <class>klarna/observer</class>
+                        <method>updateDatabase</method>
+                    </klarna>
+                </observers>
+            </admin_system_config_section_save_after>
+        </events>
         <resources>
             <klarna_setup>
                 <setup>

@@ -1,5 +1,11 @@
 <?php
 
+require_once('Klarna/2.4.3/Klarna.php');
+require_once('Klarna/2.4.3/Country.php');
+require_once('Klarna/2.4.3/Language.php');
+require_once('Klarna/2.4.3/Currency.php');
+require_once('Klarna/2.4.3/Exceptions.php');
+
 class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract {
 
     /**
