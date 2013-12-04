@@ -21,13 +21,6 @@
                 <language>FI</language>
                 <can_search_address>0</can_search_address>
             </fi>
-            <no>
-                <code>NO</code>
-                <currency>NOK</currency>
-                <name>Norway</name>
-                <language>NO</language>
-                <can_search_address>0</can_search_address>
-            </no>
             <dk>
                 <code>DK</code>
                 <currency>DKK</currency>

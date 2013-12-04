@@ -293,10 +293,21 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         return true;
     }
 
+    /**
+     * Fetch PClasses from Klarna if all necessary parameter are set and correct
+     *
+     * @param array $params -This array must contain correct Klarna specific values
+     *
+     */
     public function getPClasses(array $params)
     {
+        if (!isset($params['country']) || !isset($params['language']) || !isset($params['currency'])) {
+            Mage::log(get_class($this) . '::' . __FUNCTION__ . ' Parameters not set');
+            return;
+        }
+
         try {
-            $result = $this->api($params)->fetchPClasses($params['country'], $params['language'], $params['currency']);
+            $this->api($params)->fetchPClasses($params['country'], $params['language'], $params['currency']);
         } catch (KlarnaException $ex) {
             print $ex->getMessage() . PHP_EOL;
             $this->debug($ex->getMessage());
