@@ -11,8 +11,9 @@ $installer->startSetup();
  * Creating table klarna_pclass
  */
 $table = $installer->getConnection()
-    ->newTable($installer->getTable('klarna/pclass'))
-    ->addColumn('eid', Varien_Db_Ddl_Table::TYPE_INTEGER, array(10), array(
+    ->newTable($installer->getTable('klarna/pclass'));
+
+    $table->addColumn('eid', Varien_Db_Ddl_Table::TYPE_INTEGER, array(10), array(
         'nullable' => false
     ), 'E-store ID which refers to your store in Klarna database')
     ->addColumn('id', Varien_Db_Ddl_Table::TYPE_INTEGER, array(10), array(
@@ -46,5 +47,9 @@ $table = $installer->getConnection()
         'nullable' => false,
     ), 'Expire date')
     ->setComment('Klarna PClasses');
+
+// Set old school charset and collate
+$table->setOption('charset', 'latin2');
+$table->setOption('collate', 'latin2_general_ci');
 
 $installer->getConnection()->createTable($table);
