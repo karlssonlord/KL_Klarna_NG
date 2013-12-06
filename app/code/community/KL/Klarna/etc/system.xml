@@ -46,6 +46,27 @@
                         </debug>
                     </fields>
                 </klarna>
+
+                <klarna_pclass translate="label" module="klarna">
+                    <label>Klarna PClasses</label>
+                    <sort_order>105</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <buttons translate="label">
+                            <label>PClasses</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>klarna/adminhtml_pclasses</frontend_model>
+                            <sort_order>3</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_store>1</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <comment>Submit the form and view or update your PClasses.</comment>
+                        </buttons>
+                    </fields>
+                </klarna_pclass>
+
                 <klarna_invoice translate="label" module="klarna">
                     <label>Klarna Invoice</label>
                     <sort_order>110</sort_order>

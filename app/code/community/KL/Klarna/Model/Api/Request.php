@@ -297,13 +297,14 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
      * Fetch PClasses from Klarna if all necessary parameter are set and correct
      *
      * @param array $params -This array must contain correct Klarna specific values
-     *
+     * @return string - Error messages if any
      */
     public function getPClasses(array $params)
     {
+        $errors = false;
         if (!isset($params['country']) || !isset($params['language']) || !isset($params['currency'])) {
             Mage::log(get_class($this) . '::' . __FUNCTION__ . ' Parameters not set');
-            return;
+            return Mage::helper('klarna')->__("Can't get PClasses, parameters missing for Klarna API");
         }
 
         try {
@@ -311,6 +312,8 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         } catch (KlarnaException $ex) {
             print $ex->getMessage() . PHP_EOL;
             $this->debug($ex->getMessage());
+            $errors = Mage::helper('klarna')->__('Error occurred when fetching Klarna PClasses, se log file for details.');
         }
+        return $errors;
     }
 }

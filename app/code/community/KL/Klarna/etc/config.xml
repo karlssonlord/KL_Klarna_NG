@@ -69,8 +69,16 @@
                 </entities>
             </klarna_resource>
         </models>
+        <blocks>
+            <klarna>
+                <class>KL_Klarna_Block</class>
+            </klarna>
+        </blocks>
     </global>
     <adminhtml>
+        <rewrite>
+            <pclasses>KL_Klarna_Block_Adminhtml_Pclasses</pclasses>
+        </rewrite>
         <translate>
             <modules>
                 <klarna>
@@ -81,6 +89,22 @@
             </modules>
         </translate>
     </adminhtml>
+
+    <!-- START Admin router -->
+    <!-- http://klarna.dev/index.php/admin/payment/index -->
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <payment after="Mage_Adminhtml">KL_Klarna_Adminhtml</payment>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+    <!-- END Admin router -->
+
     <default>
         <payment>
             <klarna>
