@@ -27,7 +27,7 @@ class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract
      * Get all countries that are defined for the payment types. Populate and return a array with
      * corresponding Klarna specific codes for country, language and currency.
      *
-     * @return array $params Array with Klarna specific data for defined countries
+     * @return array $params Array with Klarna specific data for defined countries and error messages if any
      */
     public function getDefinedCountriesCredentials()
     {
@@ -75,7 +75,25 @@ class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract
         // If something went pear shaped, silently log error messages to system log
         $this->_logKlarnaApiErrors($errors);
 
-        return $params;
+        return array(
+            'params' => $params,
+            'errors' => array_filter($errors),
+        );
+
+    }
+
+    /**
+     * Get PClasses stored in database
+     *
+     * @return array All stored PClasses
+     */
+    public function getPclasses()
+    {
+        $sql = 'SELECT * FROM klarna_pclass order by country';
+        // Get database connection
+        $connection = Mage::getSingleton('core/resource')->getConnection('core_read');
+        // Execute query
+        return $connection->fetchAll($sql);
     }
 
 

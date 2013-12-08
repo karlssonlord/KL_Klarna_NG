@@ -15,18 +15,20 @@ class KL_Klarna_Model_Import extends KL_Klarna_Model_Api_Request
      */
     public function run()
     {
-        $errors = array();
         // Get all defined countries and get all pclasses from the Klarna helper class
         /* @var $klarnaHelper KL_Klarna_Helper_Klarna */
         $klarnaHelper = Mage::helper('klarna/klarna');
 
-        $definedCountries = $klarnaHelper->getDefinedCountriesCredentials();
+        $credentials = $klarnaHelper->getDefinedCountriesCredentials();
+        $definedCountries = $credentials['params'];
+        $errors = $credentials['errors'];
 
         // Get PClasses for defined countries
         foreach ($definedCountries as $definedCountry) {
             $errors[] = $this->getPClasses($definedCountry);
         }
-        return $errors;
+
+        return array_filter($errors);
     }
 
 }

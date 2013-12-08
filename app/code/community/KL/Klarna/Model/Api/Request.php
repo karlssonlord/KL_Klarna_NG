@@ -310,7 +310,6 @@ class KL_Klarna_Model_Api_Request extends Varien_Object
         try {
             $this->api($params)->fetchPClasses($params['country'], $params['language'], $params['currency']);
         } catch (KlarnaException $ex) {
-            print $ex->getMessage() . PHP_EOL;
             $this->debug($ex->getMessage());
             $errors = Mage::helper('klarna')->__('Error occurred when fetching Klarna PClasses, se log file for details.');
         }
