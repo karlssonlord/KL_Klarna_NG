@@ -24,6 +24,20 @@ class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Return an error array with an appropriate message
+     *
+     * @param $message
+     * @return array
+     */
+    private static function _returnErrorArray($message)
+    {
+        return array(
+            'countries' => null,
+            'errors' => Mage::helper('klarna')->__($message),
+        );
+    }
+
+    /**
      * Get all countries that are defined for the payment types. Populate and return a array with
      * corresponding Klarna specific codes for country, language and currency.
      *
@@ -31,19 +45,19 @@ class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract
      */
     public function getDefinedCountriesCredentials()
     {
+        // No payment types defined
         if (empty($this->definedPaymentTypes)) {
-            return array();
+            return self::_returnErrorArray("No payment types are defined");
         }
 
-        $params = array();
+        $countries = array();
         $errors = array();
-
         // Get all defined countries and load data
         $enabledCountries = $this->_getDefinedCountries();
 
         // Nothing to process, gtfo
-        if (empty($enabledCountries[0])) {
-            return array();
+        if (empty($enabledCountries) || empty($enabledCountries[0])) {
+            return self::_returnErrorArray("No countries are enabled");
         }
 
         // Right, let's get some klarna specific values
@@ -64,7 +78,7 @@ class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract
              * exception, get data for the rest of the countries anyway
              */
             if (!is_null($klarnaCountry) && !is_null($klarnaLanguage) && !is_null($klarnaCurrency)) {
-                $params[] = array(
+                $countries[] = array(
                     'country' => $klarnaCountry,
                     'language' => $klarnaLanguage,
                     'currency' => $klarnaCurrency,
@@ -76,7 +90,7 @@ class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract
         $this->_logKlarnaApiErrors($errors);
 
         return array(
-            'params' => $params,
+            'countries' => $countries,
             'errors' => array_filter($errors),
         );
 
@@ -106,6 +120,8 @@ class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract
     private function _getDefinedCountries()
     {
         $countries = array();
+        $enabledCountries = array();
+
         foreach ($this->definedPaymentTypes as $paymentType) {
             $paymentTypeCountries = $this->_getKlarnaInvoiceDefinedCountries($paymentType);
             $countries = array_filter(array_unique(array_merge($countries, $paymentTypeCountries)));
@@ -113,9 +129,21 @@ class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract
 
         // Get country data from config.xml file
         foreach ($countries as $country) {
-            $enabledCountries[] = Mage::getModel("klarna/api_countries")->getCountry($country)->getData();
+            $data = Mage::getModel("klarna/api_countries")->getCountry($country)->getData();;
+
+            // If the country can't be found, set empty values and let the error logic handle it.
+            if (empty($data)) {
+                $data = array(
+                    'code' => $country,
+                    'currency' => '',
+                    'name' => '',
+                    'language' => '',
+                    'can_search_address' => 0
+                );
+            }
+            $enabledCountries[] = $data;
         }
-        return $enabledCountries;
+        return array_filter($enabledCountries);
     }
 
     /**
@@ -129,7 +157,8 @@ class KL_Klarna_Helper_Klarna extends Mage_Core_Helper_Abstract
     public function updatePClassesDatabaseAfterSave()
     {
         $countryIds = array();
-        $definedCountries = $this->getDefinedCountriesCredentials();
+        $credentials = $this->getDefinedCountriesCredentials();
+        $definedCountries = isset($credentials['countries']) ? $credentials['countries'] : array();
 
         // If there's no country pclasses to delete, just return
         if (empty($definedCountries)) {

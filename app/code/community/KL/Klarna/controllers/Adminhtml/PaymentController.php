@@ -20,19 +20,24 @@ class KL_Klarna_Adminhtml_PaymentController extends Mage_Adminhtml_Controller_Ac
      */
     public function updateAction()
     {
-        $errors = Mage::getModel('klarna/import')->run();
-        // Set success or error message
-        if (count($errors)) {
+        $errorMessages = Mage::getModel('klarna/import')->run();
+        
+        /**
+         * If errorMessages is set display error message
+         */
+        if (count($errorMessages)) {
             $message = '';
-            foreach ($errors as $error) {
-                $message .= $error;
+            foreach ($errorMessages as $error) {
+                $message .= $error . " ";
             }
+            $message .= '.' . Mage::helper('klarna')->__(' Check the config.xml file');
             Mage::getSingleton('adminhtml/session')->addError($message);
         } else {
             $message = $this->__('PClasses has been updated successfully!');
             Mage::getSingleton('adminhtml/session')->addSuccess($message);
         }
 
+        $message = null;
         $this->_redirectReferer();
     }
 
