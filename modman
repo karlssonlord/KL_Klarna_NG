@@ -1,3 +1,4 @@
-app/etc/modules/*.xml                                       app/etc/modules/
-app/code/community/KL/Klarna/*                              app/code/community/KL/Klarna/
-lib/Klarna/*                                                lib/Klarna/
+app/etc/modules/*.xml                       app/etc/modules/
+app/code/community/KL/Klarna/*              app/code/community/KL/Klarna/
+lib/Klarna/*                                lib/Klarna/
+app/design/frontend/base/default/template/* app/design/frontend/base/default/template/
