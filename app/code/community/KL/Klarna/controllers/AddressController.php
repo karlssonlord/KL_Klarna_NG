@@ -2,6 +2,12 @@
 
 class KL_Klarna_AddressController extends Mage_Core_Controller_Front_Action {
 
+    protected function jsonReponse($jsonData)
+    {
+        $this->getResponse()->setHeader('Content-type', 'application/json');
+        $this->getResponse()->setBody($jsonData);
+    }
+
     /**
      * Frontend controller for fetching address data
      *
@@ -20,7 +26,7 @@ class KL_Klarna_AddressController extends Mage_Core_Controller_Front_Action {
          * If no social security number was given, exit with an error message
          */
         if ( ! $ssn ) {
-            Mage::helper('klarna/json')->error($this->__('Missing social security number'));
+            return $this->jsonReponse(Mage::helper('klarna/json')->error($this->__('Missing social security number')));
         }
 
         /**
@@ -30,10 +36,10 @@ class KL_Klarna_AddressController extends Mage_Core_Controller_Front_Action {
             ->fetch($ssn);
 
         if ( $addresses && is_array($addresses) ) {
-            Mage::helper('klarna/json')->success($addresses);
+            return $this->jsonReponse(Mage::helper('klarna/json')->success($addresses));
         }
 
-        Mage::helper('klarna/json')->error( $this->__('Unable to fetch address information') );
+        return $this->jsonReponse(Mage::helper('klarna/json')->error($this->__('Unable to fetch address information')));
     }
 
 }
