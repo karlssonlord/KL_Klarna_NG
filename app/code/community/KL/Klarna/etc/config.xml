@@ -15,6 +15,13 @@
                 </args>
             </modulename>
         </routers>
+        <layout>
+            <updates>
+                <klarna module="kl_klarna">
+                    <file>kl_klarna.xml</file>
+                </klarna>
+            </updates>
+        </layout>
     </frontend>
     <global>
         <blocks>
@@ -63,19 +70,21 @@
         <payment>
             <klarna>
                 <live>0</live>
-                <debug>0</debug>
+                <debug>1</debug>
             </klarna>
             <klarna_invoice>
                 <title>Klarna Invoice</title>
                 <active>0</active>
                 <model>klarna/payment_invoice</model>
                 <payment_action>authorize</payment_action>
+                <fee>0</fee>
             </klarna_invoice>
             <klarna_partpayment>
                 <title>Klarna Part Payment</title>
                 <active>0</active>
                 <model>klarna/payment_partpayment</model>
                 <payment_action>authorize</payment_action>
+                <fee>0</fee>
             </klarna_partpayment>
             <klarna_specpayment>
                 <active>0</active>
