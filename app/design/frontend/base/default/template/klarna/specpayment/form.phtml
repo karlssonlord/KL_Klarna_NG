@@ -1,7 +1,7 @@
 <ul class="form-list" id="payment_form_<?php print $this->getMethodCode(); ?>" style="display:none;">
     <li>
         <span class="klarna_box_top_agreement"></span>
-        <input type="text" class="klarna_ssn" id="<?php print $this->getMethodCode(); ?>_ssn" name="payment[<?php print $this->getMethodCode(); ?>_ssn]" class="input-text" value=""/>
+        <input type="hidden" class="klarna_ssn" id="<?php print $this->getMethodCode(); ?>_ssn" name="payment[<?php print $this->getMethodCode(); ?>_ssn]" class="input-text" value=""/>
         <span class="klarna_box_top_agreement" id="klarna_special_terms"></span>
         <script>
             var terms = new Klarna.Terms.Special({

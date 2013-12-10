@@ -10,6 +10,9 @@ class KL_Klarna_Helper_Sanitize {
     protected $_allowedKeys = array(
         'method',
         'klarna_invoice_ssn',
+        'klarna_partpayment_ssn',
+        'klarna_partpayment_ssn',
+        'klarna_specpayment_ssn'
     );
 
     /**
