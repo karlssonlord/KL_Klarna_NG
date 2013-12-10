@@ -59,4 +59,51 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
      */
     protected $_canSaveCc = false;
 
+    /**
+     * Store data from frontend in the database
+     *
+     * @param mixed $data
+     * @return Mage_Payment_Model_Info|void
+     */
+    public function assignData($data)
+    {
+
+        $this->data = $data;
+
+        /**
+         * Make sure it's an Varien_Object
+         */
+        if ( ! ($this->data instanceof Varien_Object) ) {
+            $this->data = new Varien_Object($this->data);
+        }
+
+        /**
+         * Fetch the info instance
+         */
+        $info = $this->getInfoInstance();
+
+        /**
+         * Convert data to be stored as an array
+         */
+        $additionalInformation = $this->data->getData();
+
+        /**
+         * Sanitize the data
+         */
+        $additionalInformation = Mage::helper('klarna/sanitize')->arr($additionalInformation);
+
+        /**
+         * Store in database
+         */
+        foreach ($additionalInformation as $key => $value) {
+            $info
+                ->unsAdditionalInformation($key)
+                ->setAdditionalInformation($key, $value);
+        }
+
+
+        Mage::log($data->getData());
+        Mage::log($additionalInformation);
+    }
+
 }

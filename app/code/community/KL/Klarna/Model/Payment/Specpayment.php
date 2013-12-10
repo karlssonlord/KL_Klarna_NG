@@ -3,6 +3,8 @@
 class KL_Klarna_Model_Payment_Specpayment extends KL_Klarna_Model_Payment_Abstract {
 
     protected $_code = 'klarna_specpayment';
+    protected $_formBlockType = 'klarna/specpayment_form';
+    protected $_infoBlockType = 'klarna/specpayment_info';
 
     public function getTitle()
     {
