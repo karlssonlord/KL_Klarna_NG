@@ -5,6 +5,17 @@
             <version>0.1.0</version>
         </KL_Klarna>
     </modules>
+    <frontend>
+        <routers>
+            <modulename>
+                <use>standard</use>
+                <args>
+                    <module>KL_Klarna</module>
+                    <frontName>klarna</frontName>
+                </args>
+            </modulename>
+        </routers>
+    </frontend>
     <klarna>
         <countries>
             <se>
