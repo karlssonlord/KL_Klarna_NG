@@ -68,18 +68,18 @@
             <klarna_invoice>
                 <title>Klarna Invoice</title>
                 <active>0</active>
-                <model>klarna/invoice</model>
+                <model>klarna/payment_invoice</model>
                 <payment_action>authorize</payment_action>
             </klarna_invoice>
             <klarna_partpayment>
                 <title>Klarna Part Payment</title>
                 <active>0</active>
-                <model>klarna/partpayment</model>
+                <model>klarna/payment_partpayment</model>
                 <payment_action>authorize</payment_action>
             </klarna_partpayment>
             <klarna_specpayment>
                 <active>0</active>
-                <model>klarna/specpayment</model>
+                <model>klarna/payment_specpayment</model>
                 <payment_action>authorize</payment_action>
             </klarna_specpayment>
         </payment>

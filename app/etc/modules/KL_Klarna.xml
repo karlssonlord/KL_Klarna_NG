@@ -5,6 +5,9 @@
             <active>true</active>
             <codePool>community</codePool>
             <version>0.0.1</version>
+            <depends>
+                <Mage_Payment/>
+            </depends>
         </KL_Klarna>
     </modules>
 </config>
