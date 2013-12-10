@@ -4,5 +4,8 @@
         <reference name="head">
             <block type="page/html_head" name="klarna_head" as="klarna_head" template="klarna/checkout/scripts.phtml"/>
         </reference>
+        <reference name="content">
+            <block type="klarna/fetch" name="klarna_fetch_address" as="klarna_fetch_address" before="checkout.payment.methods" template="klarna/address/fetch.phtml"/>
+        </reference>
     </checkout_onepage_index>
 </layout>
