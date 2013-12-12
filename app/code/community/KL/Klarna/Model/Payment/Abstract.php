@@ -101,9 +101,71 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
                 ->setAdditionalInformation($key, $value);
         }
 
+    }
 
-        Mage::log($data->getData());
-        Mage::log($additionalInformation);
+    /**
+     * Validate payment method information object
+     *
+     * @return Mage_Payment_Model_Abstract
+     */
+    public function validate()
+    {
+        /**
+         * Fetch information about the payment data
+         */
+        $paymentInfo = $this->getInfoInstance();
+
+        /**
+         * Fetch additional information
+         */
+        $additionalInformation = $paymentInfo->getAdditionalInformation();
+
+        /**
+         * Check the social security number
+         */
+        $socialSecurityNumber = null;
+        if (isset($additionalInformation[$this->getCode() . '_ssn'])) {
+            $socialSecurityNumber = $additionalInformation[$this->getCode() . '_ssn'];
+        }
+
+        /**
+         * Make sure social security number is set
+         */
+        if (!$socialSecurityNumber) {
+            Mage::throwException($this->__('Social security number not set.'));
+        }
+
+        /**
+         * Make sure payment option is availibe for their country
+         */
+        if ( $paymentInfo instanceof Mage_Sales_Model_Order_Payment ) {
+            $billingCountry = $paymentInfo->getOrder()->getBillingAddress()->getCountryId();
+        } else {
+            $billingCountry = $paymentInfo->getQuote()->getBillingAddress()->getCountryId();
+        }
+
+        Mage::log($billingCountry);
+
+        /**
+         * @todo Validate country
+         * @todo validate address
+         * @todo validate ssn
+         */
+
+
+        Mage::log($this->getCode());
+        Mage::throwException('Validation done, so far so good. Please stop further actions for now. ' . date("H:i:s", time()));
+
+
+        /**
+         * to validate payment method is allowed for billing country or not
+         */
+
+
+        if ( ! $this->canUseForCountry($billingCountry) ) {
+
+        }
+        return $this;
     }
 
 }
