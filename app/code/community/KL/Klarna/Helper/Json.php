@@ -1,6 +1,6 @@
 <?php
 
-class KL_Klarna_Helper_Json extends Mage_Core_Helper_Abstract {
+class KL_Klarna_Helper_Json extends KL_Klarna_Helper_Abstract {
 
     /**
      * Print error message in json format

@@ -1,6 +1,6 @@
 <?php
 
-class KL_Klarna_Helper_Data extends Mage_Core_Helper_Abstract {
+class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
 
     /**
      * Fetch configuration settings for
@@ -60,7 +60,19 @@ class KL_Klarna_Helper_Data extends Mage_Core_Helper_Abstract {
         /**
          * Log to our Magento log file
          */
-        Mage::log($message, null, 'kl_klarna.log', true);
+        Mage::log($message, null, 'kl_klarna.log', $force);
+    }
+
+    /**
+     * Convert Klarna country id to Magento string (ISO 2 char)
+     *
+     * @param $klarnaCountryId
+     *
+     * @return null|string
+     */
+    public function klarnaCountryToMagento($klarnaCountryId)
+    {
+        return KlarnaCountry::getCode($klarnaCountryId);
     }
 
 }

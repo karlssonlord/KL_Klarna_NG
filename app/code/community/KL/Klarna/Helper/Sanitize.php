@@ -1,6 +1,6 @@
 <?php
 
-class KL_Klarna_Helper_Sanitize {
+class KL_Klarna_Helper_Sanitize extends KL_Klarna_Helper_Abstract {
 
     /**
      * Keys we allow to be stored
