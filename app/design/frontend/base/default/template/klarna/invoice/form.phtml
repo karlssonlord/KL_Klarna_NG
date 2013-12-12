@@ -4,6 +4,8 @@
         <input type="hidden" class="klarna_ssn" id="<?php print $this->getMethodCode(); ?>_ssn" name="payment[<?php print $this->getMethodCode(); ?>_ssn]" class="input-text" value=""/>
         <span class="klarna_box_top_agreement" id="klarna_invoice_terms"></span>
         <script>
+            var addressEndpoint = '<?php print $this->getFetchAddressEndpoint(); ?>';
+            var updateAddressEndpoint = '<?php print $this->getUpdateAddressEndpoint(); ?>';
             var terms = new Klarna.Terms.Invoice({
                 el: 'klarna_invoice_terms',
                 eid: '<?php print $this->getEid(); ?>',
