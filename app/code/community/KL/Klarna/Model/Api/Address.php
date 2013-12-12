@@ -42,10 +42,33 @@ class KL_Klarna_Model_Api_Address extends KL_Klarna_Model_Api_Abstract {
             $return = array();
 
             /**
-             * Convert KlarnaAddr objects to array
+             * Convert KlarnaAddr objects to array and change encoding
              */
             foreach ($addresses as $address) {
-                $return[] = $address->toArray();
+
+                /**
+                 * Convert to array
+                 */
+                $addressArray = $address->toArray();
+
+                /**
+                 * Convert ISO-8859-1 characters to UTF-8 and prepare to store hash
+                 */
+                $hash = '';
+                foreach ($addressArray as $key => $value) {
+                    $addressArray[$key] = utf8_encode($value);
+                    $hash .= $addressArray[$key];
+                }
+
+                /**
+                 * Add hash to array
+                 */
+                $addressArray['hash'] = md5($hash);
+
+                /**
+                 * Store in the return array
+                 */
+                $return[] = $addressArray;
             }
 
             /**
