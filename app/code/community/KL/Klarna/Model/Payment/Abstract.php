@@ -124,15 +124,16 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
          * Check the social security number
          */
         $socialSecurityNumber = null;
-        if (isset($additionalInformation[$this->getCode() . '_ssn'])) {
+        if ( isset($additionalInformation[$this->getCode() . '_ssn']) ) {
             $socialSecurityNumber = $additionalInformation[$this->getCode() . '_ssn'];
         }
 
         /**
          * Make sure social security number is set
          */
-        if (!$socialSecurityNumber) {
-            Mage::throwException($this->__('Social security number not set.'));
+        if ( ! $socialSecurityNumber ) {
+            Mage::helper('klarna')->log('Social security number not set.');
+            Mage::throwException(Mage::helper('klarna')->__('Social security number not set.'));
         }
 
         /**
@@ -144,27 +145,19 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
             $billingCountry = $paymentInfo->getQuote()->getBillingAddress()->getCountryId();
         }
 
-        Mage::log($billingCountry);
+        /**
+         * Fetch countries where the payment module is enabled in
+         */
+        $enabledCountries = Mage::helper('klarna')->getConfig('countries', $this->getCode());
+        $enabledCountries = explode(',', $enabledCountries);
 
         /**
-         * @todo Validate country
-         * @todo validate address
-         * @todo validate ssn
+         * Make sure payment option is enabled for this country
          */
-
-
-        Mage::log($this->getCode());
-        Mage::throwException('Validation done, so far so good. Please stop further actions for now. ' . date("H:i:s", time()));
-
-
-        /**
-         * to validate payment method is allowed for billing country or not
-         */
-
-
-        if ( ! $this->canUseForCountry($billingCountry) ) {
-
+        if ( ! in_array($billingCountry, $enabledCountries) ) {
+            Mage::throwException(Mage::helper('klarna')->__('This payment option is not available for this country.'));
         }
+
         return $this;
     }
 
