@@ -10,13 +10,13 @@ class KL_Klarna_Model_Api_Abstract extends Varien_Object {
 
     private $_klarnaApi;
 
+    /**
+     * Fetch Klarna API
+     *
+     * @return Klarna
+     */
     public function getApi()
     {
-
-
-        error_reporting(2047);
-        ini_set('display_errors', 'on');
-
         /**
          * Check if we already has an instance of the API
          */

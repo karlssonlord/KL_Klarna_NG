@@ -1,4 +1,6 @@
 "Missing social security number","Inget personnummer angivet"
 "Unable to fetch address information","Vi kunde inte hämta dina adressuppgifter"
 "Unable to set address","Kunde inte spara adress"
-"Social security number not set.","Personnummer inte satt"
+"Social security number not set","Personnummer inte satt"
+"Reservation missing","Reservation saknas"
+"Reservation number","Reservations-ID"

@@ -59,6 +59,8 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
      */
     protected $_canSaveCc = false;
 
+    protected $data;
+
     /**
      * Store data from frontend in the database
      *
@@ -121,7 +123,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         $additionalInformation = $paymentInfo->getAdditionalInformation();
 
         /**
-         * Check the social security number
+         * Get the social security number
          */
         $socialSecurityNumber = null;
         if ( isset($additionalInformation[$this->getCode() . '_ssn']) ) {
@@ -157,6 +159,109 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         if ( ! in_array($billingCountry, $enabledCountries) ) {
             Mage::throwException(Mage::helper('klarna')->__('This payment option is not available for this country.'));
         }
+
+        return $this;
+    }
+
+    /**
+     * Authorize payment abstract method
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     *
+     * @return Mage_Payment_Model_Abstract
+     */
+    public function authorize(Varien_Object $payment, $amount)
+    {
+        error_reporting(2047);
+        ini_set('display_errors', 'on');
+
+
+        /**
+         * Fetch information about the payment data
+         */
+        $paymentInfo = $this->getInfoInstance();
+
+        /**
+         * Fetch additional information
+         */
+        $additionalInformation = $paymentInfo->getAdditionalInformation();
+
+        /**
+         * Get the social security number
+         */
+        $socialSecurityNumber = null;
+        if ( isset($additionalInformation[$this->getCode() . '_ssn']) ) {
+            $socialSecurityNumber = $additionalInformation[$this->getCode() . '_ssn'];
+        }
+
+        /**
+         * Make sure it's still there
+         */
+        if ( ! $socialSecurityNumber ) {
+            Mage::throwException(
+                Mage::helper('klarna')->__('Social security number not set')
+            );
+        }
+
+        /**
+         * Fetch payment method invoice fee
+         */
+        $fee = Mage::helper('klarna')->getConfig('fee', $this->getCode());
+
+        /**
+         * Fetch the quote
+         */
+        $quote = Mage::getSingleton('checkout/session')->getQuote();
+
+        /**
+         * Add invoice fee to quote
+         */
+        $quote->setData('klarna_fee', $fee);
+
+        /**
+         * Update "grand_total"
+         */
+        $quote->setData('grand_total', ($quote->getData('grand_total') + $fee));
+
+        /**
+         * Save quote
+         */
+        $quote->save();
+
+        /**
+         * Fetch the order
+         */
+        $order = $payment->getOrder();
+
+        /**
+         * Get a new Klarna instance
+         */
+        $klarnaOrderApi = Mage::getModel('klarna/api_order');
+
+        /**
+         * Populare Klarna order object
+         */
+        $klarnaOrderApi->populateFromOrder($order);
+
+        /**
+         * Create reservation
+         */
+        $return = $klarnaOrderApi->createReservation($socialSecurityNumber);
+
+        /**
+         * Since we're here everything went just fine!
+         */
+        $transactionId = $return[0];
+
+        /**
+         * Set Magento payment method transaction
+         */
+        $payment
+            ->setTransactionId($transactionId)
+            ->setIsTransactionClosed(0);
+
+        Mage::log('Sparade trans');
 
         return $this;
     }
