@@ -28,13 +28,11 @@
             <klarna>
                 <class>KL_Klarna_Block</class>
             </klarna>
-
             <adminhtml>
                 <rewrite>
                     <sales_order_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Totals</sales_order_totals>
                 </rewrite>
             </adminhtml>
-
         </blocks>
         <helpers>
             <klarna>
@@ -56,16 +54,47 @@
             </klarna_setup>
         </resources>
         <events>
-            <sales_convert_quote_to_order>
+            <sales_order_save_before>
                 <observers>
                     <klarna_observer>
                         <type>singleton</type>
                         <class>KL_Klarna_Model_Observer</class>
-                        <method>sales_convert_quote_to_order</method>
+                        <method>sales_order_save_before</method>
                     </klarna_observer>
                 </observers>
-            </sales_convert_quote_to_order>
+            </sales_order_save_before>
         </events>
+        <sales>
+            <quote>
+                <totals>
+                    <klarna_total>
+                        <class>KL_Klarna_Model_Totals_Address</class>
+                        <after>shipping</after>
+                        <!-- calculate after these total models -->
+                        <before>grand_total,tax</before>
+                        <!-- calculate before these total models -->
+                    </klarna_total>
+                </totals>
+            </quote>
+            <order_invoice>
+                <totals>
+                    <klarna_total>
+                        <class>KL_Klarna_Model_Totals_Invoice</class>
+                        <after>shipping</after>
+                        <before>grand_total,tax</before>
+                    </klarna_total>
+                </totals>
+            </order_invoice>
+            <order_creditmemo>
+                <totals>
+                    <klarna_total>
+                        <class>KL_Klarna_Model_Totals_Creditmemo</class>
+                        <after>shipping</after>
+                        <before>grand_total,tax</before>
+                    </klarna_total>
+                </totals>
+            </order_creditmemo>
+        </sales>
     </global>
     <klarna>
         <countries>

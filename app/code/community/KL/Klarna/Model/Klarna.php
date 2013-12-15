@@ -10,9 +10,9 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
         $this
             ->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id'))
             ->setSharedSecret(Mage::helper('klarna')->getConfig('shared_secret'))
-            ->setServer(Klarna::BETA)
+            ->setServer(Klarna::BETA) // @todo
             ->setPclassStorage('json')
-            ->setPclassStorageUri('/tmp/pclasses.json')
+            ->setPclassStorageUri('/tmp/pclasses.json') // @tidi
             ->setCountry($this->getCurrentCountry())
             ->setLanguage($this->getCurrentLanguage())
             ->setCurrency($this->getCurrentCurrency())

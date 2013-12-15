@@ -225,7 +225,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         /**
          * Create reservation
          */
-        $return = $klarnaOrderApi->createReservation($socialSecurityNumber, $order->getTotalDue());
+        $return = $klarnaOrderApi->createReservation($socialSecurityNumber, $order->getBaseTotalDue());
 
         /**
          * @todo Magento doesn't see the invoice fee :-( getTotalDue isn't the same as amount autorized.
@@ -265,8 +265,6 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
          */
         $object
             ->setData('klarna_fee', $fee)
-            ->setData('grand_total', ($object->getData('grand_total') + $fee))
-            ->setData('base_grand_total', ($object->getData('base_grand_total') + $fee))
             ->save();
 
         return $object;
