@@ -10,56 +10,83 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
      */
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
+        Mage::helper('klarna')->log('Preparing to collect totals');
+
         /**
          * Let the parent function do it's magic
          */
         parent::collect($address);
 
         /**
-         * Fetch the payment
+         * Fetch the quote
          */
-        $payment = $address->getQuote()->getPayment()->getMethodInstance();
+        $quote = $address->getQuote();
 
         /**
-         * Make sure it's a payment that has a fee and it's a billing address
+         * Fetch the payment if quote exists
          */
-        if ( $address->getAddressType() == 'billing' && $payment->getCode() == 'klarna_invoice' ) {
+        if ( $quote->getId() ) {
 
-            /**
-             * Fetch payment method invoice fee
-             */
-            $fee = Mage::helper('klarna')->getConfig('fee', $payment->getCode());
+            try {
 
-            /**
-             * Add store view currency amount
-             */
-            $this->_addAmount($fee);
+                Mage::helper('klarna')->log('Quote found with ID ' . $quote->getId());
 
-            /**
-             * Add base currency amount
-             */
-            $this->_addBaseAmount($fee);
+                $payment = $quote->getPayment()->getMethodInstance();
 
-            /**
-             * Also store in address for later reference in fetch()
-             */
-            $address->setKlarnaTotal($fee);
-            $address->setBaseKlarnaTotal($fee);
+                /**
+                 * Make sure it's a payment that has a fee and it's a billing address
+                 */
+                if ( $address->getAddressType() == 'billing' && is_object($payment) && $payment->getCode(
+                    ) == 'klarna_invoice'
+                ) {
 
-            /**
-             * Add the fee to the quote object
-             */
-            $address->getQuote()->setData('klarna_fee', $fee);
-        }
+                    Mage::helper('klarna')->log('Updating quote since we\'re using ' . $payment->getCode());
 
-        /**
-         * Remove fee if any other payment option
-         */
-        if ( $payment->getCode() !== 'klarna_invoice' ) {
-            /**
-             * Remove the fee to the quote object
-             */
-            $address->getQuote()->setData('klarna_fee', null);
+                    /**
+                     * Fetch payment method invoice fee
+                     */
+                    $fee = Mage::helper('klarna')->getConfig('fee', $payment->getCode());
+
+                    /**
+                     * Add store view currency amount
+                     */
+                    $this->_addAmount($fee);
+
+                    /**
+                     * Add base currency amount
+                     */
+                    $this->_addBaseAmount($fee);
+
+                    /**
+                     * Also store in address for later reference in fetch()
+                     */
+                    $address->setKlarnaTotal($fee);
+                    $address->setBaseKlarnaTotal($fee);
+
+                    /**
+                     * Add the fee to the quote object
+                     */
+                    $address->getQuote()
+                        ->setKlarnaTotal($fee)
+                        ->setBaseKlarnaTotal($fee);
+
+                    Mage::helper('klarna')->log('Set fee ' . $fee);
+                }
+
+                /**
+                 * Remove fee if any other payment option
+                 */
+                if ( $payment->getCode() !== 'klarna_invoice' ) {
+                    /**
+                     * Remove the fee to the quote object
+                     */
+                    $address->getQuote()
+                        ->setKlarnaTotal(null)
+                        ->setBaseKlarnaTotal(null);
+                }
+            } catch (Exception $e) {
+                Mage::log($e->getMessage());
+            }
         }
 
         return $this;

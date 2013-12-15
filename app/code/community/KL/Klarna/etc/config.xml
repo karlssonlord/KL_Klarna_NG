@@ -2,7 +2,7 @@
 <config>
     <modules>
         <KL_Klarna>
-            <version>0.0.1</version>
+            <version>0.0.2</version>
         </KL_Klarna>
     </modules>
     <frontend>
@@ -54,7 +54,7 @@
             </klarna_setup>
         </resources>
         <events>
-            <sales_order_save_before>
+            <!--sales_order_save_before>
                 <observers>
                     <klarna_observer>
                         <type>singleton</type>
@@ -62,7 +62,7 @@
                         <method>sales_order_save_before</method>
                     </klarna_observer>
                 </observers>
-            </sales_order_save_before>
+            </sales_order_save_before-->
         </events>
         <sales>
             <quote>
@@ -70,9 +70,7 @@
                     <klarna_total>
                         <class>KL_Klarna_Model_Totals_Address</class>
                         <after>shipping</after>
-                        <!-- calculate after these total models -->
                         <before>grand_total,tax</before>
-                        <!-- calculate before these total models -->
                     </klarna_total>
                 </totals>
             </quote>
@@ -95,6 +93,34 @@
                 </totals>
             </order_creditmemo>
         </sales>
+        <fieldsets>
+            <sales_convert_quote>
+                <base_klarna_total>
+                    <to_order>*</to_order>
+                </base_klarna_total>
+                <klarna_total>
+                    <to_order>*</to_order>
+                </klarna_total>
+            </sales_convert_quote>
+            <sales_convert_quote_address>
+                <base_klarna_total>
+                    <to_order>*</to_order>
+                </base_klarna_total>
+                <klarna_total>
+                    <to_order>*</to_order>
+                </klarna_total>
+            </sales_convert_quote_address>
+            <sales_convert_order>
+                <base_klarna_total>
+                    <to_invoice>*</to_invoice>
+                    <to_cm>*</to_cm>
+                </base_klarna_total>
+                <klarna_total>
+                    <to_invoice>*</to_invoice>
+                    <to_cm>*</to_cm>
+                </klarna_total>
+            </sales_convert_order>
+        </fieldsets>
     </global>
     <klarna>
         <countries>
@@ -128,6 +154,8 @@
                 <debug>1</debug>
                 <emailinvoice>1</emailinvoice>
                 <postalinvoice>0</postalinvoice>
+                <klarnajs>1</klarnajs>
+                <address_separator_br>1</address_separator_br>
             </klarna>
             <klarna_invoice>
                 <title>Klarna Invoice</title>
@@ -141,7 +169,6 @@
                 <active>0</active>
                 <model>klarna/payment_partpayment</model>
                 <payment_action>authorize</payment_action>
-                <fee>0</fee>
             </klarna_partpayment>
             <klarna_specpayment>
                 <active>0</active>
@@ -150,11 +177,4 @@
             </klarna_specpayment>
         </payment>
     </default>
-    <fieldsets>
-        <sales_convert_quote>
-            <klarna_feet>
-                <to_order>*</to_order>
-            </klarna_feet>
-        </sales_convert_quote>
-    </fieldsets>
 </config>

@@ -15,8 +15,8 @@ class KL_Klarna_Helper_Totals extends KL_Klarna_Helper_Abstract {
                 $fee = new Varien_Object();
                 $fee->setCode('invoice_fee_excl');
                 $fee->setLabel(Mage::helper('klarna')->__('Invoice fee'));
-                $fee->setBaseValue($block->getOrder()->getData('klarna_fee')); // $baseInvoiceFeeExVat
-                $fee->setValue($block->getOrder()->getData('klarna_fee')); // $invoiceFeeExVat
+                $fee->setBaseValue($block->getOrder()->getData('klarna_base_total')); // $baseInvoiceFeeExVat
+                $fee->setValue($block->getOrder()->getData('klarna_total')); // $invoiceFeeExVat
                 break;
             default:
                 break;
