@@ -16,11 +16,14 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
      * Create reservation
      *
      * @param $socialSecurityNumber
+     * @param $amount
      *
      * @return mixed
      */
-    public function createReservation($socialSecurityNumber)
+    public function createReservation($socialSecurityNumber, $amount = -1)
     {
+        Mage::log( "Reservera: " . $amount );
+
         /**
          * Reserv the amount
          */
@@ -28,14 +31,28 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
             $result = $this->_klarnaOrder->reserveAmount(
                 $socialSecurityNumber, // PNO (Date of birth for DE and NL).
                 null, // Gender.
-                // Amount. -1 specifies that calculation should calculate the amount
-                // using the goods list
-                - 1,
+                $amount, // Amount. -1 specifies that calculation should calculate the amount using the goods list
                 KlarnaFlags::NO_FLAG, // Flags to affect behavior.
-                // -1 notes that this is an invoice purchase, for part payment purchase
-                // you will have a pclass object on which you use getId().
+                // -1 notes that this is an invoice purchase, for part payment purchase you will have a pclass object on which you use getId().
                 KlarnaPClass::INVOICE
             );
+        } catch (KlarnaException $e) {
+            Mage::helper('klarna')->log(
+                Mage::log($e->getCode() . ': ' . $e->getMessage())
+            );
+            Mage::throwException(Mage::helper('klarna')->decode($e->getMessage()));
+        }
+
+        return $result;
+    }
+
+    public function activateReservation($reservationNumber)
+    {
+        /**
+         * Activate the amount
+         */
+        try {
+            $result = $this->_klarnaOrder->activate($reservationNumber);
         } catch (KlarnaException $e) {
             Mage::helper('klarna')->log(
                 Mage::log($e->getCode() . ': ' . $e->getMessage())
@@ -98,5 +115,32 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
 
         return $this;
     }
+
+    public function emailInvoice($invoiceNumber)
+    {
+        try {
+            $this->_klarnaOrder->emailInvoice($invoiceNumber);
+        } catch (KlarnaException $e) {
+            return false;
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function postalInvoice($invoiceNumber)
+    {
+        try {
+            $this->_klarnaOrder->sendInvoice($invoiceNumber);
+        } catch (KlarnaException $e) {
+            return false;
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
 
 }

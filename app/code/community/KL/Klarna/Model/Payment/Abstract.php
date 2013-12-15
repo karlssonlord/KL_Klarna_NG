@@ -173,10 +173,6 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
      */
     public function authorize(Varien_Object $payment, $amount)
     {
-        error_reporting(2047);
-        ini_set('display_errors', 'on');
-
-
         /**
          * Fetch information about the payment data
          */
@@ -195,6 +191,8 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
             $socialSecurityNumber = $additionalInformation[$this->getCode() . '_ssn'];
         }
 
+        Mage::log("Vill " . $amount);
+
         /**
          * Make sure it's still there
          */
@@ -205,34 +203,14 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         }
 
         /**
-         * Fetch payment method invoice fee
+         * Set fee on order
          */
-        $fee = Mage::helper('klarna')->getConfig('fee', $this->getCode());
+        $order = $this->setKlarnaFee($payment->getOrder());
 
         /**
-         * Fetch the quote
+         * Set fee on quote
          */
-        $quote = Mage::getSingleton('checkout/session')->getQuote();
-
-        /**
-         * Add invoice fee to quote
-         */
-        $quote->setData('klarna_fee', $fee);
-
-        /**
-         * Update "grand_total"
-         */
-        $quote->setData('grand_total', ($quote->getData('grand_total') + $fee));
-
-        /**
-         * Save quote
-         */
-        $quote->save();
-
-        /**
-         * Fetch the order
-         */
-        $order = $payment->getOrder();
+        $quote = $this->setKlarnaFee(Mage::getSingleton('checkout/session')->getQuote());
 
         /**
          * Get a new Klarna instance
@@ -247,7 +225,11 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         /**
          * Create reservation
          */
-        $return = $klarnaOrderApi->createReservation($socialSecurityNumber);
+        $return = $klarnaOrderApi->createReservation($socialSecurityNumber, $order->getTotalDue());
+
+        /**
+         * @todo Magento doesn't see the invoice fee :-( getTotalDue isn't the same as amount autorized.
+         */
 
         /**
          * Since we're here everything went just fine!
@@ -261,7 +243,83 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
             ->setTransactionId($transactionId)
             ->setIsTransactionClosed(0);
 
-        Mage::log('Sparade trans');
+        return $this;
+    }
+
+    /**
+     * Update quote or order object with Klarna fee
+     *
+     * @param $object
+     *
+     * @return mixed
+     */
+    public function setKlarnaFee($object)
+    {
+        /**
+         * Fetch payment method invoice fee
+         */
+        $fee = Mage::helper('klarna')->getConfig('fee', $this->getCode());
+
+        /**
+         * Add invoice fee to quote
+         */
+        $object
+            ->setData('klarna_fee', $fee)
+            ->setData('grand_total', ($object->getData('grand_total') + $fee))
+            ->setData('base_grand_total', ($object->getData('base_grand_total') + $fee))
+            ->save();
+
+        return $object;
+    }
+
+    public function capture(Varien_Object $payment, $amount)
+    {
+        $authTrans = $payment->getAuthorizationTransaction();
+
+        /**
+         * Get a new Klarna instance
+         */
+        $klarnaOrderApi = Mage::getModel('klarna/api_order');
+
+        /**
+         * Activate invoice
+         */
+        $result = $klarnaOrderApi->activateReservation($authTrans->getTxnId());
+        $invoiceNumber = $result[1];
+
+        /**
+         * Update payment
+         */
+        $payment
+            ->setAdditionalInformation('klarna_invoice_no', $invoiceNumber);
+
+        /**
+         * Send by e-mail
+         */
+        if ( Mage::helper('klarna')->getConfig('emailinvoice') ) {
+            $result = $klarnaOrderApi
+                ->emailInvoice($invoiceNumber);
+
+            if ( $result ) {
+                $payment->setAdditionalInformation('emailed', 'success');
+            } else {
+                $payment->setAdditionalInformation('emailed', 'failure');
+            }
+        }
+
+        /**
+         * Send by postal
+         */
+        if ( Mage::helper('klarna')->getConfig('postalinvoice') ) {
+            $result = $klarnaOrderApi
+                ->postalInvoice($invoiceNumber);
+
+            if ( $result ) {
+                $payment->setAdditionalInformation('posted', 'success');
+            } else {
+                $payment->setAdditionalInformation('posted', 'failure');
+            }
+        }
 
         return $this;
     }

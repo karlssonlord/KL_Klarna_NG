@@ -28,6 +28,13 @@
             <klarna>
                 <class>KL_Klarna_Block</class>
             </klarna>
+
+            <adminhtml>
+                <rewrite>
+                    <sales_order_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Totals</sales_order_totals>
+                </rewrite>
+            </adminhtml>
+
         </blocks>
         <helpers>
             <klarna>
@@ -90,6 +97,8 @@
             <klarna>
                 <live>0</live>
                 <debug>1</debug>
+                <emailinvoice>1</emailinvoice>
+                <postalinvoice>0</postalinvoice>
             </klarna>
             <klarna_invoice>
                 <title>Klarna Invoice</title>

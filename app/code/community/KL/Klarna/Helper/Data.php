@@ -36,7 +36,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         /**
          * Check if we should do logging or not
          */
-        if ($this->getConfig('debug') == '1') {
+        if ( $this->getConfig('debug') == '1' ) {
             $force = true;
         } else {
             $force = false;
@@ -73,6 +73,20 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
     public function klarnaCountryToMagento($klarnaCountryId)
     {
         return KlarnaCountry::getCode($klarnaCountryId);
+    }
+
+    public function getInvoiceLogo($width = 250, $country = 'SE')
+    {
+        return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/invoice/' . $country . '_invoice_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
+            'merchant_id'
+        );
+    }
+
+    public function getPartpaymentLogo($width = 250, $country = 'SE')
+    {
+        return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/account/' . $country . '_account_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
+            'merchant_id'
+        );
     }
 
 }
