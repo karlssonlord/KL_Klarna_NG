@@ -56,18 +56,7 @@
                 </setup>
             </klarna_setup>
         </resources>
-        <events>
-            <!--sales_order_save_before>
-                <observers>
-                    <klarna_observer>
-                        <type>singleton</type>
-                        <class>KL_Klarna_Model_Observer</class>
-                        <method>sales_order_save_before</method>
-                    </klarna_observer>
-                </observers>
-            </sales_order_save_before-->
-        </events>
-        <sales>
+         <sales>
             <quote>
                 <totals>
                     <klarna_total>
@@ -96,6 +85,17 @@
                 </totals>
             </order_creditmemo>
         </sales>
+        <pdf>
+            <totals>
+                <klarna_total translate="title">
+                    <title>Invoice fee:</title>
+                    <source_field>base_klarna_total</source_field>
+                    <font_size>7</font_size>
+                    <display_zero>0</display_zero>
+                    <sort_order>450</sort_order>
+                </klarna_total>
+            </totals>
+        </pdf>
         <fieldsets>
             <sales_convert_quote_address>
                 <base_klarna_total>
