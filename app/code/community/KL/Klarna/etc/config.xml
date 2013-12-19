@@ -2,7 +2,7 @@
 <config>
     <modules>
         <KL_Klarna>
-            <version>0.0.3</version>
+            <version>0.0.4</version>
         </KL_Klarna>
     </modules>
     <frontend>
@@ -33,7 +33,8 @@
                     <sales_order_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Totals</sales_order_totals>
                 </rewrite>
                 <rewrite>
-                    <sales_order_invoice_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Invoice_Totals</sales_order_invoice_totals>
+                    <sales_order_invoice_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Invoice_Totals
+                    </sales_order_invoice_totals>
                 </rewrite>
             </adminhtml>
         </blocks>
@@ -47,14 +48,34 @@
                 <class>KL_Klarna_Model</class>
                 <resourceModel>klarna_resource</resourceModel>
             </klarna>
+            <klarna_resource>
+                <class>KL_Klarna_Model_Resource</class>
+                <entities>
+                    <pclass>
+                        <table>klarna_pclass</table>
+                    </pclass>
+                </entities>
+            </klarna_resource>
         </models>
         <resources>
             <klarna_setup>
                 <setup>
                     <module>KL_Klarna</module>
-                    <class>KL_Klarna_Model_Resource_Setup</class>
                 </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
             </klarna_setup>
+            <klarna_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </klarna_write>
+            <klarna_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </klarna_read>
         </resources>
         <sales>
             <quote>
