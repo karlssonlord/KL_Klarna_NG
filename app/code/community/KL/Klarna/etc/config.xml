@@ -102,14 +102,6 @@
                     <to_order>*</to_order>
                 </klarna_total>
             </sales_convert_quote>
-            <sales_convert_quote_address>
-                <base_klarna_total>
-                    <to_order>*</to_order>
-                </base_klarna_total>
-                <klarna_total>
-                    <to_order>*</to_order>
-                </klarna_total>
-            </sales_convert_quote_address>
             <sales_convert_order>
                 <base_klarna_total>
                     <to_invoice>*</to_invoice>
