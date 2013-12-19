@@ -151,7 +151,7 @@
                     <klarna>
                         <type>singleton</type>
                         <class>klarna/observer</class>
-                        <method>adminSystemConfigChangedSectionKlarna</method>
+                        <method>adminSystemConfigChangedSectionPayment</method>
                     </klarna>
                 </observers>
             </admin_system_config_changed_section_payment>

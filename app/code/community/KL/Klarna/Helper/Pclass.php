@@ -2,9 +2,16 @@
 
 class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
 
+    /**
+     * Fetch new pclasses from Klarna and store in database
+     *
+     * @return array
+     */
     public function updateDatabase()
     {
-        // truncate existing pclasses
+        /**
+         * Setup array for holding the pclasses
+         */
 
         $allPClasses = array();
 
@@ -43,15 +50,7 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
                             ->setSharedSecret($store->getConfig('payment/klarna/shared_secret'))
                             ->setServer($mode);
 
-                        /**
-                         * Add new pclasses to array
-                         */
-                        foreach ($api->fetch($klarnaModel) as $pclass) {
-                            if ( ! isset($allPClasses[$pclass->getEid() . '-' . $pclass->getId()]) ) {
-                                $allPClasses[$pclass->getEid() . '-' . $pclass->getId()] = $pclass;
-                            }
-                        }
-
+                        $api->fetch($klarnaModel);
                         break;
                     case 'DK':
                         /**
@@ -67,15 +66,7 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
                             ->setSharedSecret($store->getConfig('payment/klarna/shared_secret'))
                             ->setServer($mode);
 
-                        /**
-                         * Add new pclasses to array
-                         */
-                        foreach ($api->fetch($klarnaModel) as $pclass) {
-                            if ( ! isset($allPClasses[$pclass->getEid() . '-' . $pclass->getId()]) ) {
-                                $allPClasses[$pclass->getEid() . '-' . $pclass->getId()] = $pclass;
-                            }
-                        }
-
+                        $api->fetch($klarnaModel);
                         break;
                 }
             }
@@ -86,6 +77,9 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
         return array();
     }
 
+    /**
+     * View stored pclasses in admin
+     */
     public function adminView()
     {
         /**
@@ -155,18 +149,33 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
             );
         }
 
+        /**
+         * Setup template
+         */
         $template = new Mage_Core_Block_Template();
         $template
             ->setTemplate('klarna/pclasses.phtml')
             ->assign('pclasses', $this->addCurrencySign($pclasses, $code, $before));
 
+        /**
+         * Add HTML to session message
+         */
         Mage::getSingleton("core/session")->addNotice(
             $template->renderView()
         );
 
     }
 
-    public function addCurrencySign($pclasses, $sign, $before = false)
+    /**
+     * Add currency signs to amounts
+     *
+     * @param $pclasses
+     * @param $sign
+     * @param bool $before
+     *
+     * @return mixed
+     */
+    private function addCurrencySign($pclasses, $sign, $before = false)
     {
         foreach ($pclasses as $key => $pclass) {
             if ( $before ) {

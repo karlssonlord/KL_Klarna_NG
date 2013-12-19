@@ -24,18 +24,6 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
             $this->setData($key, $value);
             echo $key . " => " . $value . "<br>";
         }
-
-
-
-
-      #  echo '<pre>';
-      #  print_r( $this->getData() );
-       # exit;
-
-        # $this->getServer(),
-        # $this->getPclassStorage(),
-        # $this->getPclassStorageUri(),
-
     }
 
     public function getCurrentServer()
