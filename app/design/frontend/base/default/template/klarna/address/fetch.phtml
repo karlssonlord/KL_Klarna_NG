@@ -1,3 +1,3 @@
 <input type="text" name="klarna_ssn" id="klarna_ssn" value="" /> <input value="Hämta adress" type="button" onClick="fetchKlarnaAddress('klarna_ssn');">
 <div id="klarna_select_address"></div>
-<script>var klarnaAddressGlue = '<?php if (Mage::helper('klarna')->getConfig('address_separator_br') == '1') print '<br />'; else print '\n'; ?>';</script>
+<script>var klarnaAddressGlue = "<?php if (Mage::helper('klarna')->getConfig('address_separator_br') == '1') print '<br />'; else print ', '; ?>";</script>

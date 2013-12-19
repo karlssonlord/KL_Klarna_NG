@@ -29,8 +29,8 @@ function fetchKlarnaAddress(fieldId) {
                 // Setup the address line
                 var addressLine =
                     address.fname + ' ' +
-                    address.lname + ', ' +
-                    address.street + ', ' +
+                    address.lname + klarnaAddressGlue +
+                    address.street + klarnaAddressGlue +
                     address.zip + ' ' + address.city;
 
                 // Build the hidden address fields with hash

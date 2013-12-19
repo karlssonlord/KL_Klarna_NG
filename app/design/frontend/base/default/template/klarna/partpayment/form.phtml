@@ -10,7 +10,7 @@
                 el: 'klarna_account_terms',
                 eid: '<?php print $this->getEid(); ?>',
                 country: '<?php print strtolower($this->getCurrentCountry()); ?>',
-                charge: <?php print Mage::helper('klarna')->getConfig('fee', 'invoice'); ?>,
+                charge: 0,
                 type: 'desktop'
             });
         </script>
