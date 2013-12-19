@@ -36,7 +36,7 @@ class KL_Klarna_Helper_Json extends KL_Klarna_Helper_Abstract {
         /**
          * Print it as json
          */
-        return  json_encode($message);
+        return json_encode($message);
     }
 
 }

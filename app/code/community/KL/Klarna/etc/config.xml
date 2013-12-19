@@ -2,7 +2,7 @@
 <config>
     <modules>
         <KL_Klarna>
-            <version>0.0.2</version>
+            <version>0.0.3</version>
         </KL_Klarna>
     </modules>
     <frontend>
@@ -31,6 +31,9 @@
             <adminhtml>
                 <rewrite>
                     <sales_order_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Totals</sales_order_totals>
+                </rewrite>
+                <rewrite>
+                    <sales_order_invoice_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Invoice_Totals</sales_order_invoice_totals>
                 </rewrite>
             </adminhtml>
         </blocks>
@@ -94,6 +97,14 @@
             </order_creditmemo>
         </sales>
         <fieldsets>
+            <sales_convert_quote_address>
+                <base_klarna_total>
+                    <to_order>*</to_order>
+                </base_klarna_total>
+                <klarna_total>
+                    <to_order>*</to_order>
+                </klarna_total>
+            </sales_convert_quote_address>
             <sales_convert_quote>
                 <base_klarna_total>
                     <to_order>*</to_order>

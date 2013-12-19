@@ -18,6 +18,12 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
         parent::collect($address);
 
         /**
+         * Reset previous values
+         */
+        $this->_setAmount(0);
+        $this->_setBaseAmount(0);
+
+        /**
          * Fetch the quote
          */
         $quote = $address->getQuote();
@@ -34,9 +40,10 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
                 $payment = $quote->getPayment()->getMethodInstance();
 
                 /**
-                 * Make sure it's a payment that has a fee and it's a billing address
+                 * Make sure it's a payment that has a fee and it's a shipping address, otherwise
+                 * the invoice fee won't be added.
                  */
-                if ( $address->getAddressType() == 'billing' && is_object($payment) && $payment->getCode(
+                if ( $address->getAddressType() == 'shipping' && is_object($payment) && $payment->getCode(
                     ) == 'klarna_invoice'
                 ) {
 
@@ -83,6 +90,11 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
                     $address->getQuote()
                         ->setKlarnaTotal(null)
                         ->setBaseKlarnaTotal(null);
+
+                    /**
+                     * @todo Recollect totals?
+                     */
+
                 }
             } catch (Exception $e) {
                 Mage::log($e->getMessage());
@@ -93,7 +105,7 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
     }
 
     /**
-     * Show in cart summary
+     * Show in cart and review summary
      *
      * @param Mage_Sales_Model_Quote_Address $address
      *

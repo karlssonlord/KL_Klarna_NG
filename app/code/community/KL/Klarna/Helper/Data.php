@@ -4,8 +4,9 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
 
     /**
      * Fetch configuration settings for
-     * @param $key
-     * @param $type "invoice", "spec" or "part". Default is "klarna"
+     *
+     * @param string $key Magento setting key
+     * @param string $type "invoice", "spec" or "part". Default is "klarna"
      *
      * @return mixed
      */
@@ -27,19 +28,22 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
     /**
      * Log message to our log files
      *
-     * @param $message mixed
+     * @param mixed $message mixed
+     * @param boolean $force
      *
      * @return void
      */
-    public function log($message)
+    public function log($message, $force = null)
     {
         /**
          * Check if we should do logging or not
          */
-        if ( $this->getConfig('debug') == '1' ) {
-            $force = true;
-        } else {
-            $force = false;
+        if ( is_null($force) ) {
+            if ( $this->getConfig('debug') == '1' ) {
+                $force = true;
+            } else {
+                $force = false;
+            }
         }
 
         /**

@@ -27,12 +27,17 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
     /**
      * Can capture partial amounts online?
      */
-    protected $_canCapturePartial = false;
+    protected $_canCapturePartial = true;
 
     /**
      * Can refund online?
      */
-    protected $_canRefund = false;
+    protected $_canRefund = true;
+
+    /**
+     * Can refund partial
+     */
+    protected $_canRefundInvoicePartial = true;
 
     /**
      * Can void transactions online?
@@ -59,12 +64,16 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
      */
     protected $_canSaveCc = false;
 
+    /**
+     * @var
+     */
     protected $data;
 
     /**
      * Store data from frontend in the database
      *
      * @param mixed $data
+     *
      * @return Mage_Payment_Model_Info|void
      */
     public function assignData($data)
@@ -191,7 +200,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
             $socialSecurityNumber = $additionalInformation[$this->getCode() . '_ssn'];
         }
 
-        Mage::log("Vill " . $amount);
+        Mage::helper('klarna')->log("Vill " . $amount);
 
         /**
          * Make sure it's still there
@@ -249,12 +258,15 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
     /**
      * Update quote or order object with Klarna fee
      *
+     * @todo Is this really needed? Remove otherwise.
+     *
      * @param $object
      *
      * @return mixed
      */
     public function setKlarnaFee($object)
     {
+        return $object;
         /**
          * Fetch payment method invoice fee
          */

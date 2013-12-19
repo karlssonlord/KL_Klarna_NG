@@ -21,5 +21,4 @@ class KL_Klarna_Model_Totals_Invoice extends Mage_Sales_Model_Order_Invoice_Tota
         return $this;
     }
 
-
 }

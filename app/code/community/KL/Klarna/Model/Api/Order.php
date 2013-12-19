@@ -22,10 +22,10 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
      */
     public function createReservation($socialSecurityNumber, $amount = -1)
     {
-        Mage::log( "Reservera: " . $amount );
+        Mage::log("Reservera: " . $amount);
 
         /**
-         * Reserv the amount
+         * Reserve the amount
          */
         try {
             $result = $this->_klarnaOrder->reserveAmount(
@@ -33,8 +33,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
                 null, // Gender.
                 $amount, // Amount. -1 specifies that calculation should calculate the amount using the goods list
                 KlarnaFlags::NO_FLAG, // Flags to affect behavior.
-                // -1 notes that this is an invoice purchase, for part payment purchase you will have a pclass object on which you use getId().
-                KlarnaPClass::INVOICE
+                KlarnaPClass::INVOICE // -1 notes that this is an invoice purchase, for part payment purchase you will have a pclass object on which you use getId().
             );
         } catch (KlarnaException $e) {
             Mage::helper('klarna')->log(
@@ -73,6 +72,13 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
     public function populateFromOrder($order)
     {
         /**
+         * Make sure order object is set
+         */
+        if ( ! is_object($order) || ! is_array($order->getAllVisibleItems()) ) {
+            Mage::throwException(Mage::helper('klarna')->__('No items found in quote!'));
+        }
+
+        /**
          * Loop all products in quote
          */
         foreach ($order->getAllVisibleItems() as $item) {
@@ -85,8 +91,6 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
                 $qty = $item->getQtyOrdered();
             }
 
-            // @todo fetch class tax rate
-
             /**
              * Add the product
              */
@@ -95,7 +99,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
                 $item->getSku(),
                 $item->getName(),
                 $item->getPriceInclTax(),
-                25, // TAX rate
+                $item->getTaxPercent(), // TAX rate
                 0, // Discount
                 KlarnaFlags::INC_VAT
             );
@@ -110,7 +114,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         /**
          * Set shipping address
          */
-        $shippingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna($order->getBillingAddress());
+        $shippingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna($order->getShippingAddress());
         $this->_klarnaOrder->setAddress(KlarnaFlags::IS_SHIPPING, $shippingAddress);
 
         return $this;

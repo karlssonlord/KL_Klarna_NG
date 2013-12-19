@@ -4,7 +4,6 @@ class KL_Klarna_Helper_Totals extends KL_Klarna_Helper_Abstract {
 
     public function addFeeToBlock($block)
     {
-
         $fee = false;
 
         switch ($block->getOrder()->getPayment()->getMethod()) {
@@ -28,7 +27,6 @@ class KL_Klarna_Helper_Totals extends KL_Klarna_Helper_Abstract {
         if ( $fee ) {
             $block->addTotalBefore($fee, 'shipping');
         }
-
 
         return $block;
     }
