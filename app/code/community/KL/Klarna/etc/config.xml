@@ -145,6 +145,17 @@
                 </klarna_total>
             </sales_convert_order>
         </fieldsets>
+        <events>
+            <admin_system_config_changed_section_payment>
+                <observers>
+                    <klarna>
+                        <type>singleton</type>
+                        <class>klarna/observer</class>
+                        <method>adminSystemConfigChangedSectionKlarna</method>
+                    </klarna>
+                </observers>
+            </admin_system_config_changed_section_payment>
+        </events>
     </global>
     <klarna>
         <countries>
@@ -155,13 +166,6 @@
                 <language>SV</language>
                 <can_search_address>1</can_search_address>
             </se>
-            <fi>
-                <code>FI</code>
-                <currency>EUR</currency>
-                <name>Finland</name>
-                <language>FI</language>
-                <can_search_address>0</can_search_address>
-            </fi>
             <dk>
                 <code>DK</code>
                 <currency>DKK</currency>

@@ -1,0 +1,33 @@
+<?php if ( count($pclasses) ): ?>
+    <table class="pclassTable">
+        <tr>
+            <th>Country</th>
+            <th>PClass ID</th>
+            <th>Merchant ID</th>
+            <th>Description</th>
+            <th>Expiry date</th>
+            <th>Months</th>
+            <th>Start fee</th>
+            <th>Invoice fee</th>
+            <th>Interest rate</th>
+            <th>Minimum amount</th>
+        </tr>
+        <?php foreach ($pclasses AS $pclass): ?>
+            <tr>
+                <?php $country = strtolower($pclass["country"]); ?>
+                <td><?php print $pclass['country']; ?></td>
+                <td><?php print $pclass['id']; ?></td>
+                <td><?php print $pclass['eid']; ?></td>
+                <td><?php print $pclass['description']; ?></td>
+                <td><?php print $pclass['expiryDate']; ?></td>
+                <td><?php print $pclass['months']; ?></td>
+                <td><?php print $pclass['startFee']; ?></td>
+                <td><?php print $pclass['invoiceFee']; ?></td>
+                <td><?php print $pclass['interestRate']; ?></td>
+                <td><?php print $pclass['minAmount']; ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+<?php else: ?>
+    <div class="pclassNotice">No PClasses in the database</div>
+<?php endif; ?>

@@ -2,30 +2,73 @@
 
 class KL_Klarna_Model_Klarna extends Varien_Object {
 
-    public function __construct()
+    public function __construct($customData = array())
     {
         /**
-         * Configure the Klarna object
+         * Configure the Klarna object with default data
          */
         $this
             ->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id'))
             ->setSharedSecret(Mage::helper('klarna')->getConfig('shared_secret'))
-            ->setServer(Klarna::BETA) // @todo
-            ->setPclassStorage('json')
-            ->setPclassStorageUri('/tmp/pclasses.json') // @todo
+            ->setServer($this->getCurrentServer())
+            ->setPclassStorage('mysql')
+            ->setPclassStorageUri($this->getDbUri())
             ->setCountry($this->getCurrentCountry())
             ->setLanguage($this->getCurrentLanguage())
-            ->setCurrency($this->getCurrentCurrency())
-        ;
+            ->setCurrency($this->getCurrentCurrency());
 
         /**
-         * @todo Implement this with settings from admin or other place
+         * Add custom data
          */
+        foreach ($customData as $key => $value) {
+            $this->setData($key, $value);
+            echo $key . " => " . $value . "<br>";
+        }
+
+
+
+
+      #  echo '<pre>';
+      #  print_r( $this->getData() );
+       # exit;
 
         # $this->getServer(),
         # $this->getPclassStorage(),
         # $this->getPclassStorageUri(),
 
+    }
+
+    public function getCurrentServer()
+    {
+        if (Mage::helper('klarna')->getConfig('live') == '1') {
+            return Klarna::LIVE;
+        }
+
+        return Klarna::BETA;
+    }
+
+    public function getDbUri()
+    {
+        /**
+         * Fetch core resource
+         */
+        $resource = Mage::getSingleton('core/resource');
+
+        /**
+         * Fetch database configuration
+         */
+        $config = Mage::getConfig()->getResourceConnectionConfig("default_setup");
+
+        /**
+         * Return array used by Klarna
+         */
+        return array(
+            'user' => $config->username,
+            'passwd' => $config->password,
+            'dsn' => $config->host,
+            'db' => $config->dbname,
+            'table' => $resource->getTableName('klarna/pclass')
+        );
     }
 
     /**
@@ -51,14 +94,14 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
         /**
          * Check the shipping address
          */
-        if (!$country) {
+        if ( ! $country ) {
             $country = $quote->getShippingAddress()->getCountry();
         }
 
         /**
          * Use store default as our final destination
          */
-        if (!$country) {
+        if ( ! $country ) {
             $country = Mage::getStoreConfig('general/country/default');
         }
 
