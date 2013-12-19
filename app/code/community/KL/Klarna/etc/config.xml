@@ -56,7 +56,7 @@
                 </setup>
             </klarna_setup>
         </resources>
-         <sales>
+        <sales>
             <quote>
                 <totals>
                     <klarna_total>
