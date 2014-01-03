@@ -22,7 +22,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
      */
     public function createReservation($socialSecurityNumber, $amount = -1)
     {
-        Mage::log("Reservera: " . $amount);
+        Mage::helper('klarna')->log("Reservera: " . $amount);
 
         /**
          * Reserve the amount
@@ -37,7 +37,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
             );
         } catch (KlarnaException $e) {
             Mage::helper('klarna')->log(
-                Mage::log($e->getCode() . ': ' . $e->getMessage())
+                '#' . $e->getCode() . ': ' . $e->getMessage()
             );
             Mage::throwException(Mage::helper('klarna')->decode($e->getMessage()));
         }
@@ -54,7 +54,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
             $result = $this->_klarnaOrder->activate($reservationNumber);
         } catch (KlarnaException $e) {
             Mage::helper('klarna')->log(
-                Mage::log($e->getCode() . ': ' . $e->getMessage())
+                '#' . $e->getCode() . ': ' . $e->getMessage()
             );
             Mage::throwException(Mage::helper('klarna')->decode($e->getMessage()));
         }
@@ -114,7 +114,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         /**
          * Set shipping address
          */
-        $shippingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna($order->getShippingAddress());
+        $shippingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna($order->getShippingAddress(), $order->getBillingAddress()->getEmail());
         $this->_klarnaOrder->setAddress(KlarnaFlags::IS_SHIPPING, $shippingAddress);
 
         return $this;

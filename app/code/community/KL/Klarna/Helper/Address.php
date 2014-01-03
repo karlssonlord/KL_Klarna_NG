@@ -2,7 +2,7 @@
 
 class KL_Klarna_Helper_Address extends KL_Klarna_Helper_Abstract {
 
-    public function fromMagentoToKlarna($address)
+    public function fromMagentoToKlarna($address, $emailAddress = null)
     {
 
         /**
@@ -16,8 +16,12 @@ class KL_Klarna_Helper_Address extends KL_Klarna_Helper_Abstract {
         // House Extension. Dutch customers only.
         $houseExt = '';
 
+        if ( is_null($emailAddress) ) {
+            $emailAddress = $address->getEmail();
+        }
+
         $klarnaAddress = new KlarnaAddr(
-            $address->getEmail(),
+            $emailAddress,
             "",
             $this->encode($address->getTelephone()),
             $this->encode($address->getFirstname()),
@@ -30,6 +34,8 @@ class KL_Klarna_Helper_Address extends KL_Klarna_Helper_Abstract {
             $this->encode($houseNo),
             $this->encode($houseExt)
         );
+
+        Mage::helper('klarna')->log($klarnaAddress);
 
         return $klarnaAddress;
     }
