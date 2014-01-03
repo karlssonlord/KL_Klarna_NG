@@ -3,6 +3,83 @@
 class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
 
     /**
+     * Fetch all available pclasses
+     *
+     * @param null $typeId
+     * @param null $quote
+     *
+     * @return array
+     */
+    public function getAvailable($typeId = null, $quote = null)
+    {
+        /**
+         * Setup the return array
+         */
+        $return = array();
+
+        /**
+         * Fetch quote if missing
+         */
+        if ( is_null($quote) ) {
+            /**
+             * Fetch quote from session
+             */
+            $quote = Mage::getSingleton('checkout/cart')->getQuote();
+        }
+
+        /**
+         * Make sure it's a valid Magento quote
+         */
+        if ( $quote instanceof Mage_Sales_Model_Quote ) {
+            /**
+             * Fetch grand total
+             */
+            $grandTotal = floatval($quote->getGrandTotal());
+        } else {
+            $grandTotal = 0;
+        }
+
+        /**
+         * Fetch our Klarna model
+         */
+        $klarna = Mage::getModel('klarna/klarna');
+
+        /**
+         * Setup the collection
+         */
+        $collection = Mage::getModel('klarna/pclass')
+            ->getCollection()
+            ->addFieldToFilter('country', $klarna->getCurrentCountry())
+            ->addFieldToFilter('eid', $klarna->getMerchantId());
+
+        /**
+         * Add type id if set
+         */
+        if ( ! is_null($typeId) ) {
+            $collection->addFieldToFilter('type', $typeId);
+        }
+
+        /**
+         * Add sorting
+         */
+        $collection->addOrder('id', 'ASC');
+
+        /**
+         * Add pclasses if the minimum amount is fulfilled
+         */
+        foreach ($collection as $row) {
+            if ( $grandTotal >= floatval($row->getData('minamount')) ) {
+                $return[] = $row->getData();
+            }
+        }
+
+        /**
+         * Return the result
+         */
+        return $return;
+    }
+
+    /**
      * Fetch new pclasses from Klarna and store in database
      *
      * @return array

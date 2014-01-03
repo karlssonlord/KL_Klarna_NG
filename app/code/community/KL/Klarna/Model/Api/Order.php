@@ -17,10 +17,11 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
      *
      * @param $socialSecurityNumber
      * @param $amount
+     * @param int $pclass
      *
      * @return mixed
      */
-    public function createReservation($socialSecurityNumber, $amount = -1)
+    public function createReservation($socialSecurityNumber, $amount = -1, $pclass = KlarnaPClass::INVOICE)
     {
         Mage::helper('klarna')->log("Reservera: " . $amount);
 
@@ -33,7 +34,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
                 null, // Gender.
                 $amount, // Amount. -1 specifies that calculation should calculate the amount using the goods list
                 KlarnaFlags::NO_FLAG, // Flags to affect behavior.
-                KlarnaPClass::INVOICE // -1 notes that this is an invoice purchase, for part payment purchase you will have a pclass object on which you use getId().
+                $pclass // -1 notes that this is an invoice purchase, for part payment purchase you will have a pclass object on which you use getId().
             );
         } catch (KlarnaException $e) {
             Mage::helper('klarna')->log(
@@ -114,7 +115,10 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         /**
          * Set shipping address
          */
-        $shippingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna($order->getShippingAddress(), $order->getBillingAddress()->getEmail());
+        $shippingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna(
+            $order->getShippingAddress(),
+            $order->getBillingAddress()->getEmail()
+        );
         $this->_klarnaOrder->setAddress(KlarnaFlags::IS_SHIPPING, $shippingAddress);
 
         return $this;

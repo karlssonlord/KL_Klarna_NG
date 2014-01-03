@@ -22,7 +22,6 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
          */
         foreach ($customData as $key => $value) {
             $this->setData($key, $value);
-            echo $key . " => " . $value . "<br>";
         }
     }
 

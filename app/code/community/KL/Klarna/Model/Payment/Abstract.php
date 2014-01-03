@@ -78,7 +78,6 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
      */
     public function assignData($data)
     {
-
         $this->data = $data;
 
         /**
@@ -106,12 +105,8 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         /**
          * Store in database
          */
-        foreach ($additionalInformation as $key => $value) {
-            $info
-                ->unsAdditionalInformation($key)
-                ->setAdditionalInformation($key, $value);
-        }
-
+        $info
+            ->setAdditionalInformation($additionalInformation);
     }
 
     /**
@@ -178,7 +173,9 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
      * @param Varien_Object $payment
      * @param float $amount
      *
-     * @return Mage_Payment_Model_Abstract
+     * @return $this|Mage_Payment_Model_Abstract
+     *
+     * @throws Exception
      */
     public function authorize(Varien_Object $payment, $amount)
     {
@@ -200,8 +197,6 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
             $socialSecurityNumber = $additionalInformation[$this->getCode() . '_ssn'];
         }
 
-        Mage::helper('klarna')->log("Vill " . $amount);
-
         /**
          * Make sure it's still there
          */
@@ -212,14 +207,17 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         }
 
         /**
+         * Set the right pclass
+         */
+        $pclass = KlarnaPClass::INVOICE;
+        if ( isset($additionalInformation[$this->getCode() . '_pclass']) ) {
+            $pclass = $additionalInformation[$this->getCode() . '_pclass'];
+        }
+
+        /**
          * Set fee on order
          */
         $order = $this->setKlarnaFee($payment->getOrder());
-
-        /**
-         * Set fee on quote
-         */
-        $quote = $this->setKlarnaFee(Mage::getSingleton('checkout/session')->getQuote());
 
         /**
          * Get a new Klarna instance
@@ -234,11 +232,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         /**
          * Create reservation
          */
-        $return = $klarnaOrderApi->createReservation($socialSecurityNumber, $order->getBaseTotalDue());
-
-        /**
-         * @todo Magento doesn't see the invoice fee :-( getTotalDue isn't the same as amount autorized.
-         */
+        $return = $klarnaOrderApi->createReservation($socialSecurityNumber, $order->getBaseTotalDue(), $pclass);
 
         /**
          * Since we're here everything went just fine!

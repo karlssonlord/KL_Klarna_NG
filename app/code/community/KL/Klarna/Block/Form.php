@@ -2,8 +2,14 @@
 
 class KL_Klarna_Block_Form extends Mage_Payment_Block_Form {
 
+    /**
+     * @return string
+     */
     public function getCurrentCountry()
     {
+        /**
+         * @todo Don't hard code Sweden
+         */
         return 'SE';
     }
 
