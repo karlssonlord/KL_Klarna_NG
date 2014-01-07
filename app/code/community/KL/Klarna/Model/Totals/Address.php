@@ -97,7 +97,7 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
 
                 }
             } catch (Exception $e) {
-                Mage::log($e->getMessage());
+                Mage::helper('klarna')->log('Exception when calling collect: ' . $e->getMessage());
             }
         }
 

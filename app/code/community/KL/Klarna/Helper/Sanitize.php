@@ -32,7 +32,6 @@ class KL_Klarna_Helper_Sanitize extends KL_Klarna_Helper_Abstract {
              * Remove if not in our allowed keys array
              */
             if (!in_array($key, $this->_allowedKeys)) {
-                Mage::log("Removing " . $key);
                 unset($array[$key]);
             }
         }
