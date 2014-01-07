@@ -47,20 +47,27 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
     }
 
     /**
+     * @param amount
      * @param $invoiceNumber
      * @return mixed
      */
-    public function createRefund($invoiceNumber)
+    public function createRefund($amount, $invoiceNumber)
     {
         Mage::helper('klarna')->log(
-            'Prepare to refund'
+            'Prepare refund of amount ' . $amount . ' on Klarna invoice number ' . $invoiceNumber
         );
 
         /**
          * Create the refund
          */
         try {
-            $result = $this->_klarnaOrder->creditPart($invoiceNumber);
+            $result = $this->_klarnaOrder->returnAmount(
+                $invoiceNumber,
+                $amount,
+                25, // 25% VAT
+                KlarnaFlags::INC_VAT, // Amount including VAT.
+                Mage::helper('klarna')->__('Refund')
+            );
         } catch (KlarnaException $e) {
             Mage::helper('klarna')->log(
                 '#' . $e->getCode() . ': ' . $e->getMessage()

@@ -27,7 +27,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
     /**
      * Can capture partial amounts online?
      */
-    protected $_canCapturePartial = true;
+    protected $_canCapturePartial = false;
 
     /**
      * Can refund online?
@@ -317,19 +317,9 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         parent::refund($payment, $amount);
 
         /**
-         * Fetch the credit memo
-         */
-        $creditMemo = $payment->getCreditmemo();
-
-        /**
          * Get a new Klarna instance
          */
         $klarnaOrderApi = Mage::getModel('klarna/api_order');
-
-        /**
-         * Populare Klarna order using credit memo object
-         */
-        $klarnaOrderApi->populateFromCreditMemo($creditMemo);
 
         /**
          * Fetch Klarna Invoice No from additional information field
@@ -339,7 +329,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         /**
          * Perform the refund
          */
-        $refundInvoiceId = $klarnaOrderApi->createRefund($klarnaInvoiceNumber);
+        $refundInvoiceId = $klarnaOrderApi->createRefund($amount, $klarnaInvoiceNumber);
 
         /**
          * Add comment to the order
