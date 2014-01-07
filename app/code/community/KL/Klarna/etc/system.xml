@@ -146,7 +146,17 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <comment>Invoice fee including tax</comment>
                         </fee>
+                        <fee_tax_percent translate="label">
+                            <label>Invoice fee tax %</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Enter 25 for 25% tax</comment>
+                        </fee_tax_percent>
                     </fields>
                 </klarna_invoice>
 

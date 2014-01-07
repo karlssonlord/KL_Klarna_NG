@@ -215,9 +215,9 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         }
 
         /**
-         * Set fee on order
+         * Get the Magento order
          */
-        $order = $this->setKlarnaFee($payment->getOrder());
+        $order = $payment->getOrder();
 
         /**
          * Get a new Klarna instance

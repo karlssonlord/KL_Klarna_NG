@@ -201,6 +201,34 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         }
 
         /**
+         * Add shipping cost (if any)
+         */
+        $this->_klarnaOrder->addArticle(
+            1,
+            'shipping_fee',
+            Mage::helper('klarna')->__('Shipping fee'),
+            ($order->getShippingAmount() + $order->getShippingTaxAmount()), //price
+            (($order->getShippingTaxAmount() / $order->getShippingAmount()) * 100),
+            0, // Discount
+            KlarnaFlags::INC_VAT
+        );
+
+        /**
+         * Add invoice cost (if any)
+         */
+        if ( $order->getData('base_klarna_total') > 0 ) {
+            $this->_klarnaOrder->addArticle(
+                1,
+                'invoice_fee',
+                Mage::helper('klarna')->__('Invoice fee'),
+                $order->getData('base_klarna_total'),
+                Mage::helper('klarna')->getConfig('fee_tax_percent', 'invoice'),
+                0, // Discount
+                KlarnaFlags::INC_VAT
+            );
+        }
+
+        /**
          * Set billing address
          */
         $billingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna($order->getBillingAddress());
@@ -214,6 +242,11 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
             $order->getBillingAddress()->getEmail()
         );
         $this->_klarnaOrder->setAddress(KlarnaFlags::IS_SHIPPING, $shippingAddress);
+
+        /**
+         * Set Magento order id
+         */
+        $this->_klarnaOrder->setEstoreInfo($order->getIncrementId());
 
         return $this;
     }
