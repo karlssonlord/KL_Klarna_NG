@@ -46,8 +46,45 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         return $result;
     }
 
+    /**
+     * @param $invoiceNumber
+     * @return mixed
+     */
+    public function createRefund($invoiceNumber)
+    {
+        Mage::helper('klarna')->log(
+            'Prepare to refund'
+        );
+
+        /**
+         * Create the refund
+         */
+        try {
+            $result = $this->_klarnaOrder->creditPart($invoiceNumber);
+        } catch (KlarnaException $e) {
+            Mage::helper('klarna')->log(
+                '#' . $e->getCode() . ': ' . $e->getMessage()
+            );
+            Mage::throwException(Mage::helper('klarna')->decode($e->getMessage()));
+        }
+
+        Mage::helper('klarna')->log(
+            'Refund complete'
+        );
+
+        return $result;
+    }
+
+    /**
+     * @param $reservationNumber
+     * @return mixed
+     */
     public function activateReservation($reservationNumber)
     {
+        Mage::helper('klarna')->log(
+            'Prepare to activate amount'
+        );
+
         /**
          * Activate the amount
          */
@@ -60,11 +97,68 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
             Mage::throwException(Mage::helper('klarna')->decode($e->getMessage()));
         }
 
+        Mage::helper('klarna')->log(
+            'Activation complete'
+        );
+
         return $result;
     }
 
     /**
-     * Populate Klarna order object with the use of an order
+     * Populate Klarna object with the use of a credit memo
+     *
+     * @param $creditMemo
+     * @return mixed
+     */
+    public function populateFromCreditMemo($creditMemo)
+    {
+        /**
+         * Log the start
+         */
+        Mage::helper('klarna')->log('Preparing to populate order from credit memo');
+
+        /**
+         * Make sure order object is set
+         */
+        if ( ! is_object($creditMemo) ) {
+            Mage::throwException(Mage::helper('klarna')->__('No items found in credit memo!'));
+        }
+
+        /**
+         * See what product(s) to refund
+         */
+        foreach ($creditMemo->getItemsCollection() as $item) {
+
+            /**
+             * Fetch the product
+             */
+            $product = $item->getOrderItem();
+
+            /**
+             * Make sure it's simple only
+             */
+            if ( $product->getParentItem() ) {
+
+                /**
+                 * Add product that should be refunded
+                 */
+                $this->_klarnaOrder->addArtNo($item->getQty(), $item->getSku());
+
+                /**
+                 * Add quantity and product for logging purposes
+                 */
+                Mage::helper('klarna')->log(
+                    'Added ' . $item->getQty() . ' pcs of SKU ' . $item->getSku() . ' for refund'
+                );
+            }
+
+        }
+
+        return $this;
+    }
+
+    /**
+     * Populate Klarna object with the use of an order
      *
      * @param $order
      *

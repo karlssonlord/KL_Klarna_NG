@@ -37,12 +37,12 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
     /**
      * Can refund partial
      */
-    protected $_canRefundInvoicePartial = true;
+    protected $_canRefundInvoicePartial = false;
 
     /**
      * Can void transactions online?
      */
-    protected $_canVoid = true;
+    protected $_canVoid = false;
 
     /**
      * Can use this payment method in administration panel?
@@ -249,33 +249,6 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         return $this;
     }
 
-    /**
-     * Update quote or order object with Klarna fee
-     *
-     * @todo Is this really needed? Remove otherwise.
-     *
-     * @param $object
-     *
-     * @return mixed
-     */
-    public function setKlarnaFee($object)
-    {
-        return $object;
-        /**
-         * Fetch payment method invoice fee
-         */
-        $fee = Mage::helper('klarna')->getConfig('fee', $this->getCode());
-
-        /**
-         * Add invoice fee to quote
-         */
-        $object
-            ->setData('klarna_fee', $fee)
-            ->save();
-
-        return $object;
-    }
-
     public function capture(Varien_Object $payment, $amount)
     {
         $authTrans = $payment->getAuthorizationTransaction();
@@ -324,6 +297,56 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
                 $payment->setAdditionalInformation('posted', 'failure');
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Refund specified amount for payment
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     *
+     * @return Mage_Payment_Model_Abstract
+     */
+    public function refund(Varien_Object $payment, $amount)
+    {
+        /**
+         * Make sure we can refund
+         */
+        parent::refund($payment, $amount);
+
+        /**
+         * Fetch the credit memo
+         */
+        $creditMemo = $payment->getCreditmemo();
+
+        /**
+         * Get a new Klarna instance
+         */
+        $klarnaOrderApi = Mage::getModel('klarna/api_order');
+
+        /**
+         * Populare Klarna order using credit memo object
+         */
+        $klarnaOrderApi->populateFromCreditMemo($creditMemo);
+
+        /**
+         * Fetch Klarna Invoice No from additional information field
+         */
+        $klarnaInvoiceNumber = $payment->getAdditionalInformation('klarna_invoice_no');
+
+        /**
+         * Perform the refund
+         */
+        $refundInvoiceId = $klarnaOrderApi->createRefund($klarnaInvoiceNumber);
+
+        /**
+         * Add comment to the order
+         */
+        $payment->getOrder()
+            ->addStatusHistoryComment('Klarna refund successful, Klarna refund invoice id: ' . $refundInvoiceId)
+            ->save();
 
         return $this;
     }
