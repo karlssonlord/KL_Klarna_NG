@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
     <checkout_onepage_index>
-        <!--reference name="head">
+        <reference name="head">
             <block type="page/html_head" name="klarna_head" as="klarna_head" template="klarna/checkout/scripts.phtml"/>
-        </reference-->
+            <action method="addItem"><type>skin_js</type><name>js/kl_klarna.js</name></action>
+        </reference>
         <reference name="content">
             <block type="klarna/fetch" name="klarna_fetch_address" as="klarna_fetch_address" before="checkout.payment.methods" template="klarna/address/fetch.phtml"/>
         </reference>
