@@ -192,7 +192,7 @@
                 <fee>0</fee>
             </klarna_invoice>
             <klarna_partpayment>
-                <title>Klarna Part Payment</title>
+                <title>Klarna Account</title>
                 <active>0</active>
                 <model>klarna/payment_partpayment</model>
                 <payment_action>authorize</payment_action>
