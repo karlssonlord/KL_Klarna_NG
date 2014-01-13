@@ -24,8 +24,6 @@ function fetchKlarnaAddress(fieldId) {
 
             $(json).each(function(address){
 
-                console.log(address);
-
                 // Setup the address line
                 var addressLine =
                     address.fname + ' ' +
