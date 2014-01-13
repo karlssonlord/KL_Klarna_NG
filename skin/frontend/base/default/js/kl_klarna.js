@@ -41,13 +41,13 @@ function fetchKlarnaAddress(fieldId) {
                 });
 
                 // Setup the checkboxes with addresses
-                selectBox = selectBox + '<label for="klarna_address_key_' + address.hash + '">';
-                selectBox = selectBox + '<input onClick="klarnaChangeAddress();" type="radio" id="klarna_address_key_' + address.hash + '" name="klarna_address_key" value="' + address.hash + '" style="display: block !important"';
+                selectBox += '<input onClick="klarnaChangeAddress();" type="radio" id="klarna_address_key_' + address.hash + '" name="klarna_address_key" value="' + address.hash + '"';
                 if (checked === true) {
-                    selectBox = selectBox + ' checked="checked"';
+                    selectBox += ' checked="checked"';
                     checked = false;
                 }
-                selectBox = selectBox + '/> ' + addressLine + '</label>';
+                selectBox += '/>';
+                selectBox += ' <label for="klarna_address_key_' + address.hash + '">'+addressLine+'</label>';
 
             });
 
