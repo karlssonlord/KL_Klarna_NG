@@ -11,3 +11,4 @@
 "No items found in credit memo!","Inga produkter finns i kreditfakturan"
 "Pclass selection not set","Ett fel har uppstått. Kontrollera valen för betalsättet."
 "Refund","Återbetalning"
+"Request not allowed. Missing cart items.","Åtgärden inte tillåten. Saknar produkter i varukorgen."

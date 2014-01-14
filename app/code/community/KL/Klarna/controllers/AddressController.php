@@ -37,6 +37,14 @@ class KL_Klarna_AddressController extends Mage_Core_Controller_Front_Action {
         }
 
         /**
+         * Fetch quote
+         */
+        $quote = Mage::getModel('checkout/cart')->getQuote();
+        if ( count($quote->getAllItems()) < 1 ) {
+            return $this->jsonReponse(Mage::helper('klarna/json')->error($this->__('Request not allowed. Missing cart items.')));
+        }
+
+        /**
          * Fetch the addresses
          */
         $addresses = Mage::getModel('klarna/api_address')
