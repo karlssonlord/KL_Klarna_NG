@@ -83,18 +83,13 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
                 /**
                  * Remove fee if any other payment option
                  */
-                if ( $payment->getCode() !== 'klarna_invoice' ) {
-                    /**
-                     * Remove the fee to the quote object
-                     */
+                if ($payment->getCode() !== 'klarna_invoice') {
+                    $address->setKlarnaTotal(null);
+                    $address->setBaseKlarnaTotal(null);
+
                     $address->getQuote()
                         ->setKlarnaTotal(null)
                         ->setBaseKlarnaTotal(null);
-
-                    /**
-                     * @todo Recollect totals?
-                     */
-
                 }
             } catch (Exception $e) {
                 Mage::helper('klarna')->log('Exception when calling collect: ' . $e->getMessage());
