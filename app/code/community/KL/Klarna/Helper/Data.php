@@ -1,11 +1,10 @@
 <?php
-
-class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
-
+class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
+{
     /**
      * Fetch configuration settings for
      *
-     * @param string $key Magento setting key
+     * @param string $key  Magento setting key
      * @param string $type "invoice", "spec" or "part". Default is "klarna"
      *
      * @return mixed
@@ -28,8 +27,8 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
     /**
      * Log message to our log files
      *
-     * @param mixed $message mixed
-     * @param boolean $force
+     * @param mixed   $message Log message
+     * @param boolean $force   Flag to activate force logging
      *
      * @return void
      */
@@ -70,7 +69,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
     /**
      * Convert Klarna country id to Magento string (ISO 2 char)
      *
-     * @param $klarnaCountryId
+     * @param int $klarnaCountryId Klarna country ID
      *
      * @return null|string
      */
@@ -79,6 +78,14 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         return KlarnaCountry::getCode($klarnaCountryId);
     }
 
+    /**
+     * Get URL for invoice logo from Klarna CDN
+     *
+     * @param int    $width   Width in pixels
+     * @param string $country Country code
+     *
+     * @return string
+     */
     public function getInvoiceLogo($width = 250, $country = 'SE')
     {
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/invoice/' . $country . '_invoice_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
@@ -86,11 +93,18 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         );
     }
 
+    /**
+     * Get URL for account logo from Klarna CDN
+     *
+     * @param int    $width   Width in pixels
+     * @param string $country Country code
+     *
+     * @return string
+     */
     public function getPartpaymentLogo($width = 250, $country = 'SE')
     {
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/account/' . $country . '_account_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
             'merchant_id'
         );
     }
-
 }
