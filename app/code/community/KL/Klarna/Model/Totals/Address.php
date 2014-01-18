@@ -28,16 +28,16 @@ class KL_Klarna_Model_Totals_Address
         $quote = $address->getQuote();
 
         if ($quote->getId()) {
-
-            $payment = $quote->getPayment()->getMethodInstance();
-
-            if (is_object($payment)) {
-                $paymentCode = $payment->getCode();
-            } else {
-                $paymentCode = false;
-            }
-
             try {
+
+                $payment = $quote->getPayment();
+
+                if (is_object($payment)) {
+                    $paymentCode = $payment->getMethodInstance()->getCode();
+                } else {
+                    $paymentCode = false;
+                }
+
                 $helper->log('Quote found with ID ' . $quote->getId());
 
                 /**
