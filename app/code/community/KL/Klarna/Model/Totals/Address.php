@@ -1,20 +1,19 @@
 <?php
-class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Total_Abstract {
-
+class KL_Klarna_Model_Totals_Address
+    extends Mage_Sales_Model_Quote_Address_Total_Abstract
+{
     /**
      * Calculate your total value
      *
-     * @param Mage_Sales_Model_Quote_Address $address
+     * @param Mage_Sales_Model_Quote_Address $address Quote address
      *
      * @return $this|Mage_Sales_Model_Quote_Address_Total_Abstract
      */
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
-        Mage::helper('klarna')->log('Preparing to collect totals');
+        $helper = Mage::helper('klarna');
+        $helper->log('Preparing to collect totals');
 
-        /**
-         * Let the parent function do it's magic
-         */
         parent::collect($address);
 
         /**
@@ -28,31 +27,34 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
          */
         $quote = $address->getQuote();
 
-        /**
-         * Fetch the payment if quote exists
-         */
-        if ( $quote->getId() ) {
+        if ($quote->getId()) {
+
+            $payment = $quote->getPayment()->getMethodInstance();
+
+            if (is_object($payment)) {
+                $paymentCode = $payment->getCode();
+            } else {
+                $paymentCode = false;
+            }
 
             try {
-
-                Mage::helper('klarna')->log('Quote found with ID ' . $quote->getId());
-
-                $payment = $quote->getPayment()->getMethodInstance();
+                $helper->log('Quote found with ID ' . $quote->getId());
 
                 /**
-                 * Make sure it's a payment that has a fee and it's a shipping address, otherwise
-                 * the invoice fee won't be added.
+                 * Make sure it's a payment that has a fee and it's a shipping
+                 * address, otherwise the invoice fee won't be added.
                  */
-                if ( $address->getAddressType() == 'shipping' && is_object($payment) && $payment->getCode(
-                    ) == 'klarna_invoice'
+                if ($address->getAddressType() == 'shipping'
+                    && $paymentCode == 'klarna_invoice'
                 ) {
-
-                    Mage::helper('klarna')->log('Updating quote since we\'re using ' . $payment->getCode());
+                    $helper->log(
+                        'Updating quote since we\'re using ' . $paymentCode
+                    );
 
                     /**
                      * Fetch payment method invoice fee
                      */
-                    $fee = Mage::helper('klarna')->getConfig('fee', $payment->getCode());
+                    $fee = $helper->getConfig('fee', $payment->getCode());
 
                     /**
                      * Add store view currency amount
@@ -92,7 +94,9 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
                         ->setBaseKlarnaTotal(null);
                 }
             } catch (Exception $e) {
-                Mage::helper('klarna')->log('Exception when calling collect: ' . $e->getMessage());
+                $helper->log(
+                    'Exception when calling collect: ' . $e->getMessage()
+                );
             }
         }
 
@@ -102,7 +106,7 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
     /**
      * Show in cart and review summary
      *
-     * @param Mage_Sales_Model_Quote_Address $address
+     * @param Mage_Sales_Model_Quote_Address $address Quote address
      *
      * @return $this|array
      */
@@ -123,5 +127,4 @@ class KL_Klarna_Model_Totals_Address extends Mage_Sales_Model_Quote_Address_Tota
 
         return $this;
     }
-
 }
