@@ -7,10 +7,7 @@ class KL_Klarna_Block_Form extends Mage_Payment_Block_Form {
      */
     public function getCurrentCountry()
     {
-        /**
-         * @todo Don't hard code Sweden
-         */
-        return 'SE';
+        return Mage::getSingleton('core/session')->getCountryCode();
     }
 
     public function getEid()
