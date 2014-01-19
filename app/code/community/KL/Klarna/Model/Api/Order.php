@@ -235,6 +235,28 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
             );
         }
 
+        if ( $order->getDiscountAmount() <> 0 ) {
+
+            $discount = $order->getDiscountAmount();
+            $defaultTaxDiscount = Mage::helper('klarna')->getConfig('fee_tax_percent', 'invoice');
+
+            if ( Mage::getStoreConfig('tax/calculation/discount_tax') == '0' ) {
+                $defaultTaxDiscountValue = ($defaultTaxDiscount / 100) + 1;
+                $discount = $discount * $defaultTaxDiscountValue;
+            }
+
+            $this->_klarnaOrder->addArticle(
+                1,
+                'discount',
+                $order->getDiscountDescription(),
+                $discount,
+                $defaultTaxDiscount,
+                0, // Discount
+                KlarnaFlags::INC_VAT
+            );
+
+        }
+
         /**
          * Set billing address
          */
