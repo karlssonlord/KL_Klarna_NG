@@ -152,9 +152,9 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         }
 
         /**
-         * Fetch countries where the payment module is enabled in
+         * Fetch countries where the Klarna is enabled in
          */
-        $enabledCountries = Mage::helper('klarna')->getConfig('countries', $this->getCode());
+        $enabledCountries = Mage::helper('klarna')->getConfig('countries', 'klarna');
         $enabledCountries = explode(',', $enabledCountries);
 
         /**
