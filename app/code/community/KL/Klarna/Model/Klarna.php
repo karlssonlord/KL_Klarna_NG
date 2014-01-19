@@ -27,7 +27,7 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
 
     public function getCurrentServer()
     {
-        if (Mage::helper('klarna')->getConfig('live') == '1') {
+        if ( Mage::helper('klarna')->getConfig('live') == '1' ) {
             return Klarna::LIVE;
         }
 
@@ -112,7 +112,11 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
      */
     public function getCurrentCurrency()
     {
-        return KlarnaCurrency::fromCode('SEK');
+        $systemCurrency = Mage::app()->getLocale()->currency(
+            Mage::app()->getStore()->getCurrentCurrencyCode()
+        )->getSymbol();
+
+        return KlarnaCurrency::fromCode(trim($systemCurrency));
     }
 
     /**
