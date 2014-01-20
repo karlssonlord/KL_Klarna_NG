@@ -137,7 +137,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         /**
          * Make sure social security number is set
          */
-        if ( ! $socialSecurityNumber ) {
+        if ( ! $socialSecurityNumber && !Mage::app()->getRequest()->getParam('klarna_invoice_ssn', false) === false) {
             Mage::helper('klarna')->log('Social security number not set.');
             Mage::throwException(Mage::helper('klarna')->__('Social security number not set.'));
         }
