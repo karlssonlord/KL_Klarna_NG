@@ -89,69 +89,63 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
         /**
          * Setup array for holding the pclasses
          */
-
         $allPClasses = array();
 
-        foreach (Mage::app()->getStores() as $store) {
+        /**
+         * Check configuration for countries
+         */
+        $countries = explode(',', Mage::getStoreConfig('payment/klarna/countries'));
 
-            /**
-             * Check configuration for countries
-             */
-            $countries = explode(',', $store->getConfig('payment/klarna/countries'));
-
-            /**
-             * Check mode (live or dev)
-             */
-            if ( $store->getConfig('payment_klarna_live') == '1' ) {
-                $mode = Klarna::LIVE;
-            } else {
-                $mode = Klarna::BETA;
-            }
-
-            /**
-             * Handle all countries
-             */
-            foreach ($countries as $country) {
-                switch ($country) {
-                    case 'SE':
-                        /**
-                         * Setup custom configuration
-                         */
-                        $api = Mage::getModel('klarna/api_pclass');
-                        $klarnaModel = Mage::getModel('klarna/klarna');
-                        $klarnaModel
-                            ->setCountry(KlarnaCountry::SE)
-                            ->setLanguage(KlarnaLanguage::SV)
-                            ->setCurrency(KlarnaCurrency::SEK)
-                            ->setMerchantId($store->getConfig('payment/klarna/merchant_id'))
-                            ->setSharedSecret($store->getConfig('payment/klarna/shared_secret'))
-                            ->setServer($mode);
-
-                        $api->fetch($klarnaModel);
-                        break;
-                    case 'DK':
-                        /**
-                         * Setup custom configuration
-                         */
-                        $api = Mage::getModel('klarna/api_pclass');
-                        $klarnaModel = Mage::getModel('klarna/klarna');
-                        $klarnaModel
-                            ->setCountry(KlarnaCountry::DK)
-                            ->setLanguage(KlarnaLanguage::DA)
-                            ->setCurrency(KlarnaCurrency::DKK)
-                            ->setMerchantId($store->getConfig('payment/klarna/merchant_id'))
-                            ->setSharedSecret($store->getConfig('payment/klarna/shared_secret'))
-                            ->setServer($mode);
-
-                        $api->fetch($klarnaModel);
-                        break;
-                }
-            }
-
-            return $allPClasses;
+        /**
+         * Check mode (live or dev)
+         */
+        if ( Mage::getStoreConfig('payment_klarna_live') == '1' ) {
+            $mode = Klarna::LIVE;
+        } else {
+            $mode = Klarna::BETA;
         }
 
-        return array();
+        /**
+         * Handle all countries
+         */
+        foreach ($countries as $country) {
+            switch ($country) {
+                case 'SE':
+                    /**
+                     * Setup custom configuration
+                     */
+                    $api = Mage::getModel('klarna/api_pclass');
+                    $klarnaModel = Mage::getModel('klarna/klarna');
+                    $klarnaModel
+                        ->setCountry(KlarnaCountry::SE)
+                        ->setLanguage(KlarnaLanguage::SV)
+                        ->setCurrency(KlarnaCurrency::SEK)
+                        ->setMerchantId(Mage::getStoreConfig('payment/klarna/merchant_id'))
+                        ->setSharedSecret(Mage::getStoreConfig('payment/klarna/shared_secret'))
+                        ->setServer($mode);
+
+                    $api->fetch($klarnaModel);
+                    break;
+                case 'DK':
+                    /**
+                     * Setup custom configuration
+                     */
+                    $api = Mage::getModel('klarna/api_pclass');
+                    $klarnaModel = Mage::getModel('klarna/klarna');
+                    $klarnaModel
+                        ->setCountry(KlarnaCountry::DK)
+                        ->setLanguage(KlarnaLanguage::DA)
+                        ->setCurrency(KlarnaCurrency::DKK)
+                        ->setMerchantId(Mage::getStoreConfig('payment/klarna/merchant_id'))
+                        ->setSharedSecret(Mage::getStoreConfig('payment/klarna/shared_secret'))
+                        ->setServer($mode);
+
+                    $api->fetch($klarnaModel);
+                    break;
+            }
+        }
+
+        return $allPClasses;
     }
 
     /**
