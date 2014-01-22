@@ -5,8 +5,7 @@
 
         <select name="payment[<?php print $this->getMethodCode(); ?>_pclass]">
             <?php foreach ($pclasses as $pclass): ?>
-                <option value="<?php print $pclass['id']; ?>"><?php print $pclass['description']; ?></option>
-
+                <option value="<?php print $pclass['id']; ?>"><?php print $pclass['description']; ?> - <?php print $pclass['perMonth']; ?></option>
             <?php endforeach; ?>
         </select>
 

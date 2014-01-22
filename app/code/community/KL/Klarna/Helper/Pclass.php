@@ -69,7 +69,23 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
          */
         foreach ($collection as $row) {
             if ( $grandTotal >= floatval($row->getData('minamount')) ) {
-                $return[] = $row->getData();
+
+                $rowData = $row->getData();
+                try {
+                    $pclass = new KlarnaPClass($rowData);
+                    $montlyCost = KlarnaCalc::calc_monthly_cost($grandTotal, $pclass, KlarnaFlags::CHECKOUT_PAGE);
+                    $montlyCost = round($montlyCost, 0);
+                    $rowData['perMonthRaw'] = $montlyCost;
+                    $montlyCost = Mage::helper('core')->currency($montlyCost, true, false);
+                    $rowData['perMonth'] = $this->__(sprintf('%s/month', $montlyCost));
+
+                } catch (Exception $e) {
+                    Mage::helper('klarna')->log($e->getMessage());
+                    $rowData['perMonth'] = '';
+                    $rowData['perMonthRaw'] = '';
+                }
+
+                $return[] = $rowData;
             }
         }
 
@@ -77,6 +93,21 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
          * Return the result
          */
         return $return;
+    }
+
+    public function getCheapestOption($typeId = 0, $quote = null)
+    {
+        foreach ($this->getAvailable($typeId, $quote) as $option) {
+            if (!isset($cheapest)) {
+                $cheapest = $option['perMonth'];
+                $amount = $option['perMonthRaw'];
+            } else if ($option['perMonthRaw'] < $amount) {
+                $cheapest = $option['perMonth'];
+                $amount = $option['perMonthRaw'];
+            }
+        }
+
+        return $cheapest;
     }
 
     /**
