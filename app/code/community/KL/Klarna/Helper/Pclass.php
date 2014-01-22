@@ -97,27 +97,31 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
 
     public function getCheapestOption($typeId = 0, $quote = null)
     {
-        if (is_array($typeId)) {
+        if ( is_array($typeId) ) {
             foreach ($typeId as $subId) {
                 foreach ($this->getAvailable($subId, $quote) as $option) {
-                    if (!isset($cheapest)) {
+                    if ( ! isset($cheapest) ) {
                         $cheapest = $option['perMonth'];
                         $amount = $option['perMonthRaw'];
-                    } else if ($option['perMonthRaw'] < $amount) {
-                        $cheapest = $option['perMonth'];
-                        $amount = $option['perMonthRaw'];
+                    } else {
+                        if ( $option['perMonthRaw'] < $amount ) {
+                            $cheapest = $option['perMonth'];
+                            $amount = $option['perMonthRaw'];
+                        }
                     }
                 }
             }
 
         } else {
             foreach ($this->getAvailable($typeId, $quote) as $option) {
-                if (!isset($cheapest)) {
+                if ( ! isset($cheapest) ) {
                     $cheapest = $option['perMonth'];
                     $amount = $option['perMonthRaw'];
-                } else if ($option['perMonthRaw'] < $amount) {
-                    $cheapest = $option['perMonth'];
-                    $amount = $option['perMonthRaw'];
+                } else {
+                    if ( $option['perMonthRaw'] < $amount ) {
+                        $cheapest = $option['perMonth'];
+                        $amount = $option['perMonthRaw'];
+                    }
                 }
             }
         }
@@ -146,10 +150,11 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
             /**
              * Check if invoice or account is enabled
              */
+            $eidStoreSpecific = Mage::getStoreConfig('payment/klarna/merchant_id', $_eachStoreId);
             $invoiceEnabled = Mage::getStoreConfig('payment/klarna_invoice/active', $_eachStoreId);
             $accountEnabled = Mage::getStoreConfig('payment/klarna_partpayment/active', $_eachStoreId);
 
-            if ( $invoiceEnabled || $accountEnabled ) {
+            if ( $eidStoreSpecific && ($invoiceEnabled || $accountEnabled) ) {
 
                 /**
                  * Check configuration for countries
