@@ -14,7 +14,10 @@ class KL_Klarna_Model_Payment_Partpayment extends KL_Klarna_Model_Payment_Abstra
         /**
          * Setup count of possible pclasses
          */
-        $pclasses = Mage::helper('klarna/pclass')->getAvailable($this->_pclassTypeId, $quote);
+        $pclasses = array_merge(
+            Mage::helper('klarna/pclass')->getAvailable($this->_pclassTypeId, $quote),
+            Mage::helper('klarna/pclass')->getAvailable(1, $quote)
+        );
 
         /**
          * If atleast one was found, enable the method
