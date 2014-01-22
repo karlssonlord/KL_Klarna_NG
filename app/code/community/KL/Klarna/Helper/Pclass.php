@@ -97,13 +97,28 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
 
     public function getCheapestOption($typeId = 0, $quote = null)
     {
-        foreach ($this->getAvailable($typeId, $quote) as $option) {
-            if (!isset($cheapest)) {
-                $cheapest = $option['perMonth'];
-                $amount = $option['perMonthRaw'];
-            } else if ($option['perMonthRaw'] < $amount) {
-                $cheapest = $option['perMonth'];
-                $amount = $option['perMonthRaw'];
+        if (is_array($typeId)) {
+            foreach ($typeId as $subId) {
+                foreach ($this->getAvailable($subId, $quote) as $option) {
+                    if (!isset($cheapest)) {
+                        $cheapest = $option['perMonth'];
+                        $amount = $option['perMonthRaw'];
+                    } else if ($option['perMonthRaw'] < $amount) {
+                        $cheapest = $option['perMonth'];
+                        $amount = $option['perMonthRaw'];
+                    }
+                }
+            }
+
+        } else {
+            foreach ($this->getAvailable($typeId, $quote) as $option) {
+                if (!isset($cheapest)) {
+                    $cheapest = $option['perMonth'];
+                    $amount = $option['perMonthRaw'];
+                } else if ($option['perMonthRaw'] < $amount) {
+                    $cheapest = $option['perMonth'];
+                    $amount = $option['perMonthRaw'];
+                }
             }
         }
 
