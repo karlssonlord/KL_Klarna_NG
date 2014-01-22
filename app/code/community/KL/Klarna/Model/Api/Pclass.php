@@ -20,4 +20,17 @@ class KL_Klarna_Model_Api_Pclass extends KL_Klarna_Model_Api_Abstract {
         return $api->getAllPClasses();
     }
 
+    public function clearPClasses($klarnaModel= null)
+    {
+        /**
+         * Fetch the API
+         */
+        $api = $this->getApi($klarnaModel);
+
+        /**
+         * Return what we've just stored
+         */
+        return $api->clearPClasses();
+    }
+
 }
