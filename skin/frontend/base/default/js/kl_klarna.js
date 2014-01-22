@@ -22,6 +22,13 @@ function fetchKlarnaAddress(fieldId) {
             var selectBox = '';
             var checked = true;
 
+            if(json.error) {
+                if(typeof window.fetchKlarnaAddressErrorHandler) {
+                    fetchKlarnaAddressErrorHandler(json);
+                }
+                return;
+            }
+
             $(json).each(function(address){
 
                 // Setup the address line
