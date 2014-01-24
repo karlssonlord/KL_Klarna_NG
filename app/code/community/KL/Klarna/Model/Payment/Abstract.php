@@ -27,7 +27,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
     /**
      * Can capture partial amounts online?
      */
-    protected $_canCapturePartial = false;
+    protected $_canCapturePartial = true;
 
     /**
      * Can refund online?
@@ -37,7 +37,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
     /**
      * Can refund partial
      */
-    protected $_canRefundInvoicePartial = false;
+    protected $_canRefundInvoicePartial = true;
 
     /**
      * Can void transactions online?
