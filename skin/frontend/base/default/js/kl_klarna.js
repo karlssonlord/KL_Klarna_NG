@@ -1,5 +1,6 @@
 // Fetch address and populare social security number
 function fetchKlarnaAddress(fieldId) {
+    console.log(fieldId);
 
     // Populate social security fields with the new social security number
     $$('.klarna_ssn').each(function(el) {
@@ -33,8 +34,7 @@ function fetchKlarnaAddress(fieldId) {
 
                 // Setup the address line
                 var addressLine =
-                    address.fname + ' ' +
-                    address.lname + klarnaAddressGlue +
+                    (address.fname && address.lname ? address.fname + ' ' + address.lname + klarnaAddressGlue : '') +
                     address.street + klarnaAddressGlue +
                     address.zip + ' ' + address.city;
 
@@ -46,13 +46,13 @@ function fetchKlarnaAddress(fieldId) {
                 });
 
                 // Setup the checkboxes with addresses
-                selectBox += '<input onClick="klarnaChangeAddress();" type="radio" id="klarna_address_key_' + address.hash + '" name="klarna_address_key" value="' + address.hash + '"';
+                selectBox += '<input onclick="klarnaChangeAddress();" class="klarna-address-radio" type="radio" id="klarna_address_key_' + address.hash + '" name="klarna_address_key" value="' + address.hash + '"';
                 if (checked === true) {
                     selectBox += ' checked="checked"';
                     checked = false;
                 }
                 selectBox += '/>';
-                selectBox += ' <label for="klarna_address_key_' + address.hash + '">'+addressLine+'</label>';
+                selectBox += ' <label for="klarna_address_key_' + address.hash + '" class="klarna-address-label">'+addressLine+'</label>';
 
             });
 
