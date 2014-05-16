@@ -210,15 +210,17 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         /**
          * Add shipping cost (if any)
          */
-        $this->_klarnaOrder->addArticle(
-            1,
-            'shipping_fee',
-            Mage::helper('klarna')->__('Shipping fee'),
-            ($order->getShippingAmount() + $order->getShippingTaxAmount()), //price
-            (($order->getShippingTaxAmount() / $order->getShippingAmount()) * 100),
-            0, // Discount
-            KlarnaFlags::INC_VAT
-        );
+        if ($order->getShippingAmount() > 0) {
+            $this->_klarnaOrder->addArticle(
+                1,
+                'shipping_fee',
+                Mage::helper('klarna')->__('Shipping fee'),
+                ($order->getShippingAmount() + $order->getShippingTaxAmount()), //price
+                (($order->getShippingTaxAmount() / $order->getShippingAmount()) * 100),
+                0, // Discount
+                KlarnaFlags::INC_VAT
+            );
+        }
 
         /**
          * Add invoice cost (if any)
