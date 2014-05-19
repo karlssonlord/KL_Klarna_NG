@@ -7,13 +7,13 @@
     </modules>
     <frontend>
         <routers>
-            <modulename>
+            <klklarna>
                 <use>standard</use>
                 <args>
                     <module>KL_Klarna</module>
                     <frontName>klarna</frontName>
                 </args>
-            </modulename>
+            </klklarna>
         </routers>
         <layout>
             <updates>
@@ -33,9 +33,16 @@
                     <sales_order_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Totals</sales_order_totals>
                 </rewrite>
                 <rewrite>
-                    <sales_order_invoice_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Invoice_Totals</sales_order_invoice_totals>
+                    <sales_order_invoice_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Invoice_Totals
+                    </sales_order_invoice_totals>
                 </rewrite>
             </adminhtml>
+            <checkout>
+                <rewrite>
+                    <onepage_link>KL_Klarna_Block_Checkout_Onepage_Link</onepage_link>
+                    <cart_sidebar>KL_Klarna_Block_Checkout_Cart_Sidebar</cart_sidebar>
+                </rewrite>
+            </checkout>
         </blocks>
         <helpers>
             <klarna>
@@ -202,6 +209,9 @@
                 <model>klarna/payment_specpayment</model>
                 <payment_action>authorize</payment_action>
             </klarna_specpayment>
+            <klarna_checkout>
+                <active>0</active>
+            </klarna_checkout>
         </payment>
     </default>
 </config>

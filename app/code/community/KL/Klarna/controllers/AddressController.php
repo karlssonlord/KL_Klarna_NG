@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class KL_Klarna_AddressController
+ */
 class KL_Klarna_AddressController extends Mage_Core_Controller_Front_Action {
 
     /**

@@ -1,11 +1,15 @@
 <?php
+
+/**
+ * Class KL_Klarna_Helper_Data
+ */
 class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
 {
     /**
      * Fetch configuration settings for
      *
      * @param string $key  Magento setting key
-     * @param string $type "invoice", "spec" or "part". Default is "klarna"
+     * @param string $type "invoice", "spec", "part" or "checkout". Default is "klarna"
      *
      * @return mixed
      */
@@ -106,5 +110,15 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/account/' . $country . '_account_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
             'merchant_id'
         );
+    }
+
+    /**
+     * Check if Klarna Checkout is enabled
+     *
+     * @return bool
+     */
+    public function isKcoEnabled()
+    {
+        return (bool)$this->getConfig('active', 'checkout');
     }
 }
