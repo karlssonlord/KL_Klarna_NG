@@ -121,4 +121,15 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
     {
         return (bool)$this->getConfig('active', 'checkout');
     }
+
+    /**
+     * Check if the integration is live or using test environment
+     *
+     * @return bool
+     */
+    public function isLive()
+    {
+        return (bool)$this->getConfig('live');
+    }
+
 }

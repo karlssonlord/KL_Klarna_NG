@@ -17,4 +17,19 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
             ->renderLayout();
     }
 
+    public function termsAction()
+    {
+        echo "Terms";
+    }
+
+    public function successAction()
+    {
+        echo "Success";
+    }
+
+    public function pushAction()
+    {
+        echo "Push";
+    }
+
 }

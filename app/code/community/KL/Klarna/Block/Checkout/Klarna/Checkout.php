@@ -18,7 +18,7 @@ class KL_Klarna_Block_Checkout_Klarna_Checkout extends Mage_Core_Block_Template 
         /**
          * Create the order and return the checkout HTML
          */
-        return $model->createOrder();
+        return $model->handleOrder();
     }
 
 }
