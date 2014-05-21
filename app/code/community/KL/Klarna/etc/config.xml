@@ -181,6 +181,34 @@
             </dk>
         </countries>
     </klarna>
+    <klarna_checkout>
+        <countries>
+            <se>
+                <code>SE</code>
+                <currency>SEK</currency>
+                <name>Sweden (SEK)</name>
+                <language>sv-se</language>
+            </se>
+            <no>
+                <code>NO</code>
+                <currency>NOK</currency>
+                <name>Norway (NOK)</name>
+                <language>nb-no</language>
+            </no>
+            <fi>
+                <code>FI</code>
+                <currency>EUR</currency>
+                <name>Finland (EUR)</name>
+                <language>fi-fi</language>
+            </fi>
+            <de>
+                <code>DE</code>
+                <currency>EUR</currency>
+                <name>Germany (EUR)</name>
+                <language>de-de</language>
+            </de>
+        </countries>
+    </klarna_checkout>
     <default>
         <payment>
             <klarna>
