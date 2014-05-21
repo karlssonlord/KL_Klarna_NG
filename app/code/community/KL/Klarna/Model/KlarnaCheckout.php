@@ -6,6 +6,73 @@
 class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abstract {
 
     /**
+     * @var
+     */
+    protected $_connector;
+
+    /**
+     * Get the Klarna Connector
+     *
+     * @return Klarna_Checkout_ConnectorInterface|mixed
+     */
+    protected function getKlarnaConnector()
+    {
+        if ( ! $this->_connector ) {
+            $this->_connector = Klarna_Checkout_Connector::create($this->getSharedSecret());
+        }
+        return $this->_connector;
+    }
+
+    /**
+     * Fetch existing Klarna Order
+     *
+     * @return bool|Klarna_Checkout_Order
+     */
+    public function getExistingKlarnaOrder()
+    {
+        /**
+         * Configure Klarna
+         */
+        Klarna_Checkout_Order::$baseUri = Mage::helper('klarna/checkout')->getKlarnaBaseUri();
+        Klarna_Checkout_Order::$contentType = "application/vnd.klarna.checkout.aggregated-order-v2+json";
+
+        /**
+         * Try to load existing order
+         */
+        if ( Mage::helper('klarna/checkout')->getKlarnaCheckoutId() ) {
+
+            try {
+
+                /**
+                 * Fetch checkout ID from session
+                 */
+                $checkoutId = Mage::helper('klarna/checkout')->getKlarnaCheckoutId();
+
+                /**
+                 * Fetch the checkout
+                 */
+                $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
+
+                /**
+                 * Fetch the order
+                 */
+                $order->fetch();
+
+            } catch (Exception $e) {
+
+                /**
+                 * Something went wrong, unset the checkout id
+                 */
+                Mage::helper('klarna/checkout')->setKlarnaCheckoutId(false);
+
+                return false;
+            }
+        }
+
+        return $order;
+    }
+
+    /**
      * Create or update order
      *
      * @return mixed
@@ -57,57 +124,34 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
         );
 
         /**
-         * Configure Klarna
+         * Fetch existing Klarna Order
          */
-        Klarna_Checkout_Order::$baseUri = Mage::helper('klarna/checkout')->getKlarnaBaseUri();
-        Klarna_Checkout_Order::$contentType = "application/vnd.klarna.checkout.aggregated-order-v2+json";
+        $order = $this->getExistingKlarnaOrder();
 
         /**
-         * Create a connector
+         * Update or create the order
          */
-        $connector = Klarna_Checkout_Connector::create($this->getSharedSecret());
+        if ( $order ) {
 
-        /**
-         * Default is that no order is set
-         */
-        $order = false;
-
-        /**
-         * Try to load existing order
-         */
-        if ( Mage::helper('klarna/checkout')->getKlarnaCheckoutId() ) {
-
+            /**
+             * Update the data
+             */
             try {
 
-                /**
-                 * Fetch the checkout
-                 */
-                $order = new Klarna_Checkout_Order($connector, Mage::helper('klarna/checkout')->getKlarnaCheckoutId());
-                $order->fetch();
-
-                /**
-                 * Update the data
-                 */
                 $order->update($klarnaData);
 
             } catch (Exception $e) {
 
                 /**
-                 * Something went wrong, unset the checkout id
-                 */
-                Mage::helper('klarna/checkout')->setKlarnaCheckoutId(false);
-
-                /**
-                 * Remove any order data previously fetched
+                 * Terminate the object, this will make us create a new order
                  */
                 $order = false;
-
             }
 
         }
 
         /**
-         * Create a new order if nothing is set
+         * Create order if nothing is set
          */
         if ( ! $order ) {
 
@@ -120,9 +164,9 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
             }
 
             /**
-             * Fetch the checkout
+             * Fetch empty Klarna order
              */
-            $order = new Klarna_Checkout_Order($connector);
+            $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
 
             /**
              * Create the order
