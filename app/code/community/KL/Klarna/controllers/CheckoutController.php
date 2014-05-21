@@ -43,8 +43,6 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
         echo "Terms";
     }
 
-
-
     public function pushAction()
     {
         echo "Push";

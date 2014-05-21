@@ -26,7 +26,7 @@ class KL_Klarna_Block_Checkout_Klarna_Success extends Mage_Checkout_Block_Onepag
         /**
          * Reset the Klarna Checkout ID
          */
-        # Mage::helper('klarna/checkout')->setKlarnaCheckoutId(false);
+        Mage::helper('klarna/checkout')->setKlarnaCheckoutId(false);
 
         /**
          * Return HTML snippet
