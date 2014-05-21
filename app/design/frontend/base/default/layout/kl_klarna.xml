@@ -18,4 +18,9 @@
             <block type="klarna/checkout_klarna_checkout" name="klarna_checkout" as="klarna_checkout" template="klarna/checkout/checkout.phtml"/>
         </reference>
     </klklarna_checkout_index>
+    <klklarna_checkout_success>
+        <reference name="content">
+            <block type="klarna/checkout_klarna_success" name="klarna_select_success" as="klarna_select_success" template="klarna/checkout/success.phtml"/>
+        </reference>
+    </klklarna_checkout_success>
 </layout>

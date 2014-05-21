@@ -12,6 +12,27 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
      */
     public function indexAction()
     {
+        /**
+         * Render layoyt
+         */
+        $this
+            ->loadLayout()
+            ->renderLayout();
+    }
+
+    /**
+     * Display the success page
+     */
+    public function successAction()
+    {
+        /**
+         * Reset the Magento quote
+         */
+        Mage::getSingleton('checkout/session')->setQuoteId(null);
+
+        /**
+         * Render layoyt
+         */
         $this
             ->loadLayout()
             ->renderLayout();
@@ -22,10 +43,7 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
         echo "Terms";
     }
 
-    public function successAction()
-    {
-        echo "Success";
-    }
+
 
     public function pushAction()
     {
