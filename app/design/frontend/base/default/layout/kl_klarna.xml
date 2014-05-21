@@ -10,6 +10,9 @@
         </reference>
     </checkout_onepage_index>
     <klklarna_checkout_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>js/kl_klarnacheckout.js</name></action>
+        </reference>
         <reference name="content">
             <block type="klarna/checkout_klarna_shipping" name="klarna_select_shipping" as="klarna_select_shipping" template="klarna/checkout/shipping.phtml"/>
             <block type="klarna/checkout_klarna_checkout" name="klarna_checkout" as="klarna_checkout" template="klarna/checkout/checkout.phtml"/>

@@ -1,3 +1,13 @@
 <div>
-    Select shipping method
+    <?php foreach ($this->getAvailableShippingMethods() as $shippingCode => $shippingRates): ?>
+
+        <?php foreach ($shippingRates as $shippingRate): ?>
+            <label>
+                <input onClick="klarnaCheckoutSwitchPayment('<?php print $shippingRate->getCode(); ?>');" <?php if ($this->isSelected($shippingRate)) print 'checked '; ?>type="radio" name="shippingMethod" value="<?php print $shippingRate->getCode(); ?>" />
+                <?php print $shippingRate->getMethodTitle(); ?>
+                - <?php print $this->getShippingRatePrice($shippingRate); ?>
+            </label><br />
+        <?php endforeach; ?>
+
+    <?php endforeach; ?>
 </div>
