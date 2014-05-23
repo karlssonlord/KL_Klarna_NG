@@ -66,20 +66,6 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
         $klarnaCheckout = Mage::getModel('klarna/klarnacheckout');
 
         /**
-         * Fetch shipping address
-         */
-        $shipping = Mage::getSingleton('checkout/session')
-            ->getQuote()
-            ->getShippingAddress();
-
-        /**
-         * Force given country and save it
-         */
-        $shipping
-            ->setCountryId($klarnaCheckout->getCountry())
-            ->save();
-
-        /**
          * Loop all shipping methods
          */
         foreach ($this->getAvailableShippingMethods() as $shippingCode => $shippingRates) {
@@ -107,7 +93,13 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
          */
         if ( isset($cheapestRate) ) {
 
-            $shipping
+            /**
+             * Fetch quote and shipping address
+             */
+            $quote = Mage::getSingleton('checkout/cart')->getQuote();
+            $shippingAddress = $quote->getShippingAddress();
+
+            $shippingAddress
                 ->setShippingMethod($cheapestRate->getCode())
                 ->save();
 
@@ -132,26 +124,35 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
         $klarnaCheckout = Mage::getModel('klarna/klarnacheckout');
 
         /**
-         * Collect shipping rates and assure the right country is set
+         * Fetch quote and shipping address
          */
-        Mage::getSingleton('checkout/session')
-            ->getQuote()
-            ->getShippingAddress()
+        $quote = Mage::getSingleton('checkout/cart')->getQuote();
+        $shippingAddress = $quote->getShippingAddress();
+
+        /**
+         * Make sure postcode is set
+         */
+        if ( ! $shippingAddress->setPostcode() ) {
+            $shippingAddress->setPostcode(0);
+        }
+
+        /**
+         * Make sure country and shipping rates trigger is set
+         */
+        $shippingAddress
             ->setCountryId($klarnaCheckout->getCountry())
-            ->collectShippingRates()
-            ->save();
+            ->setCollectShippingRates(true);
+
+        /**
+         * Save quote
+         */
+        $quote->save();
 
         /**
          * Fetched grouped shipping rates
          */
-        $groupedShippingRates = Mage::getSingleton('checkout/session')
-            ->getQuote()
-            ->getShippingAddress()
+        return $shippingAddress
             ->getGroupedAllShippingRates();
 
-        /**
-         * Return data
-         */
-        return $groupedShippingRates;
     }
 }
