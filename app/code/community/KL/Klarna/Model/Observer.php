@@ -1,7 +1,14 @@
 <?php
 
+/**
+ * Class KL_Klarna_Model_Observer
+ */
 class KL_Klarna_Model_Observer extends Mage_Core_Model_Abstract {
 
+    /**
+     * @param $observer
+     * @return mixed
+     */
     public function adminSystemConfigChangedSectionPayment($observer)
     {
         /**
