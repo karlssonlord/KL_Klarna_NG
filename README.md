@@ -16,4 +16,5 @@ Next generation Klarna module
 
 ### Todo
 
-- [ ] When adding an item (KL_Klarna_model_KlarnaCheckout_Item) get the correct discount amount (if any)
+- When adding an item (KL_Klarna_model_KlarnaCheckout_Item) get the correct discount amount (if any)
+- Handle errors when there is no shipping method available

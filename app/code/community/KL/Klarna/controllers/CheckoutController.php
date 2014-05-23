@@ -38,14 +38,22 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
             ->renderLayout();
     }
 
-    public function termsAction()
-    {
-        echo "Terms";
-    }
-
     public function pushAction()
     {
-        echo "Push";
+        /**
+         * Acknowledge order
+         */
+        Mage::getModel('klarna/klarnacheckout')->acknowledge($_REQUEST['klarna_order']);
+    }
+
+    public function termsAction()
+    {
+        /**
+         * Render layoyt
+         */
+        $this
+            ->loadLayout()
+            ->renderLayout();
     }
 
 }

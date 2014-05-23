@@ -18,9 +18,43 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
     protected function getKlarnaConnector()
     {
         if ( ! $this->_connector ) {
+
+            /**
+             * Configure Klarna
+             */
+            Klarna_Checkout_Order::$baseUri = Mage::helper('klarna/checkout')->getKlarnaBaseUri();
+            Klarna_Checkout_Order::$contentType = "application/vnd.klarna.checkout.aggregated-order-v2+json";
+
             $this->_connector = Klarna_Checkout_Connector::create($this->getSharedSecret());
+
         }
         return $this->_connector;
+    }
+
+    /**
+     * Acknowledge order and create it in our system
+     *
+     * @param $checkoutId
+     * @return void
+     */
+    public function acknowledge($checkoutId)
+    {
+        /**
+         * Load the order
+         */
+        try {
+
+            $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
+            $order->fetch();
+
+            echo '<pre>';
+            var_dump($order);
+
+
+        } catch (Exception $e) {
+            // Do nothing for now
+        }
+
     }
 
     /**
@@ -30,12 +64,6 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
      */
     public function getExistingKlarnaOrder()
     {
-        /**
-         * Configure Klarna
-         */
-        Klarna_Checkout_Order::$baseUri = Mage::helper('klarna/checkout')->getKlarnaBaseUri();
-        Klarna_Checkout_Order::$contentType = "application/vnd.klarna.checkout.aggregated-order-v2+json";
-
         /**
          * Try to load existing order
          */
@@ -67,9 +95,13 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
 
                 return false;
             }
+
+            return $order;
+
         }
 
-        return $order;
+        return false;
+
     }
 
     /**
