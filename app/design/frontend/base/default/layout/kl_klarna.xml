@@ -3,24 +3,39 @@
     <checkout_onepage_index>
         <reference name="head">
             <block type="page/html_head" name="klarna_head" as="klarna_head" template="klarna/checkout/scripts.phtml"/>
-            <action method="addItem"><type>skin_js</type><name>js/kl_klarna.js</name></action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>js/kl_klarna.js</name>
+            </action>
         </reference>
         <reference name="content">
-            <block type="klarna/fetch" name="klarna_fetch_address" as="klarna_fetch_address" before="checkout.payment.methods" template="klarna/address/fetch.phtml"/>
+            <block type="klarna/fetch" name="klarna_fetch_address" as="klarna_fetch_address"
+                   before="checkout.payment.methods" template="klarna/address/fetch.phtml"/>
         </reference>
     </checkout_onepage_index>
     <klklarna_checkout_index>
         <reference name="head">
-            <action method="addItem"><type>skin_js</type><name>js/kl_klarnacheckout.js</name></action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>js/kl_klarnacheckout.js</name>
+            </action>
         </reference>
         <reference name="content">
-            <block type="klarna/checkout_klarna_shipping" name="klarna_select_shipping" as="klarna_select_shipping" template="klarna/checkout/shipping.phtml"/>
-            <block type="klarna/checkout_klarna_checkout" name="klarna_checkout" as="klarna_checkout" template="klarna/checkout/checkout.phtml"/>
+            <block type="klarna/checkout_klarna_shipping" name="klarna_select_shipping" as="klarna_select_shipping"
+                   template="klarna/checkout/shipping.phtml"/>
+            <block type="klarna/checkout_klarna_checkout" name="klarna_checkout" as="klarna_checkout"
+                   template="klarna/checkout/checkout.phtml"/>
         </reference>
     </klklarna_checkout_index>
     <klklarna_checkout_success>
         <reference name="content">
-            <block type="klarna/checkout_klarna_success" name="klarna_select_success" as="klarna_select_success" template="klarna/checkout/success.phtml"/>
+            <block type="klarna/checkout_klarna_success" name="klarna_success" as="klarna_success"
+                   template="klarna/checkout/success.phtml"/>
         </reference>
     </klklarna_checkout_success>
+    <klklarna_checkout_terms>
+        <reference name="content">
+            <block type="core/template" name="klarna_terms" template="klarna/checkout/terms.phtml"/>
+        </reference>
+    </klklarna_checkout_terms>
 </layout>
