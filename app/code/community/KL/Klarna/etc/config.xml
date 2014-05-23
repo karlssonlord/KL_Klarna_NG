@@ -242,6 +242,7 @@
             </klarna_specpayment>
             <klarna_checkout>
                 <active>0</active>
+                <acknowledged_order_status>processing</acknowledged_order_status>
             </klarna_checkout>
         </payment>
     </default>
