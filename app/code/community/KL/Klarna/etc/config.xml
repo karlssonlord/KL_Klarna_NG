@@ -2,7 +2,7 @@
 <config>
     <modules>
         <KL_Klarna>
-            <version>0.0.4</version>
+            <version>0.0.5</version>
         </KL_Klarna>
     </modules>
     <frontend>
@@ -64,24 +64,24 @@
             </klarna_resource>
         </models>
         <resources>
-            <klarna_setup>
+            <klklarna_setup>
                 <setup>
                     <module>KL_Klarna</module>
                 </setup>
                 <connection>
                     <use>core_setup</use>
                 </connection>
-            </klarna_setup>
-            <klarna_write>
+            </klklarna_setup>
+            <klklarna_setup>
                 <connection>
                     <use>core_write</use>
                 </connection>
-            </klarna_write>
-            <klarna_read>
+            </klklarna_setup>
+            <klklarna_setup>
                 <connection>
                     <use>core_read</use>
                 </connection>
-            </klarna_read>
+            </klklarna_setup>
         </resources>
         <sales>
             <quote>
@@ -139,6 +139,9 @@
                 <klarna_total>
                     <to_order>*</to_order>
                 </klarna_total>
+                <klarna_checkout>
+                    <to_order>*</to_order>
+                </klarna_checkout>
             </sales_convert_quote>
             <sales_convert_order>
                 <base_klarna_total>

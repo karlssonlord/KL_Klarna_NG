@@ -23,7 +23,18 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
      */
     public function setKlarnaCheckoutId($checkoutId)
     {
+        /**
+         * Update the session
+         */
         Mage::getSingleton('core/session')->setKlarnaCheckoutId($checkoutId);
+
+        /**
+         * Update the quote
+         */
+        Mage::getSingleton('checkout/session')
+            ->getQuote()
+            ->setKlarnaCheckout($checkoutId)
+            ->save();
 
         return $this;
     }
