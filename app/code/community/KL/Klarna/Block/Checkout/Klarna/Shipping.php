@@ -6,35 +6,13 @@
 class KL_Klarna_Block_Checkout_Klarna_Shipping extends Mage_Checkout_Block_Onepage_Abstract {
 
     /**
-     * Return available shipping methods
+     * Return available shipping methods using quote
      *
      * @return array
      */
     public function getAvailableShippingMethods()
     {
-        /**
-         * Fetch the checkout model
-         */
-        $klarnaCheckout = Mage::getModel('klarna/klarnacheckout');
-
-        /**
-         * Collect shipping rates and assure the right country is set
-         */
-        $this->getShippingAddress()
-            ->setCountryId($klarnaCheckout->getCountry())
-            ->collectShippingRates()
-            ->save();
-
-        /**
-         * Fetched grouped shipping rates
-         */
-        $groupedShippingRates = $this->getShippingAddress()
-            ->getGroupedAllShippingRates();
-
-        /**
-         * Return data
-         */
-        return $groupedShippingRates;
+        return Mage::helper('klarna/checkout')->getAvailableShippingMethods();
     }
 
     /**
