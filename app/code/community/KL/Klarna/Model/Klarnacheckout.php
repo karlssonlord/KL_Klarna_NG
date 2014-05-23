@@ -44,12 +44,171 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
          */
         try {
 
+            /**
+             * Fetch order from Klarna
+             */
             $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
             $order->fetch();
 
-            echo '<pre>';
-            var_dump($order);
+            /**
+             * Make sure the order status is correct
+             */
+            if ( $order['status'] == 'checkout_complete' ) {
 
+                /**
+                 * Fetch quote
+                 */
+                $quote = Mage::getModel('sales/quote')
+                    ->getCollection()
+                    ->addFieldToFilter('klarna_checkout', $checkoutId)
+                    ->getFirstItem();
+
+                /**
+                 * Make sure quote was found
+                 */
+                if ( $quote->getId() ) {
+
+                    /**
+                     * Convert our total amount the Klarna way
+                     */
+                    $quoteTotal = intval($quote->getGrandTotal() * 100);
+
+                    /**
+                     * Compare the total amounts
+                     */
+                    if ( $quoteTotal == $order['cart']['total_price_including_tax'] ) {
+
+                        /**
+                         * Build shipping address
+                         */
+                        $shippingAddress = array();
+                        if ( isset($order['shipping_address']['care_of']) ) {
+                            $shippingAddress[] = $order['shipping_address']['care_of'];
+                        }
+                        $shippingAddress[] = $order['shipping_address']['street_address'];
+                        $shippingAddress = implode("\n", $shippingAddress);
+
+                        /**
+                         * Build billing address
+                         */
+                        $billingAddress = array();
+                        if ( isset($order['billing_address']['care_of']) ) {
+                            $billingAddress[] = $order['billing_address']['care_of'];
+                        }
+                        $billingAddress[] = $order['billing_address']['street_address'];
+                        $billingAddress = implode("\n", $billingAddress);
+
+                        /**
+                         * Reconfigure the shipping address
+                         */
+                        $quote->getShippingAddress()
+                            ->setFirstname($order['shipping_address']['given_name'])
+                            ->setLastname($order['shipping_address']['family_name'])
+                            ->setStreet($shippingAddress)
+                            ->setPostcode($order['shipping_address']['postal_code'])
+                            ->setCity($order['shipping_address']['city'])
+                            ->setCountryId(strtoupper($order['shipping_address']['country']))
+                            ->setEmail($order['shipping_address']['email'])
+                            ->setTelephone($order['shipping_address']['phone'])
+                            ->setSameAsBilling(0)
+                            ->save();
+
+                        /**
+                         * Reconfigure the billing address
+                         */
+                        $quote->getBillingAddress()
+                            ->setFirstname($order['shipping_address']['given_name'])
+                            ->setLastname($order['shipping_address']['family_name'])
+                            ->setStreet($billingAddress)
+                            ->setPostcode($order['shipping_address']['postal_code'])
+                            ->setCity($order['shipping_address']['city'])
+                            ->setCountryId(strtoupper($order['shipping_address']['country']))
+                            ->setEmail($order['shipping_address']['email'])
+                            ->setTelephone($order['shipping_address']['phone'])
+                            ->setSameAsBilling(0)
+                            ->save();
+
+                        $quote
+                            ->getPayment()
+                            ->setMethod('klarna_checkout')
+                            ->setAdditionalInformation($checkoutId)
+                            ->save();
+
+                        $quote
+                            ->collectTotals()
+                            ->save();
+
+                        /**
+                         * Fetch order status from config
+                         */
+                        $orderStatus = Mage::helper('klarna')->getConfig(
+                            'acknowledged_order_status',
+                            'klarna_checkout'
+                        );
+
+                        /**
+                         * Setup quote convertor
+                         */
+                        $convertQuote = Mage::getSingleton('sales/convert_quote');
+
+                        /**
+                         * Convert quote to order
+                         */
+                        $magentoOrder = $convertQuote->toOrder($quote);
+
+                        /**
+                         * Add all items
+                         */
+                        foreach ($quote->getAllItems() as $item) {
+                            $orderItem = $convertQuote->itemToOrderItem($item);
+                            if ( $item->getParentItem() ) {
+                                $orderItem->setParentItem(
+                                    $magentoOrder->getItemByQuoteItemId($item->getParentItem()->getId())
+                                );
+                            }
+                            $magentoOrder->addItem($orderItem);
+                        }
+
+                        /**
+                         * Configure and save the order
+                         */
+                        $magentoOrder
+                            ->setBillingAddress($convertQuote->addressToOrderAddress($quote->getBillingAddress()))
+                            ->setShippingAddress($convertQuote->addressToOrderAddress($quote->getShippingAddress()))
+                            ->setPayment($convertQuote->paymentToOrderPayment($quote->getPayment()));
+
+                        $magentoOrder
+                            ->setState('processing')
+                            ->setStatus($orderStatus)
+                            ->save();
+
+                        /**
+                         * Submit the quote
+                         */
+                        $service = Mage::getModel('sales/service_quote', $quote);
+                        $service->submitAll();
+
+                        /**
+                         * Send confirmation e-mail
+                         */
+                        try {
+                            $magentoOrder->sendNewOrderEmail();
+                        } catch (Exception $e) {
+                            // Do nothing
+                        }
+
+                        /**
+                         * If order was created, ping Klarna about it
+                         */
+                        if ( $magentoOrder->getId() ) {
+                            $order->update(array('status' => 'created'));
+                        }
+
+                    }
+
+                }
+
+            }
 
         } catch (Exception $e) {
             // Do nothing for now
@@ -170,7 +329,15 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
              */
             try {
 
+                /**
+                 * Update Klarna
+                 */
                 $order->update($klarnaData);
+
+                /**
+                 * Store session ID in session (again)
+                 */
+                Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
 
             } catch (Exception $e) {
 

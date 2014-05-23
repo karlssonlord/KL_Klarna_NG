@@ -21,17 +21,20 @@ class KL_Klarna_Block_Checkout_Klarna_Success extends Mage_Checkout_Block_Onepag
          * Fetch existing order
          */
         $order = $klarnaCheckout->getExistingKlarnaOrder();
-        $order->fetch();
 
-        /**
-         * Reset the Klarna Checkout ID
-         */
-        Mage::helper('klarna/checkout')->setKlarnaCheckoutId(false);
+        if ( is_object($order) ) {
+            $order->fetch();
 
-        /**
-         * Return HTML snippet
-         */
-        return $order['gui']['snippet'];
+            /**
+             * Reset the Klarna Checkout ID
+             */
+            Mage::helper('klarna/checkout')->setKlarnaCheckoutId(false);
+
+            /**
+             * Return HTML snippet
+             */
+            return $order['gui']['snippet'];
+        }
     }
 
 }

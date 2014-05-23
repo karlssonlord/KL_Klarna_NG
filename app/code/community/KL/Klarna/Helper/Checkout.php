@@ -103,6 +103,12 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
                 ->setShippingMethod($cheapestRate->getCode())
                 ->save();
 
+            /**
+             * Assure correct payment method
+             */
+            $shippingAddress
+                ->setPaymentMethod('klarna_checkout');
+
             return true;
 
         }

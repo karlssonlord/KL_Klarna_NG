@@ -1,4 +1,5 @@
 <div>
+    <h1><?php print $this->__('Select shipping method'); ?></h1>
     <?php foreach ($this->getAvailableShippingMethods() as $shippingCode => $shippingRates): ?>
 
         <?php foreach ($shippingRates as $shippingRate): ?>
@@ -11,3 +12,9 @@
 
     <?php endforeach; ?>
 </div>
+<?php
+    // Force reload of page if there is no shipping methods
+    if (count($this->getAvailableShippingMethods()) <= 0):
+?>
+<script>location.reload();</script>
+<?php endif; ?>
