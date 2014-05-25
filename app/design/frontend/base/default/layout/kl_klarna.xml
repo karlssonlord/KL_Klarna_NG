@@ -21,6 +21,8 @@
             </action>
         </reference>
         <reference name="content">
+            <block type="checkout/cart_coupon" name="checkout.cart.coupon" as="coupon"
+                   template="klarna/checkout/coupon.phtml"/>
             <block type="klarna/checkout_klarna_shipping" name="klarna_select_shipping" as="klarna_select_shipping"
                    template="klarna/checkout/shipping.phtml"/>
             <block type="klarna/checkout_klarna_checkout" name="klarna_checkout" as="klarna_checkout"

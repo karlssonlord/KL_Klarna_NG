@@ -304,8 +304,13 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
          */
         $items[] = Mage::getModel('klarna/klarnacheckout_shipping')->build();
 
-        // @todo Add shipping method
-        // @todo Add discounts
+        /**
+         * Handle discounts
+         */
+        $discounts = Mage::getModel('klarna/klarnacheckout_discount')->build($this->getQuote());
+        if ( $discounts ) {
+            $items[] = $discounts;
+        }
 
         /**
          * Setup the create array
