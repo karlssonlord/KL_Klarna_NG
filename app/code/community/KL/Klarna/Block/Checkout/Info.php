@@ -23,7 +23,11 @@ class KL_Klarna_Block_Checkout_Info extends KL_Klarna_Block_Info {
 
     protected function getKlarnaOrderField($field)
     {
+        /**
+         * Fetch order if not fetched
+         */
         if ( ! $this->_klarnaOrder ) {
+
             /**
              * Load our Klarna Checkout model
              */
@@ -33,6 +37,7 @@ class KL_Klarna_Block_Checkout_Info extends KL_Klarna_Block_Info {
              * Fetch the order
              */
             $this->_klarnaOrder = $checkout->getOrder($this->getCompleteCheckoutID());
+
         }
 
         /**
