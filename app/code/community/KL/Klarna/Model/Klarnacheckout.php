@@ -211,7 +211,21 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
                          * If order was created, ping Klarna about it
                          */
                         if ( $magentoOrder->getId() ) {
-                            $order->update(array('status' => 'created'));
+
+                            /**
+                             * Setup update data
+                             */
+                            $updateData = array(
+                                'status' => 'created',
+                                'merchant_reference' => array(
+                                    'orderid1' => $magentoOrder->getIncrementId()
+                                )
+                            );
+
+                            /**
+                             * Update order
+                             */
+                            $order->update($updateData);
                         }
 
                     }
