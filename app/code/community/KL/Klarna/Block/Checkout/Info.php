@@ -16,11 +16,22 @@ class KL_Klarna_Block_Checkout_Info extends KL_Klarna_Block_Info {
         $this->setTemplate('klarna/checkout-info.phtml');
     }
 
+    /**
+     * Fetch complete checkout ID (URL)
+     *
+     * @return bool
+     */
     protected function getCompleteCheckoutID()
     {
         return $this->getPaymentField('klarnaCheckoutId');
     }
 
+    /**
+     * Fetch field from Klarna order object
+     *
+     * @param $field
+     * @return mixed
+     */
     protected function getKlarnaOrderField($field)
     {
         /**
@@ -46,6 +57,11 @@ class KL_Klarna_Block_Checkout_Info extends KL_Klarna_Block_Info {
         return $this->_klarnaOrder->offsetGet($field);
     }
 
+    /**
+     * Get checkout ID
+     *
+     * @return array
+     */
     public function getCheckoutID()
     {
         /**
@@ -61,30 +77,54 @@ class KL_Klarna_Block_Checkout_Info extends KL_Klarna_Block_Info {
         return $klarnaCheckoutId;
     }
 
-
+    /**
+     * Get order status
+     *
+     * @return mixed
+     */
     public function getKlarnaStatus()
     {
-        return $this->getKlarnaOrderField('status');
+        return Mage::helper('klarna')->__('status_' . $this->getKlarnaOrderField('status'));
     }
 
+    /**
+     * Get order reference
+     *
+     * @return mixed
+     */
     public function getKlarnaReference()
     {
         return $this->getKlarnaOrderField('reference');
     }
 
+    /**
+     * Get order reservation
+     *
+     * @return mixed
+     */
     public function getKlarnaReservation()
     {
         return $this->getKlarnaOrderField('reservation');
     }
 
+    /**
+     * Get order purchase country
+     *
+     * @return string
+     */
     public function getKlarnaPurchaseCountry()
     {
-        return $this->getKlarnaOrderField('purchase_country');
+        return strtoupper($this->getKlarnaOrderField('purchase_country'));
     }
 
+    /**
+     * Get order purchase currency
+     *
+     * @return string
+     */
     public function getKlarnaPurchaseCurrency()
     {
-        return $this->getKlarnaOrderField('purchase_currency');
+        return strtoupper($this->getKlarnaOrderField('purchase_currency'));
     }
 
 }
