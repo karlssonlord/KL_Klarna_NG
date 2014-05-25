@@ -138,6 +138,9 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
                             ->setSameAsBilling(0)
                             ->save();
 
+                        /**
+                         * Set payment information
+                         */
                         $quote
                             ->getPayment()
                             ->setMethod('klarna_checkout')
@@ -157,46 +160,26 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
                         );
 
                         /**
-                         * Setup quote convertor
+                         * Feed quote object into sales model
                          */
-                        $convertQuote = Mage::getSingleton('sales/convert_quote');
+                        $service = Mage::getModel('sales/service_quote', $quote);
 
                         /**
-                         * Convert quote to order
+                         * Submit the quote and generate order
                          */
-                        $magentoOrder = $convertQuote->toOrder($quote);
+                        $service->submitAll();
 
                         /**
-                         * Add all items
+                         * Fetch the Magento Order
                          */
-                        foreach ($quote->getAllItems() as $item) {
-                            $orderItem = $convertQuote->itemToOrderItem($item);
-                            if ( $item->getParentItem() ) {
-                                $orderItem->setParentItem(
-                                    $magentoOrder->getItemByQuoteItemId($item->getParentItem()->getId())
-                                );
-                            }
-                            $magentoOrder->addItem($orderItem);
-                        }
+                        $magentoOrder = $service->getOrder();
 
                         /**
                          * Configure and save the order
                          */
                         $magentoOrder
-                            ->setBillingAddress($convertQuote->addressToOrderAddress($quote->getBillingAddress()))
-                            ->setShippingAddress($convertQuote->addressToOrderAddress($quote->getShippingAddress()))
-                            ->setPayment($convertQuote->paymentToOrderPayment($quote->getPayment()));
-
-                        $magentoOrder
                             ->setState('processing')
-                            ->setStatus($orderStatus)
-                            ->save();
-
-                        /**
-                         * Submit the quote
-                         */
-                        $service = Mage::getModel('sales/service_quote', $quote);
-                        $service->submitAll();
+                            ->setStatus($orderStatus);
 
                         /**
                          * Send confirmation e-mail
@@ -208,25 +191,24 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
                         }
 
                         /**
-                         * If order was created, ping Klarna about it
+                         * Save the order
                          */
-                        if ( $magentoOrder->getId() ) {
+                        $magentoOrder->save();
 
-                            /**
-                             * Setup update data
-                             */
-                            $updateData = array(
-                                'status' => 'created',
-                                'merchant_reference' => array(
-                                    'orderid1' => $magentoOrder->getIncrementId()
-                                )
-                            );
+                        /**
+                         * Setup update data
+                         */
+                        $updateData = array(
+                            'status' => 'created',
+                            'merchant_reference' => array(
+                                'orderid1' => $magentoOrder->getIncrementId()
+                            )
+                        );
 
-                            /**
-                             * Update order
-                             */
-                            $order->update($updateData);
-                        }
+                        /**
+                         * Update order
+                         */
+                        $order->update($updateData);
 
                     }
 
@@ -236,6 +218,7 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
 
         } catch (Exception $e) {
             // Do nothing for now
+            die('e: ' . $e->getMessage());
         }
 
     }
