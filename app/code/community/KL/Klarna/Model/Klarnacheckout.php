@@ -31,6 +31,17 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
         return $this->_connector;
     }
 
+    public function getOrder($checkoutId)
+    {
+        /**
+         * Fetch order from Klarna
+         */
+        $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
+        $order->fetch();
+
+        return $order;
+    }
+
     /**
      * Acknowledge order and create it in our system
      *
@@ -45,10 +56,9 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
         try {
 
             /**
-             * Fetch order from Klarna
+             * Fetch order
              */
-            $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
-            $order->fetch();
+            $order = $this->getOrder($checkoutId);
 
             /**
              * Make sure the order status is correct
@@ -131,7 +141,7 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
                         $quote
                             ->getPayment()
                             ->setMethod('klarna_checkout')
-                            ->setAdditionalInformation($checkoutId)
+                            ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
                             ->save();
 
                         $quote

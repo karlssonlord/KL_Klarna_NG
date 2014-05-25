@@ -3,12 +3,12 @@
 /**
  * Class KL_Klarna_Helper_Data
  */
-class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
-{
+class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
+    
     /**
      * Fetch configuration settings for
      *
-     * @param string $key  Magento setting key
+     * @param string $key Magento setting key
      * @param string $type "invoice", "spec", "part" or "checkout". Default is "klarna"
      *
      * @return mixed
@@ -31,8 +31,8 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
     /**
      * Log message to our log files
      *
-     * @param mixed   $message Log message
-     * @param boolean $force   Flag to activate force logging
+     * @param mixed $message Log message
+     * @param boolean $force Flag to activate force logging
      *
      * @return void
      */
@@ -85,7 +85,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
     /**
      * Get URL for invoice logo from Klarna CDN
      *
-     * @param int    $width   Width in pixels
+     * @param int $width Width in pixels
      * @param string $country Country code
      *
      * @return string
@@ -100,7 +100,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
     /**
      * Get URL for account logo from Klarna CDN
      *
-     * @param int    $width   Width in pixels
+     * @param int $width Width in pixels
      * @param string $country Country code
      *
      * @return string
@@ -108,6 +108,21 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
     public function getPartpaymentLogo($width = 250, $country = 'SE')
     {
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/account/' . $country . '_account_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
+            'merchant_id'
+        );
+    }
+
+    /**
+     * Get URL for regular logo from Klarna CDN
+     *
+     * @param int $width
+     * @param string $country
+     *
+     * @return string
+     */
+    public function getRegularLogo($width = 250, $country = 'SE')
+    {
+        return 'https://cdn.klarna.com/public/images/' . $country . '/logos/v1/basic/' . $country . '_basic_logo_std_blue-black.png?width=' . $width . '&eid=' . $this->getConfig(
             'merchant_id'
         );
     }

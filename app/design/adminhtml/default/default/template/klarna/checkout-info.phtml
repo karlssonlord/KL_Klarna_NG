@@ -1,0 +1,27 @@
+<img src="<?php print $this->getLogo(); ?>" width="100"/><br/>
+
+<table cellspacing="0" class="form-list">
+    <tbody>
+        <tr>
+            <td class="label"><label><?php print Mage::helper('klarna')->__('Status'); ?></label></td>
+            <td class="value"><strong><?php print $this->getKlarnaStatus(); ?></strong></td>
+        </tr>
+        <tr>
+            <td class="label"><label><?php print Mage::helper('klarna')->__('Reference'); ?></label></td>
+            <td class="value"><strong><?php print $this->getKlarnaReference(); ?></strong></td>
+        </tr>
+        <tr>
+            <td class="label"><label><?php print Mage::helper('klarna')->__('Reservation'); ?></label></td>
+            <td class="value"><strong><?php print $this->getKlarnaReservation(); ?></strong></td>
+        </tr>
+        <tr>
+            <td class="label"><label><?php print Mage::helper('klarna')->__('Purchase country'); ?></label></td>
+            <td class="value"><strong><?php print $this->getKlarnaPurchaseCountry(); ?></strong></td>
+        </tr>
+        <tr>
+            <td class="label"><label><?php print Mage::helper('klarna')->__('Purchase currency'); ?></label></td>
+            <td class="value"><strong><?php print $this->getKlarnaPurchaseCurrency(); ?></strong></td>
+        </tr>
+    </tbody>
+</table>
+<br />

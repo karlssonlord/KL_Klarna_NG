@@ -6,7 +6,7 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
 
     protected $_formBlockType = 'klarna/partpayment_form';
 
-    protected $_infoBlockType = 'klarna/partpayment_info';
+    protected $_infoBlockType = 'klarna/checkout_info';
 
     /**
      * Is this payment method a gateway (online auth/charge) ?
