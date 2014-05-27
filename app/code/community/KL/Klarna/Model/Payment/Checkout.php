@@ -83,11 +83,6 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
         return $this;
     }
 
-    public function l($a)
-    {
-        Mage::log($a, null, 'klarna.log', true);
-    }
-
     /**
      * Capture payment abstract method
      *
@@ -116,15 +111,19 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
         return $this;
     }
 
+    /**
+     * Refund specified amount for payment
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     * 
+     * @return Mage_Payment_Model_Abstract|void
+     *
+     * @throws Exception
+     */
     public function refund(Varien_Object $payment, $amount)
     {
-
-
-        throw new Exception('Foo bared');
-
-        die('foo');
-
-        return 0.00;
+        throw new Exception('Refund online not implemented');
     }
 
 }
