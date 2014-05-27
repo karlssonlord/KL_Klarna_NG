@@ -145,6 +145,8 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
                             ->getPayment()
                             ->setMethod('klarna_checkout')
                             ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
+                            ->setTransactionId($checkoutId)
+                            ->setIsTransactionClosed(0)
                             ->save();
 
                         $quote
@@ -194,6 +196,33 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
                          * Save the order
                          */
                         $magentoOrder->save();
+
+                        /**
+                         * Fetch the total amount reserved
+                         */
+                        $amountAuthorized = $order['cart']['total_price_including_tax'] / 100;
+
+                        /**
+                         * Set payment information on order object
+                         */
+                        $payment = $magentoOrder->getPayment();
+
+                        /**
+                         * Authorize
+                         */
+                        $payment->authorize($magentoOrder->getPayment(), $amountAuthorized);
+
+                        /**
+                         * Save order again
+                         */
+                        $magentoOrder->save();
+
+                        /**
+                         * Inactivate quote
+                         */
+                        $quote
+                            ->setIsActive(0)
+                            ->save();
 
                         /**
                          * Setup update data

@@ -10,47 +10,12 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
     /**
      * @var string
      */
-    protected $_formBlockType = 'klarna/partpayment_form';
+    #protected $_formBlockType = 'klarna/partpayment_form';
 
     /**
      * @var string
      */
     protected $_infoBlockType = 'klarna/checkout_info';
-
-    /**
-     * Is this payment method a gateway (online auth/charge) ?
-     */
-    protected $_isGateway = true;
-
-    /**
-     * Can authorize online?
-     */
-    protected $_canAuthorize = true;
-
-    /**
-     * Can capture funds online?
-     */
-    protected $_canCapture = true;
-
-    /**
-     * Can use this payment method in administration panel?
-     */
-    protected $_canUseInternal = true;
-
-    /**
-     * Can show this payment method as an option on checkout payment page?
-     */
-    protected $_canUseCheckout = true;
-
-    /**
-     * Can refund online?
-     */
-    protected $_canRefund = true;
-
-    /**
-     * Can refund partial
-     */
-    protected $_canRefundInvoicePartial = true;
 
     /**
      * Validation
@@ -75,33 +40,6 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
     }
 
     /**
-     * Refund specified amount for payment
-     *
-     * @param Varien_Object $payment
-     * @param float $amount
-     *
-     * @return Mage_Payment_Model_Abstract
-     */
-    public function refund(Varien_Object $payment, $amount)
-    {
-
-
-        throw new Exception('Foo bared');
-
-        die('foo');
-
-        return 0.00;
-    }
-
-    public function capture(Varien_Object $payment, $amount)
-    {
-        // validate order status
-
-        return $this;
-    }
-
-
-    /**
      * Authorize payment abstract method
      *
      * @param Varien_Object $payment
@@ -113,7 +51,80 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
      */
     public function authorize(Varien_Object $payment, $amount)
     {
+        /**
+         * Fetch the order
+         */
+        $order = $payment->getOrder();
+
+        /**
+         * Store reservation number
+         */
+        $klarnaCheckoutID = $order->getKlarnaCheckout();
+
+        /**
+         * Fetch the order
+         */
+        $klarnaOrder = Mage::getModel('klarna/klarnacheckout')->getOrder($klarnaCheckoutID);
+
+        /**
+         * Fetch the reservation number
+         */
+        $transactionId = $klarnaOrder['reservation'];
+
+        /**
+         * Set Magento payment method transaction
+         */
+        $payment
+            ->setTransactionId($transactionId)
+            ->setIsTransactionClosed(0);
+
+        Mage::log("Auth: " . $amount . ", " . $transactionId, null, 'klarna.log', true);
+
         return $this;
+    }
+
+    public function l($a)
+    {
+        Mage::log($a, null, 'klarna.log', true);
+    }
+
+    /**
+     * Capture payment abstract method
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     *
+     * @return Mage_Payment_Model_Abstract
+     */
+    public function capture(Varien_Object $payment, $amount)
+    {
+        /**
+         * Get authorization transaction
+         */
+        $authTrans = $payment->getAuthorizationTransaction();
+
+        /**
+         * Fetch Klarna API Order model
+         */
+        $apiModel = Mage::getModel('klarna/api_order');
+
+        /**
+         * Activate whole invoice at Klarna
+         */
+        $apiModel->activateReservation($authTrans->getTxnId());
+
+        return $this;
+    }
+
+    public function refund(Varien_Object $payment, $amount)
+    {
+
+
+        throw new Exception('Foo bared');
+
+        die('foo');
+
+        return 0.00;
     }
 
 }
