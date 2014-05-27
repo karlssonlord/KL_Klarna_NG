@@ -40,7 +40,8 @@ class KL_Klarna_model_KlarnaCheckout_Shipping extends KL_Klarna_model_KlarnaChec
          * If we're still failing with no shipping method
          */
         if ( ! $shipping->getShippingMethod() ) {
-            die('@todo No shipping information there. Handle me please.');
+            Mage::helper('klarna')->log('Missing shipping method for Klarna Checkout!');
+            return false;
         }
 
         /**

@@ -12,9 +12,3 @@
 
     <?php endforeach; ?>
 </div>
-<?php
-    // Force reload of page if there is no shipping methods
-    if (count($this->getAvailableShippingMethods()) <= 0):
-?>
-<script>location.reload();</script>
-<?php endif; ?>

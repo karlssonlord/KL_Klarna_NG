@@ -17,6 +17,9 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
      */
     protected function getKlarnaConnector()
     {
+        /**
+         * Setup the connector if not set
+         */
         if ( ! $this->_connector ) {
 
             /**
@@ -31,6 +34,12 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
         return $this->_connector;
     }
 
+    /**
+     * Fetch order from Klarna
+     *
+     * @param $checkoutId
+     * @return Klarna_Checkout_Order
+     */
     public function getOrder($checkoutId)
     {
         /**
@@ -299,6 +308,47 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
 
     }
 
+    public function prepareTotals()
+    {
+        /**
+         * Fetch the quote
+         */
+        $quote = $this->getQuote();
+
+        /**
+         * Fetch shipping address
+         */
+        $shippingAddress = $quote->getShippingAddress();
+
+        /**
+         * Force country to quote if not set
+         */
+        if ( ! $quote->getShippingAddress()->getCountryId() ) {
+
+            /**
+             * Add country ID
+             */
+            $shippingAddress
+                ->setCountryId($this->getCountry());
+
+        }
+
+        /**
+         * Collect quote totals
+         */
+        $shippingAddress
+            ->setTotalsCollectedFlag(false)
+            ->setCollectShippingRates(true)
+            ->collectTotals();
+
+        /**
+         * Save quote
+         */
+        $quote->save();
+
+        return $this;
+    }
+
     /**
      * Create or update order
      *
@@ -306,13 +356,6 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
      */
     public function handleOrder()
     {
-        /**
-         * Collect quote totals
-         */
-        $this
-            ->getQuote()
-            ->collectTotals();
-
         /**
          * Setup the items array
          */
@@ -328,7 +371,10 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
         /**
          * Add shipping method and the cost
          */
-        $items[] = Mage::getModel('klarna/klarnacheckout_shipping')->build();
+        $shipping = Mage::getModel('klarna/klarnacheckout_shipping')->build();
+        if ( $shipping ) {
+            $items[] = $shipping;
+        }
 
         /**
          * Handle discounts

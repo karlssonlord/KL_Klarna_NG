@@ -116,7 +116,7 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
      *
      * @param Varien_Object $payment
      * @param float $amount
-     * 
+     *
      * @return Mage_Payment_Model_Abstract|void
      *
      * @throws Exception

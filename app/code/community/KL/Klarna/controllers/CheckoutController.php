@@ -13,6 +13,11 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
     public function indexAction()
     {
         /**
+         * Prepare totals
+         */
+        Mage::getModel('klarna/klarnacheckout')->prepareTotals();
+
+        /**
          * Render layoyt
          */
         $this
