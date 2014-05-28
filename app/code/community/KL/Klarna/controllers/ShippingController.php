@@ -35,13 +35,7 @@ class KL_Klarna_ShippingController extends Mage_Core_Controller_Front_Action {
             /**
              * Update the quote
              */
-            Mage::getModel('checkout/cart')->getQuote()
-                ->getShippingAddress()
-                ->setCountryId($klarnaCheckout->getCountry())
-                ->setShippingMethod($shippingMethodCode)
-                ->setCollectShippingRates(true)
-                ->collectShippingRates()
-                ->save();
+            Mage::helper('klarna/checkout')->selectShippingMethod($shippingMethodCode);
 
             /**
              * Update the order at Klarna

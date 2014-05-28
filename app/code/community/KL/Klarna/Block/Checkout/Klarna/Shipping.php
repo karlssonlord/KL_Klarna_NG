@@ -5,6 +5,8 @@
  */
 class KL_Klarna_Block_Checkout_Klarna_Shipping extends Mage_Checkout_Block_Onepage_Abstract {
 
+    protected $_shippingFound = false;
+
     /**
      * Return available shipping methods using quote
      *
@@ -44,11 +46,23 @@ class KL_Klarna_Block_Checkout_Klarna_Shipping extends Mage_Checkout_Block_Onepa
      */
     public function isSelected($shippingRate)
     {
+
         if ( $this->getShippingAddress()->getShippingMethod() == $shippingRate->getCode() ) {
+            $this->_shippingFound = true;
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Check if a method was found
+     *
+     * @return bool
+     */
+    public function isMethodFound()
+    {
+        return $this->_shippingFound;
     }
 
 }

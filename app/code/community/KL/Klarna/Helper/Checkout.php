@@ -161,4 +161,30 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
             ->getGroupedAllShippingRates();
 
     }
+
+    public function selectShippingMethod($shippingMethodCode)
+    {
+        /**
+         * Fetch Klarna Checkout model
+         */
+        $klarnaCheckout = Mage::getModel('klarna/klarnacheckout');
+
+        /**
+         * Update the quote
+         */
+        $quote = Mage::getModel('checkout/cart')->getQuote();
+
+        $quote
+            ->getShippingAddress()
+            ->setCountryId($klarnaCheckout->getCountry())
+            ->setShippingMethod($shippingMethodCode)
+            ->save();
+
+        $quote
+            ->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->save();
+
+        return true;
+    }
 }
