@@ -341,4 +341,32 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         return $this;
     }
 
+
+    /**
+     * Cancel payment abstract method
+     *
+     * @param Varien_Object $payment
+     *
+     * @return Mage_Payment_Model_Abstract
+     */
+    public function cancel(Varien_Object $payment)
+    {
+        /**
+         * Get authorization transaction
+         */
+        $authTrans = $payment->getAuthorizationTransaction();
+
+        /**
+         * Get a new Klarna instance
+         */
+        $klarnaOrderApi = Mage::getModel('klarna/api_order');
+
+        /**
+         * Cancel reservation
+         */
+        $result = $klarnaOrderApi->cancelReservation($authTrans->getTxnId());
+
+        return $this;
+    }
+
 }

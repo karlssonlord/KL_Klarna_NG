@@ -83,6 +83,37 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
     }
 
     /**
+     * Cancel reservation
+     *
+     * @param $reservationNumber
+     * @return mixed
+     */
+    public function cancelReservation($reservationNumber)
+    {
+        Mage::helper('klarna')->log(
+            'Prepare to cancel reservation'
+        );
+
+        /**
+         * Cancel the reservation
+         */
+        try {
+            $result = $this->_klarnaOrder->cancelReservation($reservationNumber);
+        } catch (KlarnaException $e) {
+            Mage::helper('klarna')->log(
+                '#' . $e->getCode() . ': ' . $e->getMessage()
+            );
+            Mage::throwException(Mage::helper('klarna')->decode($e->getMessage()));
+        }
+
+        Mage::helper('klarna')->log(
+            'Cancel reservation complete'
+        );
+
+        return $result;
+    }
+
+    /**
      * @param $reservationNumber
      * @return mixed
      */
