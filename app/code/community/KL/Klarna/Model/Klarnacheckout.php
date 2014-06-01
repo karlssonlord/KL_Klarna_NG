@@ -59,6 +59,8 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
      */
     public function acknowledge($checkoutId)
     {
+        Mage::helper('klarna')->log('Request to acknowledge ' . $checkoutId);
+
         /**
          * Load the order
          */
@@ -68,6 +70,8 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
              * Fetch order
              */
             $order = $this->getOrder($checkoutId);
+
+            Mage::helper('klarna')->log('Order status: ' . $order['status']);
 
             /**
              * Make sure the order status is correct
@@ -87,10 +91,16 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
                  */
                 if ( $quote->getId() ) {
 
+                    Mage::helper('klarna')->log('Quote ID ' . $quote->getId() . ' matched');
+
                     /**
                      * Convert our total amount the Klarna way
                      */
                     $quoteTotal = intval($quote->getGrandTotal() * 100);
+
+                    Mage::helper('klarna')->log(
+                        'Comparing amount quote:' . $quoteTotal . ' and Klarna:' . $order['cart']['total_price_including_tax']
+                    );
 
                     /**
                      * Compare the total amounts
@@ -248,6 +258,10 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
                          */
                         $order->update($updateData);
 
+                        Mage::helper('klarna')->log(
+                            'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId()
+                        );
+
                     }
 
                 }
@@ -400,6 +414,8 @@ class KL_Klarna_model_KlarnaCheckout extends KL_Klarna_model_KlarnaCheckout_Abst
             ),
             'cart' => array('items' => $items)
         );
+
+        Mage::helper('klarna')->log($klarnaData);
 
         /**
          * Fetch existing Klarna Order
