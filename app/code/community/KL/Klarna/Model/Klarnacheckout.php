@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class KL_Klarna_model_KlarnaCheckout
+ * Class KL_Klarna_Model_KlarnaCheckout
  */
-class KL_Klarna_model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abstract {
+class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abstract {
 
     /**
      * @var
@@ -322,12 +322,24 @@ class KL_Klarna_model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abst
 
     }
 
+    /**
+     * Prepare totals
+     *
+     * @return KL_Klarna_Model_Klarnacheckout
+     */
     public function prepareTotals()
     {
         /**
          * Fetch the quote
          */
         $quote = $this->getQuote();
+
+        /**
+         * Collect totals
+         */
+        $quote
+            ->collectTotals()
+            ->save();
 
         /**
          * Fetch shipping address
@@ -348,17 +360,15 @@ class KL_Klarna_model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abst
         }
 
         /**
-         * Collect quote totals
+         * Collect shipping rates, quote totals
+         * and save the quote
          */
         $shippingAddress
             ->setTotalsCollectedFlag(false)
             ->setCollectShippingRates(true)
-            ->collectTotals();
-
-        /**
-         * Save quote
-         */
-        $quote->save();
+            ->collectShippingRates()
+            ->collectTotals()
+            ->save();
 
         return $this;
     }
