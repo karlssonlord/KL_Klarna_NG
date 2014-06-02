@@ -53,7 +53,7 @@ class KL_Klarna_model_KlarnaCheckout_Shipping extends KL_Klarna_model_KlarnaChec
          * Calculate shipping tax percent
          */
         if ( $shippingPrice ) {
-            $shippingTaxPercent = $shipping->getShippingTaxAmount() / $shipping->getShippingAmount();
+            $shippingTaxPercent = $shipping->getShippingTaxAmount() / ($shipping->getShippingAmount()-$shipping->getShippingTaxAmount());
         } else {
             $shippingTaxPercent = 0;
         }
@@ -67,7 +67,7 @@ class KL_Klarna_model_KlarnaCheckout_Shipping extends KL_Klarna_model_KlarnaChec
             'quantity' => 1,
             'unit_price' => intval($shippingPrice * 100),
             'discount_rate' => 0, // @todo
-            'tax_rate' => ($shippingTaxPercent * 100)
+            'tax_rate' => ceil(($shippingTaxPercent * 100))
         );
     }
 

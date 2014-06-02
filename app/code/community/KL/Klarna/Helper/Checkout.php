@@ -174,13 +174,15 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
          */
         $quote = Mage::getModel('checkout/cart')->getQuote();
 
+        $shippingAddress = $quote->getShippingAddress();
+
         $quote
             ->getShippingAddress()
             ->setCountryId($klarnaCheckout->getCountry())
             ->setShippingMethod($shippingMethodCode)
             ->save();
 
-        $quote
+        $shippingAddress
             ->setCollectShippingRates(true)
             ->collectShippingRates()
             ->save();
