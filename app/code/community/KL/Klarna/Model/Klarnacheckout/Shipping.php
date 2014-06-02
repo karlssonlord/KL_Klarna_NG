@@ -47,7 +47,7 @@ class KL_Klarna_model_KlarnaCheckout_Shipping extends KL_Klarna_model_KlarnaChec
         /**
          * Calculate total price
          */
-        $shippingPrice = $shipping->getShippingAmount() + $shipping->getShippingTaxAmount();
+        $shippingPrice = $shipping->getShippingAmount();
 
         /**
          * Calculate shipping tax percent
