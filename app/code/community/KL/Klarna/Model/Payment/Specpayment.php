@@ -1,28 +1,66 @@
 <?php
+/**
+ *
+ */
 
-class KL_Klarna_Model_Payment_Specpayment extends KL_Klarna_Model_Payment_Abstract {
+/**
+ *
+ */
+class KL_Klarna_Model_Payment_Specpayment
+    extends KL_Klarna_Model_Payment_Abstract
+{
 
-    protected $_code = 'klarna_specpayment';
+    protected $_code          = 'klarna_specpayment';
     protected $_formBlockType = 'klarna/specpayment_form';
     protected $_infoBlockType = 'klarna/specpayment_info';
+    protected $_pclassTypeId  = 4;
 
-    public function __construct()
-    {
-        // disable if no pclass exists
-        $this->_isGateway = false;
-        $this->_canUseCheckout = false;
-    }
-
-    public function agetTitle()
+    public function isAvailable($quote = null)
     {
         /**
-         * @todo Magic for setting the current campaign name here and also have the method removed if no campaign exists
+         * Setup count of possible pclasses
          */
-#        $this->_code = null;
-        #
+        $pclasses = Mage::helper('klarna/pclass')->getAvailable($this->_pclassTypeId, $quote);
 
+        /**
+         * If atleast one was found, enable the method
+         */
+        if (count($pclasses) > 0) {
+            return true;
+        }
 
-        return $this->__('No campaign is currently set');
+        return false;
     }
 
+    /**
+     * Custom validation
+     *
+     * @return bool|Mage_Payment_Model_Abstract
+     *
+     * @throws Exception
+     */
+    public function validate()
+    {
+        /**
+         * Fetch information about the payment data
+         */
+        $paymentInfo = $this->getInfoInstance();
+
+        /**
+         * Fetch additional information
+         */
+        $additionalInformation = $paymentInfo->getAdditionalInformation();
+
+        /**
+         * Make sure pclass is set
+         */
+        if (!isset($additionalInformation[$this->getCode() . '_pclass'])) {
+            Mage::throwException(Mage::helper('klarna')->__('Pclass selection not set: ' . var_export($additionalInformation, true)));
+        }
+
+        /**
+         * Continue with general Klarna validation
+         */
+        return parent::validate();
+    }
 }

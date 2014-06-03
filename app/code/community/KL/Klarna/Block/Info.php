@@ -22,6 +22,9 @@ class KL_Klarna_Block_Info extends Mage_Payment_Block_Info {
             case 'klarna_partpayment':
                 return Mage::helper('klarna')->getPartPaymentLogo(200);
                 break;
+            case 'klarna_specpayment':
+                return Mage::helper('klarna')->getPartPaymentLogo(200);
+                break;
             default:
                 return '';
         }
