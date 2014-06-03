@@ -61,11 +61,6 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
     public function setDefaultShippingMethodIfNotSet()
     {
         /**
-         * Fetch the checkout model
-         */
-        $klarnaCheckout = Mage::getModel('klarna/klarnacheckout');
-
-        /**
          * Loop all shipping methods
          */
         foreach ($this->getAvailableShippingMethods() as $shippingCode => $shippingRates) {

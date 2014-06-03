@@ -71,7 +71,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abst
              */
             $order = $this->getOrder($checkoutId);
 
-            Mage::helper('klarna')->log('Order status: ' . $order['status']);
+            Mage::helper('klarna')->log('Acknowledge: Order status: ' . $order['status']);
 
             /**
              * Make sure the order status is correct
@@ -79,190 +79,82 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abst
             if ( $order['status'] == 'checkout_complete' ) {
 
                 /**
-                 * Fetch quote
+                 * Load Magento order
                  */
-                $quote = Mage::getModel('sales/quote')
+                $magentoOrder = Mage::getModel('sales/order')
                     ->getCollection()
                     ->addFieldToFilter('klarna_checkout', $checkoutId)
                     ->getFirstItem();
 
                 /**
-                 * Make sure quote was found
+                 * Make sure order was found
                  */
-                if ( $quote->getId() ) {
-
-                    Mage::helper('klarna')->log('Quote ID ' . $quote->getId() . ' matched');
+                if ( $magentoOrder->getId() ) {
 
                     /**
-                     * Convert our total amount the Klarna way
+                     * Set the payment information
                      */
-                    $quoteTotal = intval($quote->getGrandTotal() * 100);
+                    $magentoOrder
+                        ->getPayment()
+                        ->setMethod('klarna_checkout')
+                        ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
+                        ->setTransactionId($checkoutId)
+                        ->setIsTransactionClosed(0)
+                        ->save();
 
-                    Mage::helper('klarna')->log(
-                        'Comparing amount quote:' . $quoteTotal . ' and Klarna:' . $order['cart']['total_price_including_tax']
+                    /**
+                     * Fetch order status from config
+                     */
+                    $orderStatus = Mage::helper('klarna')->getConfig(
+                        'acknowledged_order_status',
+                        'klarna_checkout'
                     );
 
                     /**
-                     * Compare the total amounts
+                     * Configure and save the order
                      */
-                    if ( $quoteTotal == $order['cart']['total_price_including_tax'] ) {
+                    $magentoOrder
+                        ->setState('processing')
+                        ->setStatus($orderStatus);
 
-                        /**
-                         * Build shipping address
-                         */
-                        $shippingAddress = array();
-                        if ( isset($order['shipping_address']['care_of']) ) {
-                            $shippingAddress[] = $order['shipping_address']['care_of'];
-                        }
-                        $shippingAddress[] = $order['shipping_address']['street_address'];
-                        $shippingAddress = implode("\n", $shippingAddress);
+                    /**
+                     * Fetch the total amount reserved
+                     */
+                    $amountAuthorized = $order['cart']['total_price_including_tax'] / 100;
 
-                        /**
-                         * Build billing address
-                         */
-                        $billingAddress = array();
-                        if ( isset($order['billing_address']['care_of']) ) {
-                            $billingAddress[] = $order['billing_address']['care_of'];
-                        }
-                        $billingAddress[] = $order['billing_address']['street_address'];
-                        $billingAddress = implode("\n", $billingAddress);
+                    /**
+                     * Set payment information on order object
+                     */
+                    $payment = $magentoOrder->getPayment();
 
-                        /**
-                         * Reconfigure the shipping address
-                         */
-                        $quote->getShippingAddress()
-                            ->setFirstname($order['shipping_address']['given_name'])
-                            ->setLastname($order['shipping_address']['family_name'])
-                            ->setStreet($shippingAddress)
-                            ->setPostcode($order['shipping_address']['postal_code'])
-                            ->setCity($order['shipping_address']['city'])
-                            ->setCountryId(strtoupper($order['shipping_address']['country']))
-                            ->setEmail($order['shipping_address']['email'])
-                            ->setTelephone($order['shipping_address']['phone'])
-                            ->setSameAsBilling(0)
-                            ->save();
+                    /**
+                     * Authorize
+                     */
+                    $payment->authorize($magentoOrder->getPayment(), $amountAuthorized);
 
-                        /**
-                         * Reconfigure the billing address
-                         */
-                        $quote->getBillingAddress()
-                            ->setFirstname($order['shipping_address']['given_name'])
-                            ->setLastname($order['shipping_address']['family_name'])
-                            ->setStreet($billingAddress)
-                            ->setPostcode($order['shipping_address']['postal_code'])
-                            ->setCity($order['shipping_address']['city'])
-                            ->setCountryId(strtoupper($order['shipping_address']['country']))
-                            ->setEmail($order['shipping_address']['email'])
-                            ->setTelephone($order['shipping_address']['phone'])
-                            ->setSameAsBilling(0)
-                            ->save();
+                    /**
+                     * Save order again
+                     */
+                    $magentoOrder->save();
 
-                        /**
-                         * Set payment information
-                         */
-                        $quote
-                            ->getPayment()
-                            ->setMethod('klarna_checkout')
-                            ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
-                            ->setTransactionId($checkoutId)
-                            ->setIsTransactionClosed(0)
-                            ->save();
+                    /**
+                     * Setup update data
+                     */
+                    $updateData = array(
+                        'status' => 'created',
+                        'merchant_reference' => array(
+                            'orderid1' => $magentoOrder->getIncrementId()
+                        )
+                    );
 
-                        $quote
-                            ->collectTotals()
-                            ->save();
+                    /**
+                     * Update order
+                     */
+                    $order->update($updateData);
 
-                        /**
-                         * Fetch order status from config
-                         */
-                        $orderStatus = Mage::helper('klarna')->getConfig(
-                            'acknowledged_order_status',
-                            'klarna_checkout'
-                        );
-
-                        /**
-                         * Feed quote object into sales model
-                         */
-                        $service = Mage::getModel('sales/service_quote', $quote);
-
-                        /**
-                         * Submit the quote and generate order
-                         */
-                        $service->submitAll();
-
-                        /**
-                         * Fetch the Magento Order
-                         */
-                        $magentoOrder = $service->getOrder();
-
-                        /**
-                         * Configure and save the order
-                         */
-                        $magentoOrder
-                            ->setState('processing')
-                            ->setStatus($orderStatus);
-
-                        /**
-                         * Send confirmation e-mail
-                         */
-                        try {
-                            $magentoOrder->sendNewOrderEmail();
-                        } catch (Exception $e) {
-                            // Do nothing
-                        }
-
-                        /**
-                         * Save the order
-                         */
-                        $magentoOrder->save();
-
-                        /**
-                         * Fetch the total amount reserved
-                         */
-                        $amountAuthorized = $order['cart']['total_price_including_tax'] / 100;
-
-                        /**
-                         * Set payment information on order object
-                         */
-                        $payment = $magentoOrder->getPayment();
-
-                        /**
-                         * Authorize
-                         */
-                        $payment->authorize($magentoOrder->getPayment(), $amountAuthorized);
-
-                        /**
-                         * Save order again
-                         */
-                        $magentoOrder->save();
-
-                        /**
-                         * Inactivate quote
-                         */
-                        $quote
-                            ->setIsActive(0)
-                            ->save();
-
-                        /**
-                         * Setup update data
-                         */
-                        $updateData = array(
-                            'status' => 'created',
-                            'merchant_reference' => array(
-                                'orderid1' => $magentoOrder->getIncrementId()
-                            )
-                        );
-
-                        /**
-                         * Update order
-                         */
-                        $order->update($updateData);
-
-                        Mage::helper('klarna')->log(
-                            'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId()
-                        );
-
-                    }
+                    Mage::helper('klarna')->log(
+                        'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId()
+                    );
 
                 }
 
@@ -473,6 +365,60 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abst
              */
             if ( $this->useMobileGui() ) {
                 $klarnaData['gui'] = array('layout' => 'mobile');
+            }
+
+            /**
+             * Prefill information from current user
+             */
+            if ( Mage::getSingleton('customer/session')->isLoggedIn() ) {
+
+                /**
+                 * Fetch current user
+                 */
+                $currentUser = Mage::getSingleton('customer/session')->getCustomer();
+
+                /**
+                 * Make sure the variable in the array is defined
+                 */
+                if ( ! isset($klarnaData['shipping_address']) ) {
+                    $klarnaData['shipping_address'] = array();
+                }
+
+                /**
+                 * Set the e-mail
+                 */
+                $klarnaData['shipping_address']['email'] = $currentUser->getEmail();
+
+                /**
+                 * Fetch the default shipping address
+                 */
+                $defaultShippingAddressId = $currentUser->getDefaultShipping();
+                if ( $defaultShippingAddressId ) {
+
+                    /**
+                     * Load the address
+                     */
+                    $defaultShippingAddress = $address = Mage::getModel('customer/address')->load(
+                        $defaultShippingAddressId
+                    );
+
+                    /**
+                     * Prefill postcode
+                     */
+                    if ( $defaultShippingAddress->getPostcode() ) {
+                        $klarnaData['shipping_address']['postal_code'] = $defaultShippingAddress->getPostcode();
+                    }
+
+                }
+
+                /**
+                 * Prefill using test credentials if it's a test environment
+                 */
+                if ( ! Mage::helper('klarna')->isLive() ) {
+                    $klarnaData['shipping_address']['email'] = 'checkout-se@testdrive.klarna.com';
+                    $klarnaData['shipping_address']['postal_code'] = '12345';
+                }
+
             }
 
             /**

@@ -18,7 +18,7 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
         Mage::getModel('klarna/klarnacheckout')->prepareTotals();
 
         /**
-         * Render layoyt
+         * Render layout
          */
         $this
             ->loadLayout()
@@ -31,16 +31,38 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
     public function successAction()
     {
         /**
-         * Reset the Magento quote
+         * Create the order
          */
-        Mage::getSingleton('checkout/session')->setQuoteId(null);
+        try {
+            /**
+             * Create the order
+             */
+            $orderObject = Mage::getModel('klarna/klarnacheckout_order')->create();
 
-        /**
-         * Render layoyt
-         */
-        $this
-            ->loadLayout()
-            ->renderLayout();
+            /**
+             * Render layout
+             */
+            $this->loadLayout();
+            $layout = $this->getLayout();
+            $block = $layout->getBlock('klarna_success');
+            $block->setOrder($orderObject);
+
+            $this->renderLayout();
+
+        } catch (Exception $e) {
+
+            /**
+             * Log the exception
+             */
+            Mage::helper('klarna')->log('Exception when trying to create order: ' . $e->getMessage());
+
+            /**
+             * Throw error to frontend
+             */
+            throw new Exception($e->getMessage());
+
+        }
+
     }
 
     public function pushAction()
@@ -54,7 +76,7 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
     public function termsAction()
     {
         /**
-         * Render layoyt
+         * Render layout
          */
         $this
             ->loadLayout()
