@@ -11,7 +11,7 @@ class KL_Klarna_Block_Specpayment_Form extends KL_Klarna_Block_Form {
         $pclasses = array_merge(
             Mage::helper('klarna/pclass')->getAvailable(0),
             Mage::helper('klarna/pclass')->getAvailable(2),
-            Mage::helper('klarna/pclass')->getAvailable(4),
+            Mage::helper('klarna/pclass')->getAvailable(4)
         );
 
         $this

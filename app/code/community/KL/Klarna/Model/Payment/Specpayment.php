@@ -23,7 +23,7 @@ class KL_Klarna_Model_Payment_Specpayment
         $pclasses = array_merge(
             Mage::helper('klarna/pclass')->getAvailable(0, $quote),
             Mage::helper('klarna/pclass')->getAvailable(2, $quote),
-            Mage::helper('klarna/pclass')->getAvailable(4, $quote),
+            Mage::helper('klarna/pclass')->getAvailable(4, $quote)
         );
 
         /**
