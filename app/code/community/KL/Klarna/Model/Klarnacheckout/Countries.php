@@ -1,6 +1,9 @@
 <?php
 
-class KL_Klarna_Model_KlarnaCheckout_Countries extends Varien_Object {
+/**
+ * Class KL_Klarna_Model_Klarnacheckout_Countries
+ */
+class KL_Klarna_Model_Klarnacheckout_Countries extends Varien_Object {
 
     /**
      * @return array

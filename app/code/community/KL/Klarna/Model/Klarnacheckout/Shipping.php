@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class KL_Klarna_model_KlarnaCheckout_Shipping
+ * Class KL_Klarna_Model_Klarnacheckout_Shipping
  */
-class KL_Klarna_model_KlarnaCheckout_Shipping extends KL_Klarna_model_KlarnaCheckout_Abstract {
+class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_model_KlarnaCheckout_Abstract {
 
     /**
      * Build array with shipping information

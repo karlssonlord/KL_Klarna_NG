@@ -20,4 +20,3 @@ class KL_Klarna_Block_Checkout_Cart_Sidebar extends Mage_Checkout_Block_Cart_Sid
     }
 
 }
-

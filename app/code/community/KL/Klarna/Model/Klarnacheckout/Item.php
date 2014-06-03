@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class KL_Klarna_model_KlarnaCheckout_Item
+ * Class KL_Klarna_Model_Klarnacheckout_Item
  */
-class KL_Klarna_model_KlarnaCheckout_Item extends KL_Klarna_model_KlarnaCheckout_Abstract {
+class KL_Klarna_Model_Klarnacheckout_Item extends KL_Klarna_model_KlarnaCheckout_Abstract {
 
     /**
      * Build array

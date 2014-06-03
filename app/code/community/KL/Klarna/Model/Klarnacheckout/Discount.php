@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class KL_Klarna_model_KlarnaCheckout_Discount
+ * Class KL_Klarna_Model_Klarnacheckout_Discount
  */
-class KL_Klarna_model_KlarnaCheckout_Discount extends KL_Klarna_model_KlarnaCheckout_Abstract {
+class KL_Klarna_Model_Klarnacheckout_Discount extends KL_Klarna_model_KlarnaCheckout_Abstract {
 
     /**
      * Build array

@@ -20,4 +20,3 @@ class KL_Klarna_Block_Checkout_Onepage_Link extends Mage_Checkout_Block_Onepage_
     }
 
 }
-
