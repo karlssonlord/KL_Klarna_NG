@@ -6,10 +6,7 @@ class KL_Klarna_Block_Partpayment_Form extends KL_Klarna_Block_Form {
     {
         parent::__construct();
 
-        $pclasses = array_merge(
-            Mage::helper('klarna/pclass')->getAvailable(0), // Part payment
-            Mage::helper('klarna/pclass')->getAvailable(1) // Account
-        );
+        $pclasses = Mage::helper('klarna/pclass')->getAvailable(1);
 
         $this
             ->assign('pclasses', $pclasses)
