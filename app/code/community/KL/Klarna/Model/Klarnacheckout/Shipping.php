@@ -59,11 +59,23 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_model_KlarnaChec
         }
 
         /**
+         * Set the shipping name
+         */
+        $shippingName = $shipping->getShippingDescription();
+
+        /**
+         * If the shipping name wasn't loaded by some reason, just add a standard name
+         */
+        if (!$shippingName) {
+            $shippingName = Mage::helper('klarna')->__('Shipping');
+        }
+
+        /**
          * Return the array
          */
         return array(
             'reference' => $shipping->getShippingMethod(),
-            'name' => $shipping->getShippingDescription(),
+            'name' => $shippingName,
             'quantity' => 1,
             'unit_price' => intval($shippingPrice * 100),
             'discount_rate' => 0, // @todo
