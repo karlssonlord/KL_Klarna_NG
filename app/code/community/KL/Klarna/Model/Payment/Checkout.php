@@ -88,11 +88,67 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
      *
      * @param Varien_Object $payment
      * @param float $amount
-     *
-     * @return Mage_Payment_Model_Abstract
+     * @return $this
+     * @throws Exception
      */
     public function capture(Varien_Object $payment, $amount)
     {
+        /**
+         * Load the order
+         */
+        $order = $payment->getOrder();
+
+        /**
+         * Setup array of items to activate
+         */
+        $activate = array();
+
+        /**
+         * Setup invoice counter
+         */
+        $counter = 0;
+
+        /**
+         * Loop all invoices
+         */
+        foreach ($order->getInvoiceCollection() as $invoice) {
+
+            /**
+             * Increase counter
+             */
+            $counter ++;
+
+            /**
+             * If invoice ID is missing, then that's the one
+             */
+            if ( ! $invoice->getId() ) {
+
+                /**
+                 * Fetch all items
+                 */
+                foreach ($invoice->getAllItems() as $item) {
+
+                    /**
+                     * Only invoice items that has row total set
+                     */
+                    if ( $item->getRowTotal() > 0 ) {
+
+                        /**
+                         * Add item
+                         */
+                        $activate[$item->getSku()] = $item->getQty();
+                    }
+                }
+            }
+        }
+
+        /**
+         * If it's the first invoice, include shipping cost
+         */
+        if ( $counter == 1 && $order->getShippingMethod() ) {
+            $activate[$order->getShippingMethod()] = 1;
+        }
+
         /**
          * Get authorization transaction
          */
@@ -107,7 +163,7 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
          * Activate whole invoice at Klarna
          */
         if ( is_object($authTrans) ) {
-            $apiModel->activateReservation($authTrans->getTxnId());
+            $apiModel->activateReservation($authTrans->getTxnId(), $activate);
         } else {
             throw new Exception('No authorization transaction exists');
         }

@@ -114,14 +114,33 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
     }
 
     /**
+     * Activate reservation
+     *
      * @param $reservationNumber
+     * @param array $items
      * @return mixed
      */
-    public function activateReservation($reservationNumber)
+    public function activateReservation($reservationNumber, $items = array())
     {
         Mage::helper('klarna')->log(
             'Prepare to activate amount'
         );
+
+        if ( count($items) ) {
+
+            /**
+             * Add each item
+             */
+            foreach ($items as $sku => $qty) {
+
+                Mage::helper('klarna')->log(
+                    'Adding ' . $qty . ' pcs of sku ' . $sku
+                );
+
+                $this->_klarnaOrder->addArtNo($qty, $sku);
+            }
+
+        }
 
         /**
          * Activate the amount
@@ -140,6 +159,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         );
 
         return $result;
+
     }
 
     /**
@@ -241,7 +261,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         /**
          * Add shipping cost (if any)
          */
-        if ($order->getShippingAmount() > 0) {
+        if ( $order->getShippingAmount() > 0 ) {
             $this->_klarnaOrder->addArticle(
                 1,
                 'shipping_fee',
