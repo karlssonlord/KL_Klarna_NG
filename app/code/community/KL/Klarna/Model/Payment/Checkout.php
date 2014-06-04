@@ -106,7 +106,11 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
         /**
          * Activate whole invoice at Klarna
          */
-        $apiModel->activateReservation($authTrans->getTxnId());
+        if ( is_object($authTrans) ) {
+            $apiModel->activateReservation($authTrans->getTxnId());
+        } else {
+            throw new Exception('No authorization transaction exists');
+        }
 
         return $this;
     }
