@@ -3,7 +3,7 @@
 /**
  * Class KL_Klarna_Model_Klarnacheckout_Shipping
  */
-class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_KlarnaCheckout_Abstract {
+class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnacheckout_Abstract {
 
     /**
      * Build array with shipping information

@@ -3,7 +3,7 @@
 /**
  * Class KL_Klarna_Model_Klarnacheckout_Discount
  */
-class KL_Klarna_Model_Klarnacheckout_Discount extends KL_Klarna_Model_KlarnaCheckout_Abstract {
+class KL_Klarna_Model_Klarnacheckout_Discount extends KL_Klarna_Model_Klarnacheckout_Abstract {
 
     /**
      * Build array
