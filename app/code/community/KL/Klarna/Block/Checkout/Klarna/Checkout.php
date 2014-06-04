@@ -39,4 +39,35 @@ class KL_Klarna_Block_Checkout_Klarna_Checkout extends Mage_Core_Block_Template 
         return $data;
     }
 
+    /** Show veterinar popup? This is Animail-specific code. */
+
+    public function getVeterinarProducts(){
+        $veterinaryProducts = array();
+        $vererinaryHtml = array();
+
+        // Fetch instance of products and if it's not set
+        $products = Mage::getModel('catalog/product');
+
+        // Fetch the cart
+        $cart = Mage::helper('checkout/cart')->getCart();
+
+        // Loop through the cart
+        foreach($cart->getItems() as $_item) {
+            // Load the product
+            $_product = $products->load($_item->getProductId());
+
+            // Check the product
+            if ($_product->getStandardvet() == 1 || $_product->getVeterinar() == 1) {
+                $veterinaryProducts[] = $_product->getName();
+            }
+        }
+
+        if(count($veterinaryProducts)){
+            Mage::getSingleton('core/session')->setShowVetDialog(true);
+            return $veterinaryProducts;
+        }
+        Mage::getSingleton('core/session')->setShowVetDialog(false);
+        return false;
+    }
+
 }
