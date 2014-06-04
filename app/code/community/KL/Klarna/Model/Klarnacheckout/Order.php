@@ -3,7 +3,7 @@
 /**
  * Class KL_Klarna_Model_Klarnacheckout_Order
  */
-class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_model_KlarnaCheckout_Abstract {
+class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_KlarnaCheckout_Abstract {
 
     /**
      * @var
