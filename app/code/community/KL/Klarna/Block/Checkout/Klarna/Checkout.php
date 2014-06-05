@@ -5,6 +5,12 @@
  */
 class KL_Klarna_Block_Checkout_Klarna_Checkout extends Mage_Core_Block_Template {
 
+
+    protected function _prepareLayout()
+    {
+        $this->getLayout()->getBlock('head')->setTitle(Mage::helper('customer')->__('Checkout'));
+        return parent::_prepareLayout();
+    }
     /**
      * Fetch Klarna HTML
      */
