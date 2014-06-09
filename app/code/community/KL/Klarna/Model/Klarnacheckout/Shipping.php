@@ -47,13 +47,13 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
         /**
          * Calculate total price
          */
-        $shippingPrice = $shipping->getShippingAmount();
+        $shippingPrice = $shipping->getShippingAmount() + $shipping->getShippingTaxAmount();
 
         /**
          * Calculate shipping tax percent
          */
         if ( $shippingPrice ) {
-            $shippingTaxPercent = $shipping->getShippingTaxAmount() / ($shipping->getShippingAmount()-$shipping->getShippingTaxAmount());
+            $shippingTaxPercent = $shipping->getShippingTaxAmount() / $shipping->getShippingAmount();
         } else {
             $shippingTaxPercent = 0;
         }
@@ -73,7 +73,7 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
         /**
          * Return the array
          */
-        return array(
+        $shipping = array(
             'reference' => $shipping->getShippingMethod(),
             'name' => $shippingName,
             'quantity' => 1,
@@ -81,6 +81,8 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
             'discount_rate' => 0, // @todo
             'tax_rate' => ceil(($shippingTaxPercent * 100))
         );
+
+        return $shipping;
     }
 
 }
