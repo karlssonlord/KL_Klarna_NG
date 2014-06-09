@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Class KL_Klarna_Model_Observer
+ * Observer
  */
 class KL_Klarna_Model_Observer extends Mage_Core_Model_Abstract {
 
@@ -40,4 +39,18 @@ class KL_Klarna_Model_Observer extends Mage_Core_Model_Abstract {
         return $observer;
     }
 
+    /**
+     * Observer method for handling Klarna Checkout orders
+     *
+     * @param Varien_Event_Observer @observer
+     *
+     * @return Varien_Event_Observer
+     */
+    public function handleOrder($observer)
+    {
+        Mage::getModel('klarna/klarnacheckout')
+            ->handleOrder();
+
+        return $observer;
+    }
 }

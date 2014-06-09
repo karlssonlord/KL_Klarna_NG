@@ -33,8 +33,7 @@
                     <sales_order_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Totals</sales_order_totals>
                 </rewrite>
                 <rewrite>
-                    <sales_order_invoice_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Invoice_Totals
-                    </sales_order_invoice_totals>
+                    <sales_order_invoice_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Invoice_Totals</sales_order_invoice_totals>
                 </rewrite>
             </adminhtml>
             <checkout>
@@ -164,6 +163,24 @@
                     </klarna>
                 </observers>
             </admin_system_config_changed_section_payment>
+            <cart_json_response>
+                <observers>
+                    <klarna_checkout_cart>
+                        <type>singleton</type>
+                        <class>klarna/observer</class>
+                        <method>handleOrder</method>
+                    </klarna_checkout_cart>
+                </observers>
+            </cart_json_response>
+            <checkout_json_response>
+                <observers>
+                    <klarna_checkout_checkout>
+                        <type>singleton</type>
+                        <class>klarna/observer</class>
+                        <method>handleOrder</method>
+                    </klarna_checkout_checkout>
+                </observers>
+            </checkout_json_response>
         </events>
     </global>
     <klarna>
