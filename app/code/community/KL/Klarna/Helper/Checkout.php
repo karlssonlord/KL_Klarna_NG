@@ -177,6 +177,9 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
             ->setShippingMethod($shippingMethodCode)
             ->save();
 
+        $quote->collectTotals()
+            ->save();
+
         $shippingAddress
             ->setCollectShippingRates(true)
             ->collectShippingRates()
