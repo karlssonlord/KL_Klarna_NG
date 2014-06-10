@@ -181,6 +181,15 @@
                     </klarna_checkout_checkout>
                 </observers>
             </checkout_json_response>
+            <controller_action_predispatch_klklarna_checkout_index>
+                <observers>
+                    <klarna_checkout_checkout>
+                        <type>singleton</type>
+                        <class>klarna/observer</class>
+                        <method>preDispatchCheckout</method>
+                    </klarna_checkout_checkout>
+                </observers>
+            </controller_action_predispatch_klklarna_checkout_index>
         </events>
     </global>
     <klarna>

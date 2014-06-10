@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Include Klarna Checkout library
  */
@@ -8,7 +7,9 @@ require_once('Klarna/Checkout.php');
 /**
  * Class KL_Klarna_Model_Klarnacheckout_Abstract
  */
-class KL_Klarna_Model_Klarnacheckout_Abstract extends KL_Klarna_Model_Klarna {
+class KL_Klarna_Model_Klarnacheckout_Abstract
+    extends KL_Klarna_Model_Klarna
+{
 
     /**
      * Fetch country model selected

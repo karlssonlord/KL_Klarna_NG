@@ -12,11 +12,12 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
      */
     public function build()
     {
+        $quote = Mage::helper('checkout')->getQuote();
+
         /**
          * Fetch information from quote
          */
-        $shipping = Mage::helper('checkout')->getQuote()
-            ->getShippingAddress();
+        $shipping = $quote->getShippingAddress();
 
         /**
          * Set first shipping method if none is set
@@ -31,8 +32,7 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
             /**
              * Fetch information from quote again
              */
-            $shipping = Mage::helper('checkout')->getQuote()
-                ->getShippingAddress();
+            $shipping = $quote->getShippingAddress();
 
         }
 
@@ -44,16 +44,21 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
             return false;
         }
 
+        $shipping
+            ->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->save();
+
         /**
          * Calculate total price
          */
-        $shippingPrice = $shipping->getShippingAmount() + $shipping->getShippingTaxAmount();
+        $shippingPrice = $shipping->getShippingAmount();
 
         /**
          * Calculate shipping tax percent
          */
         if ( $shippingPrice ) {
-            $shippingTaxPercent = ( $shipping->getShippingTaxAmount() / $shipping->getShippingAmount() ) * 100;
+            $shippingTaxPercent = ( $shipping->getShippingTaxAmount() / ($shippingPrice - $shipping->getShippingTaxAmount()) ) * 100;
         } else {
             $shippingTaxPercent = 0;
         }
