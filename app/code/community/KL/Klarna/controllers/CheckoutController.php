@@ -6,8 +6,7 @@ require_once Mage::getModuleDir('controllers', 'Mage_Checkout')
  * Class KL_Klarna_CheckoutController
  */
 class KL_Klarna_CheckoutController
-    extends Mage_Checkout_OnepageController
-{
+    extends Mage_Checkout_OnepageController {
 
     /**
      * Display the checkout
@@ -18,7 +17,7 @@ class KL_Klarna_CheckoutController
     {
         $quote = $this->_getQuote();
 
-        if($quote->getItemsCount() === '0') {
+        if ( $quote->getItemsCount() === '0' ) {
             $this->_redirectUrl(Mage::helper('core/url')->getHomeUrl());
             $this->setFlag('', self::FLAG_NO_DISPATCH, true);
             return $this;
@@ -52,6 +51,14 @@ class KL_Klarna_CheckoutController
              * Create the order
              */
             $orderObject = Mage::getModel('klarna/klarnacheckout_order')->create();
+
+            /**
+             * Redirect if order wasn't created
+             */
+            if ( ! $orderObject ) {
+                $this->_redirectUrl(Mage::helper('core/url')->getHomeUrl());
+                return $this;
+            }
 
             /**
              * Render layout

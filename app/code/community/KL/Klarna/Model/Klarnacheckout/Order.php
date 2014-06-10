@@ -28,7 +28,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         /**
          * Make sure it was found
          */
-        if (!$checkoutId) {
+        if ( ! $checkoutId ) {
             throw new Exception('No checkout ID exists');
         }
 
@@ -43,6 +43,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         $quote = Mage::getModel('sales/quote')
             ->getCollection()
             ->addFieldToFilter('klarna_checkout', $checkoutId)
+            ->addFieldToFilter('is_active', 1)
             ->getFirstItem();
 
         /**
@@ -140,6 +141,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
 
                 $quote
                     ->collectTotals()
+                    ->setIsActive(0)
                     ->save();
 
                 /**
@@ -185,7 +187,9 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         } else {
 
             // Unable to find a matching quote!!!
-            throw new Exception('Unable to find matching quote when about to create Klarna order');
+            Mage::helper('klarna')->log('Unable to find matching quote when about to create Klarna order');
+
+            return false;
 
         }
 
