@@ -27,6 +27,7 @@ class KL_Klarna_Block_Checkout_Klarna_Checkout extends Mage_Core_Block_Template 
         try {
             $data = $model->handleOrder();
         } catch (Exception $e) {
+            Mage::helper('klarna')->log($e->getMessage(), true);
             $data = false;
         }
 
