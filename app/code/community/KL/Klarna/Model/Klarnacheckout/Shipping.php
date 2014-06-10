@@ -12,11 +12,12 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
      */
     public function build()
     {
+        $quote = Mage::helper('checkout')->getQuote();
+
         /**
          * Fetch information from quote
          */
-        $shipping = Mage::helper('checkout')->getQuote()
-            ->getShippingAddress();
+        $shipping = $quote->getShippingAddress();
 
         /**
          * Set first shipping method if none is set
@@ -31,8 +32,7 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
             /**
              * Fetch information from quote again
              */
-            $shipping = Mage::helper('checkout')->getQuote()
-                ->getShippingAddress();
+            $shipping = $quote->getShippingAddress();
 
         }
 
@@ -44,6 +44,11 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
             return false;
         }
 
+        $shipping
+            ->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->save();
+
         /**
          * Calculate total price
          */
@@ -53,7 +58,7 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
          * Calculate shipping tax percent
          */
         if ( $shippingPrice ) {
-            $shippingTaxPercent = $shipping->getShippingTaxAmount() / ($shipping->getShippingAmount()-$shipping->getShippingTaxAmount());
+            $shippingTaxPercent = ( $shipping->getShippingTaxAmount() / ($shippingPrice - $shipping->getShippingTaxAmount()) ) * 100;
         } else {
             $shippingTaxPercent = 0;
         }
@@ -73,7 +78,7 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
         /**
          * Return the array
          */
-        return array(
+        $shipping = array(
             'reference' => $shipping->getShippingMethod(),
             'name' => $shippingName,
             'quantity' => 1,
@@ -81,6 +86,8 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
             'discount_rate' => 0, // @todo
             'tax_rate' => ceil(($shippingTaxPercent * 100))
         );
+
+        return $shipping;
     }
 
 }

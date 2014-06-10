@@ -95,8 +95,7 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
             $shippingAddress = $quote->getShippingAddress();
 
             $shippingAddress
-                ->setShippingMethod($cheapestRate->getCode())
-                ->save();
+                ->setShippingMethod($cheapestRate->getCode());
 
             /**
              * Assure correct payment method

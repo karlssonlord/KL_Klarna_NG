@@ -1,9 +1,13 @@
 <?php
+require_once Mage::getModuleDir('controllers', 'Mage_Checkout')
+    . DS . 'OnepageController.php';
 
 /**
  * Class KL_Klarna_CheckoutController
  */
-class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
+class KL_Klarna_CheckoutController
+    extends Mage_Checkout_OnepageController
+{
 
     /**
      * Display the checkout
@@ -12,6 +16,10 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
      */
     public function indexAction()
     {
+        $quote = $this->_getQuote();
+
+       $this->getOnepage()->initCheckout();
+
         /**
          * Prepare totals
          */
@@ -63,6 +71,18 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
 
         }
 
+    }
+
+    /**
+     * Get quote
+     *
+     * @return Mage_Sales_Model_Quote
+     */
+    protected function _getQuote()
+    {
+        $quote = $this->getOnepage()->getQuote();
+
+        return $quote;
     }
 
     public function pushAction()

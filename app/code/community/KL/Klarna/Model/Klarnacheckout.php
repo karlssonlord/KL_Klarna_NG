@@ -1,9 +1,10 @@
 <?php
-
 /**
  * Class KL_Klarna_Model_KlarnaCheckout
  */
-class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abstract {
+class KL_Klarna_Model_Klarnacheckout
+    extends KL_Klarna_Model_Klarnacheckout_Abstract
+{
 
     /**
      * @var
@@ -230,6 +231,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abst
          * Collect totals
          */
         $quote
+            ->setTotalsCollectedFlag(false)
             ->collectTotals()
             ->save();
 
@@ -256,10 +258,8 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abst
          * and save the quote
          */
         $shippingAddress
-            ->setTotalsCollectedFlag(false)
             ->setCollectShippingRates(true)
             ->collectShippingRates()
-            ->collectTotals()
             ->save();
 
         return $this;

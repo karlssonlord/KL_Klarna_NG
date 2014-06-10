@@ -53,4 +53,40 @@ class KL_Klarna_Model_Observer extends Mage_Core_Model_Abstract {
 
         return $observer;
     }
+
+    public function preDispatchCheckout($observer)
+    {
+
+        $shippingAddress = Mage::getSingleton('checkout/session')
+            ->getQuote()
+            ->getShippingAddress();
+
+        $shippingAddress
+            ->setCountryId(Mage::getModel('klarna/klarnacheckout')->getCountry())
+            ->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->save();
+
+        $groups = $shippingAddress->getGroupedAllShippingRates();
+
+        if (!empty($groups)) {
+            foreach ($groups as $code => $groupItems) {
+                foreach ($groupItems as $item) {
+                    if (!isset($shippingMethod)
+                        || $shippingMethod->getPrice() > $item->getPrice()
+                    ) {
+                        $shippingMethod = $item;
+                    }
+                }
+            }
+
+            if (!$shippingAddress->getShippingMethod()) {
+                $shippingAddress->setShippingMethod(
+                    $shippingMethod->getCode()
+                )->save();
+            }
+        }
+
+        return $observer;
+    }
 }
