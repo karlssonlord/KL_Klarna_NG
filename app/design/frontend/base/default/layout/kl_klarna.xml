@@ -35,9 +35,4 @@
                    template="klarna/checkout/success.phtml"/>
         </reference>
     </klklarna_checkout_success>
-    <klklarna_checkout_terms>
-        <reference name="content">
-            <block type="core/template" name="klarna_terms" template="klarna/checkout/terms.phtml"/>
-        </reference>
-    </klklarna_checkout_terms>
 </layout>

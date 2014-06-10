@@ -309,7 +309,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_model_Klarnacheckout_Abst
             'locale' => $this->getLocale(),
             'merchant' => array(
                 'id' => $this->getMerchantId(),
-                'terms_uri' => Mage::getUrl('klarna/checkout/terms'),
+                'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
                 'checkout_uri' => Mage::getUrl('klarna/checkout'),
                 'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
                 'push_uri' => Mage::getUrl('klarna/checkout/push'),

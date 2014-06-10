@@ -73,14 +73,4 @@ class KL_Klarna_CheckoutController extends Mage_Core_Controller_Front_Action {
         Mage::getModel('klarna/klarnacheckout')->acknowledge($_REQUEST['klarna_order']);
     }
 
-    public function termsAction()
-    {
-        /**
-         * Render layout
-         */
-        $this
-            ->loadLayout()
-            ->renderLayout();
-    }
-
 }
