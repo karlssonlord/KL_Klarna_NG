@@ -53,7 +53,7 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
          * Calculate shipping tax percent
          */
         if ( $shippingPrice ) {
-            $shippingTaxPercent = $shipping->getShippingTaxAmount() / $shipping->getShippingAmount();
+            $shippingTaxPercent = ( $shipping->getShippingTaxAmount() / $shipping->getShippingAmount() ) * 100;
         } else {
             $shippingTaxPercent = 0;
         }
