@@ -18,7 +18,13 @@ class KL_Klarna_CheckoutController
     {
         $quote = $this->_getQuote();
 
-       $this->getOnepage()->initCheckout();
+        if($quote->getItemsCount() === '0') {
+            $this->_redirectUrl(Mage::helper('core/url')->getHomeUrl());
+            $this->setFlag('', self::FLAG_NO_DISPATCH, true);
+            return $this;
+        }
+
+        $this->getOnepage()->initCheckout();
 
         /**
          * Prepare totals
