@@ -53,6 +53,14 @@ class KL_Klarna_CheckoutController
             $orderObject = Mage::getModel('klarna/klarnacheckout_order')->create();
 
             /**
+             * Clear the session
+             *
+             * @see Mage_Checkout_OnepageController successAction
+             *
+             */
+            $this->getOnepage()->getCheckout()->clear();
+
+            /**
              * Redirect if order wasn't created
              */
             if ( ! $orderObject ) {
@@ -81,6 +89,7 @@ class KL_Klarna_CheckoutController
              * Throw error to frontend
              */
             throw new Exception($e->getMessage());
+            // TODO: This should never be visible to customer
 
         }
 

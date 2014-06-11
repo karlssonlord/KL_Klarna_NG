@@ -172,14 +172,15 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                 $magentoOrder->save();
 
                 /**
-                 * Reset the Magento quote
+                 * Add order information to the session
                  */
-                Mage::getSingleton('checkout/session')->setQuoteId(null);
+                Mage::getSingleton('checkout/session')
+                    ->setLastOrderId($magentoOrder->getId())
+                    ->setLastRealOrderId($magentoOrder->getIncrementId());
 
                 /**
-                 * Reset the Magento quote of the current user
+                 * Reset the Magento quote is done in the successAction controller
                  */
-                Mage::getSingleton('checkout/session')->setQuoteId(null);
 
                 return $magentoOrder;
             }
