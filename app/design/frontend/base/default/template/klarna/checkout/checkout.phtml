@@ -1,1 +1,10 @@
-<?php print $this->getKlarnaHTML();
+<div class="block-title">
+    <h2><span class="icon-payment"></span><?php echo $this->__('Place order'); ?></h2>
+</div>
+<p><?php echo $this->__('Pay with invoice, credit card or bank account.'); ?></p>
+<div class="kco-quote-ok" style="display: none;">
+    <?php echo $this->getKlarnaHTML(); ?>
+</div>
+<div class="kco-quote-error" style="display: none;">
+    <p><?php echo $this->__("Your cart contains one or more errors. Probably due to quantity issues, please correct them in order to be able to place the order."); ?></p>
+</div>
