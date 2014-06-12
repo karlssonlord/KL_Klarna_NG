@@ -1,12 +1,11 @@
 <?php
-require_once Mage::getModuleDir('controllers', 'Mage_Checkout')
-    . DS . 'OnepageController.php';
+
+require_once Mage::getModuleDir('controllers', 'Mage_Checkout') . DS . 'OnepageController.php';
 
 /**
  * Class KL_Klarna_CheckoutController
  */
-class KL_Klarna_CheckoutController
-    extends Mage_Checkout_OnepageController {
+class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
     /**
      * Display the checkout
@@ -17,7 +16,7 @@ class KL_Klarna_CheckoutController
     {
         $quote = $this->_getQuote();
 
-        if ( $quote->getItemsCount() === '0' || $quote->getItemsCount() == NULL) {
+        if ( $quote->getItemsCount() === '0' || $quote->getItemsCount() == null ) {
             $this->_redirectUrl(Mage::helper('core/url')->getHomeUrl());
             $this->setFlag('', self::FLAG_NO_DISPATCH, true);
             return $this;
@@ -86,11 +85,9 @@ class KL_Klarna_CheckoutController
             Mage::helper('klarna')->log('Exception when trying to create order: ' . $e->getMessage());
 
             /**
-             * Throw error to frontend
+             * Redirect to frontpage
              */
-            throw new Exception($e->getMessage());
-            // TODO: This should never be visible to customer
-
+            $this->_redirect('/');
         }
 
     }
