@@ -11,11 +11,23 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
     protected $_model;
 
     /**
+     * @var Mage_Customer_Model_Session
+     */
+    protected $_customerSession;
+
+    /**
+     * @var Mage_Checkout_Model_Session
+     */
+    protected $_checkoutSession;
+
+    /**
      * Class constructor
      */
     public function __construct()
     {
         $this->_klarnacheckout = Mage::getModel('klarna/klarnacheckout');
+        $this->_checkoutSession = Mage::getSingleton('checkout/session');
+        $this->_customerSession = Mage::getSingleton('customer/session');
     }
 
     public function create()
@@ -166,10 +178,31 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                  */
                 $service->submitAll();
 
+                $this->_checkoutSession
+                    ->setLastQuoteId($quote->getId())
+                    ->setLastSuccessQuoteId($quote->getId())
+                    ->clearHelperData();
+
                 /**
                  * Fetch the Magento Order
                  */
                 $magentoOrder = $service->getOrder();
+
+                if ( $magentoOrder ) {
+
+                    Mage::dispatchEvent(
+                        'checkout_type_onepage_save_order_after',
+                        array('order' => $magentoOrder, 'quote' => $quote)
+                    );
+
+                    /**
+                     * Add order information to the session
+                     */
+                    $this->_checkoutSession
+                        ->setLastOrderId($magentoOrder->getId())
+                        ->setLastRealOrderId($magentoOrder->getIncrementId());
+
+                }
 
                 /**
                  * Configure and save the order
@@ -191,8 +224,21 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                     ->setLastRealOrderId($magentoOrder->getIncrementId());
 
                 /**
-                 * Reset the Magento quote is done in the successAction controller
+                 * Add recurring profiles information to the session
                  */
+                $profiles = $service->getRecurringPaymentProfiles();
+                if ($profiles) {
+                    $ids = array();
+                    foreach ($profiles as $profile) {
+                        $ids[] = $profile->getId();
+                    }
+                    $this->_checkoutSession->setLastRecurringProfileIds($ids);
+                }
+
+                Mage::dispatchEvent(
+                    'checkout_submit_all_after',
+                    array('order' => $magentoOrder, 'quote' => $quote, 'recurring_profiles' => $profiles)
+                );
 
                 return $magentoOrder;
             }
