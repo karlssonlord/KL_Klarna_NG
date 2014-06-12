@@ -139,6 +139,18 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                     ->setIsTransactionClosed(0)
                     ->save();
 
+                /**
+                 * Assign customer object
+                 */
+                $quote
+                    ->setCustomerFirstname($order['shipping_address']['given_name'])
+                    ->setCustomerLastname($order['shipping_address']['family_name'])
+                    ->setCustomerEmail($order['shipping_address']['email'])
+                    ->save();
+
+                /**
+                 * Collect totals once more
+                 */
                 $quote
                     ->collectTotals()
                     ->setIsActive(0)
