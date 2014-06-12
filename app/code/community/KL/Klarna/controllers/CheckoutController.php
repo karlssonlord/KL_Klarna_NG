@@ -17,7 +17,7 @@ class KL_Klarna_CheckoutController
     {
         $quote = $this->_getQuote();
 
-        if ( $quote->getItemsCount() === '0' ) {
+        if ( $quote->getItemsCount() === '0' || $quote->getItemsCount() == NULL) {
             $this->_redirectUrl(Mage::helper('core/url')->getHomeUrl());
             $this->setFlag('', self::FLAG_NO_DISPATCH, true);
             return $this;
