@@ -21,7 +21,7 @@ class KL_Klarna_Model_Klarnacheckout_Item extends KL_Klarna_Model_Klarnacheckout
             'name' => $quoteItem->getName(),
             'quantity' => $quoteItem->getQty(),
             'unit_price' => intval($quoteItem->getPriceInclTax() * 100),
-            'discount_rate' => 0, // @todo
+            'discount_rate' => 0, // Not needed since Magento gives us the actual price
             'tax_rate' => ($quoteItem->getTaxPercent() * 100)
         );
     }
