@@ -18,8 +18,6 @@ class KL_Klarna_PingController extends Mage_Core_Controller_Front_Action {
          */
         $emailAddress = false;
 
-        $_SERVER['HTTP_REFERER'] = 'http://local.animail.se/foo/bar';
-
         /**
          * Check HTTP referer
          */
