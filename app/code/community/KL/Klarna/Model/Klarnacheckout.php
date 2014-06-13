@@ -327,7 +327,7 @@ class KL_Klarna_Model_Klarnacheckout
                 'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
             ),
             'cart' => array('items' => $items),
-            'gui' => array('options' => 'disable_autofocus')
+            'gui' => array('options' => array('disable_autofocus'))
         );
 
         Mage::helper('klarna')->log($klarnaData);
