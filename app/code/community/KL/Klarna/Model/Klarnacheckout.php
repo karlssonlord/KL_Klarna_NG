@@ -314,7 +314,8 @@ class KL_Klarna_Model_Klarnacheckout
                 'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
                 'push_uri' => Mage::getUrl('klarna/checkout/push'),
             ),
-            'cart' => array('items' => $items)
+            'cart' => array('items' => $items),
+            'gui' => array('options' => 'disable_autofocus')
         );
 
         Mage::helper('klarna')->log($klarnaData);
@@ -364,7 +365,7 @@ class KL_Klarna_Model_Klarnacheckout
              * This can only be set when first creating the checkout session
              */
             if ( $this->useMobileGui() ) {
-                $klarnaData['gui'] = array('layout' => 'mobile');
+                $klarnaData['gui']['layout'] = 'mobile';
             }
 
             /**
