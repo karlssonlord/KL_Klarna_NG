@@ -18,10 +18,12 @@ class KL_Klarna_PingController extends Mage_Core_Controller_Front_Action {
          */
         $emailAddress = false;
 
+        $serverName = str_replace('*.','', $_SERVER['SERVER_NAME']);
+
         /**
          * Check HTTP referer
          */
-        if ( isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']) ) {
+        if ( isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $serverName) ) {
 
             /**
              * Fetch the Klarna Checkout model
@@ -53,7 +55,7 @@ class KL_Klarna_PingController extends Mage_Core_Controller_Front_Action {
              * Make a note in the log
              */
             Mage::helper('klarna')->log(
-                'Referer for PING failed. "' . $_SERVER['HTTP_REFERER'] . '" vs "' . $_SERVER['SERVER_NAME'] . '"'
+                'Referer for PING failed. "' . $_SERVER['HTTP_REFERER'] . '" vs "' . $serverName . '"'
             );
 
         }
