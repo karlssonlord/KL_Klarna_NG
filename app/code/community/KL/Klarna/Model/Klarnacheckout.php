@@ -316,18 +316,17 @@ class KL_Klarna_Model_Klarnacheckout
          * Setup the create array
          */
         $klarnaData = array(
-            'purchase_country' => $this->getCountry(),
+            'purchase_country'  => $this->getCountry(),
             'purchase_currency' => $this->getCurrency(),
-            'locale' => $this->getLocale(),
-            'merchant' => array(
-                'id' => $this->getMerchantId(),
-                'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
-                'checkout_uri' => Mage::getUrl('klarna/checkout'),
+            'locale'            => $this->getLocale(),
+            'merchant'          => array(
+                'id'               => $this->getMerchantId(),
+                'terms_uri'        => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
+                'checkout_uri'     => Mage::getUrl('klarna/checkout'),
                 'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
-                'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
+                'push_uri'         => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
             ),
-            'cart' => array('items' => $items),
-            'gui' => array('options' => array('disable_autofocus'))
+            'cart'              => array('items' => $items)
         );
 
         Mage::helper('klarna')->log($klarnaData);
@@ -359,6 +358,8 @@ class KL_Klarna_Model_Klarnacheckout
 
             } catch (Exception $e) {
 
+                Mage::helper('klarna')->log($e->getMessage());
+
                 /**
                  * Terminate the object, this will make us create a new order
                  */
@@ -371,6 +372,8 @@ class KL_Klarna_Model_Klarnacheckout
          * Create order if nothing is set
          */
         if ( ! $order ) {
+
+            $klarnaData['gui']['options'] = 'disable_autofocus';
 
             /**
              * Check if we should use the mobile gui
