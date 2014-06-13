@@ -266,6 +266,12 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
         $pclasses = array();
 
         /**
+         * Define variables
+         */
+        $code = "";
+        $before = false;
+
+        /**
          * Fetch all PClasses from database
          */
         foreach ($storage->getAllPClasses() as $pclass) {
@@ -276,9 +282,6 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
             }
 
             $country = KlarnaCountry::getCode($pclass->getCountry());
-
-            $code = "";
-            $before = false;
 
             // Check if we should set the currency symbol
             switch (strtolower($country)) {
