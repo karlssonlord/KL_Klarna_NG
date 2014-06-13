@@ -36,7 +36,7 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
      */
     public function isAvailable($quote = '')
     {
-        return true;
+        return false;
     }
 
     /**
