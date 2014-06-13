@@ -1,10 +1,10 @@
 <?php
+
 /**
  * Class KL_Klarna_Model_KlarnaCheckout
  */
 class KL_Klarna_Model_Klarnacheckout
-    extends KL_Klarna_Model_Klarnacheckout_Abstract
-{
+    extends KL_Klarna_Model_Klarnacheckout_Abstract {
 
     /**
      * @var
@@ -157,7 +157,19 @@ class KL_Klarna_Model_Klarnacheckout
                         'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId()
                     );
 
+                } else {
+
+                    Mage::helper('klarna')->log(
+                        'Unable to acknowledge due to order status from Klarna: ' . $order['status']
+                    );
+
                 }
+
+            } else {
+
+                Mage::helper('klarna')->log(
+                    'Unable to acknowledge due to missing order in Magento.'
+                );
 
             }
 
