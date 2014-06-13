@@ -160,7 +160,7 @@ class KL_Klarna_Model_Klarnacheckout
                 } else {
 
                     Mage::helper('klarna')->log(
-                        'Unable to acknowledge due to order status from Klarna: ' . $order['status']
+                        'Unable to acknowledge due to missing order in Magento.'
                     );
 
                 }
@@ -168,7 +168,7 @@ class KL_Klarna_Model_Klarnacheckout
             } else {
 
                 Mage::helper('klarna')->log(
-                    'Unable to acknowledge due to missing order in Magento.'
+                    'Unable to acknowledge due to order status from Klarna: ' . $order['status']
                 );
 
             }
