@@ -373,7 +373,7 @@ class KL_Klarna_Model_Klarnacheckout
          */
         if ( ! $order ) {
 
-            $klarnaData['gui']['options'] = 'disable_autofocus';
+            $klarnaData['gui']['options'] = array('disable_autofocus');
 
             /**
              * Check if we should use the mobile gui
