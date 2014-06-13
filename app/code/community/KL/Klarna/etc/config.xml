@@ -208,6 +208,20 @@
                 <language>DA</language>
                 <can_search_address>0</can_search_address>
             </dk>
+            <no>
+                <code>NO</code>
+                <currency>NOK</currency>
+                <name>Norway</name>
+                <language>NB</language>
+                <can_search_address>0</can_search_address>
+            </no>
+            <fi>
+                <code>FI</code>
+                <currency>EUR</currency>
+                <name>Finland</name>
+                <language>FI</language>
+                <can_search_address>0</can_search_address>
+            </fi>
         </countries>
     </klarna>
     <klarna_checkout>

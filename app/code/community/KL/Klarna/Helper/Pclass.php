@@ -146,7 +146,6 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
          */
         foreach (Mage::app()->getStores() as $_eachStoreId => $val) {
 
-
             /**
              * Check if invoice or account is enabled
              */
@@ -175,62 +174,86 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
                  */
                 foreach ($countries as $country) {
                     switch ($country) {
+
+                        /**
+                         * Sweden
+                         */
                         case 'SE':
-                            /**
-                             * Setup custom configuration
-                             */
-                            $api = Mage::getModel('klarna/api_pclass');
-                            $klarnaModel = Mage::getModel('klarna/klarna');
-
-                            $klarnaModel
-                                ->setCountry(KlarnaCountry::SE)
-                                ->setLanguage(KlarnaLanguage::SV)
-                                ->setCurrency(KlarnaCurrency::SEK)
-                                ->setMerchantId(Mage::getStoreConfig('payment/klarna/merchant_id', $_eachStoreId))
-                                ->setSharedSecret(
-                                    Mage::getStoreConfig('payment/klarna/shared_secret', $_eachStoreId)
-                                )
-                                ->setServer($mode);
-
-
-                            /**
-                             * Clear old pclasses
-                             */
-                            if ( ! $clearedPclasses ) {
-                                $clearedPclasses = true;
-                                $api->clearPClasses($klarnaModel);
-                            }
-
-                            $api->fetch($klarnaModel);
+                            $pclassCountry = KlarnaCountry::SE;
+                            $pclassLanguage = KlarnaLanguage::SV;
+                            $pclassCurrency = KlarnaCurrency::SEK;
                             break;
+
+                        /**
+                         * Denmark
+                         */
                         case 'DK':
-                            /**
-                             * Setup custom configuration
-                             */
-                            $api = Mage::getModel('klarna/api_pclass');
-                            $klarnaModel = Mage::getModel('klarna/klarna');
-
-                            $klarnaModel
-                                ->setCountry(KlarnaCountry::DK)
-                                ->setLanguage(KlarnaLanguage::DA)
-                                ->setCurrency(KlarnaCurrency::DKK)
-                                ->setMerchantId(Mage::getStoreConfig('payment/klarna/merchant_id', $_eachStoreId))
-                                ->setSharedSecret(
-                                    Mage::getStoreConfig('payment/klarna/shared_secret', $_eachStoreId)
-                                )
-                                ->setServer($mode);
-
-                            /**
-                             * Clear old pclasses
-                             */
-                            if ( ! $clearedPclasses ) {
-                                $clearedPclasses = true;
-                                $api->clearPClasses($klarnaModel);
-                            }
-
-                            $api->fetch($klarnaModel);
+                            $pclassCountry = KlarnaCountry::DK;
+                            $pclassLanguage = KlarnaLanguage::DA;
+                            $pclassCurrency = KlarnaCurrency::DKK;
                             break;
+
+                        /**
+                         * Finland
+                         */
+                        case 'FI':
+                            $pclassCountry = KlarnaCountry::FI;
+                            $pclassLanguage = KlarnaLanguage::FI;
+                            $pclassCurrency = KlarnaCurrency::EUR;
+                            break;
+
+                        /**
+                         * Norway
+                         */
+                        case 'NO':
+                            $pclassCountry = KlarnaCountry::NO;
+                            $pclassLanguage = KlarnaLanguage::NB;
+                            $pclassCurrency = KlarnaCurrency::NOK;
+                            break;
+
+                        /**
+                         * Unknown country
+                         */
+                        default:
+                            $pclassCountry = null;
+                            $pclassLanguage = null;
+                            $pclassCurrency = null;
+                            break;
+
                     }
+
+                    /**
+                     * Fetch the pclasses if required data is set
+                     */
+                    if ( $pclassCurrency && $pclassLanguage && $pclassCountry ) {
+
+                        /**
+                         * Setup custom configuration
+                         */
+                        $api = Mage::getModel('klarna/api_pclass');
+                        $klarnaModel = Mage::getModel('klarna/klarna');
+
+                        $klarnaModel
+                            ->setCountry($pclassCountry)
+                            ->setLanguage($pclassLanguage)
+                            ->setCurrency($pclassCurrency)
+                            ->setMerchantId(Mage::getStoreConfig('payment/klarna/merchant_id', $_eachStoreId))
+                            ->setSharedSecret(
+                                Mage::getStoreConfig('payment/klarna/shared_secret', $_eachStoreId)
+                            )
+                            ->setServer($mode);
+
+                        /**
+                         * Clear old pclasses
+                         */
+                        if ( ! $clearedPclasses ) {
+                            $clearedPclasses = true;
+                            $api->clearPClasses($klarnaModel);
+                        }
+
+                        $api->fetch($klarnaModel);
+                    }
+
                 }
             }
         }
