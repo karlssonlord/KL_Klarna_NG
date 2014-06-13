@@ -63,6 +63,14 @@ class KL_Klarna_Model_Klarnacheckout
         Mage::helper('klarna')->log('Request to acknowledge ' . $checkoutId);
 
         /**
+         * So sorry for this. Klarna is doing the callback so quick that
+         * we haven't had time to create the order yet. We will handle
+         * this later in the project. Best for now is to sleep for a while
+         * until the order has been created.
+         */
+        sleep(10);
+
+        /**
          * Load the order
          */
         try {
