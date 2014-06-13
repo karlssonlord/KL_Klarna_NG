@@ -3,7 +3,9 @@
 /**
  * Class KL_Klarna_Block_Checkout_Klarna_Shipping
  */
-class KL_Klarna_Block_Checkout_Klarna_Success extends Mage_Checkout_Block_Onepage_Abstract {
+class KL_Klarna_Block_Checkout_Klarna_Success
+    extends Mage_Checkout_Block_Onepage_Success
+{
 
     /**
      * Show the confirmation div
@@ -36,5 +38,4 @@ class KL_Klarna_Block_Checkout_Klarna_Success extends Mage_Checkout_Block_Onepag
             return $order['gui']['snippet'];
         }
     }
-
 }
