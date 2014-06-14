@@ -28,6 +28,21 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         return Mage::getStoreConfig('payment/' . $type . '/' . $key);
     }
 
+    public function getConfigFlag($key, $type = 'klarna')
+    {
+        /**
+         * Add prefix if missing (probably will)
+         */
+        if ( substr($type, 0, 6) !== 'klarna' ) {
+            $type = 'klarna_' . $type;
+        }
+
+        /**
+         * Return configuration value
+         */
+        return Mage::getStoreConfigFlag('payment/' . $type . '/' . $key);
+    }
+
     /**
      * Log message to our log files
      *
