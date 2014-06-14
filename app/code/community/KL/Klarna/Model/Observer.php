@@ -89,4 +89,11 @@ class KL_Klarna_Model_Observer extends Mage_Core_Model_Abstract {
 
         return $observer;
     }
+
+    public function setDefaultPaymentMethod($observer)
+    {
+        Mage::getSingleton('checkout/session')->setData('selected_payment', 'klarna_invoice');
+
+        return $observer;
+    }
 }

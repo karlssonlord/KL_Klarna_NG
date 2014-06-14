@@ -55,6 +55,20 @@ class KL_Klarna_Block_Form
     }
 
     /**
+     * Is payment method selected
+     *
+     * @return boolean
+     */
+    public function isSelected()
+    {
+        if (Mage::getSingleton('checkout/session')->getData('selected_payment') == $this->getMethodCode()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get quote
      *
      * @return Mage_Sales_Model_Quote

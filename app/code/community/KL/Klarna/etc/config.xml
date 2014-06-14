@@ -181,6 +181,15 @@
                     </klarna_checkout_checkout>
                 </observers>
             </checkout_json_response>
+            <checkout_quote_init>
+                <observers>
+                    <klarna_as_default>
+                        <type>model</type>
+                        <class>klarna/observer</class>
+                        <method>setDefaultPaymentMethod</method>
+                    </klarna_as_default>
+                </observers>
+            </checkout_quote_init>
             <controller_action_predispatch_klklarna_checkout_index>
                 <observers>
                     <klarna_checkout_checkout>
