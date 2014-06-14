@@ -60,6 +60,8 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
 
     /**
      * Fetch the current country and return using Klarnas own ID
+     *
+     * @return null|int
      */
     public function getCurrentCountry()
     {
@@ -81,14 +83,14 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
         /**
          * Check the shipping address
          */
-        if ( ! $country ) {
+        if (!$country) {
             $country = $quote->getShippingAddress()->getCountry();
         }
 
         /**
          * Use store default as our final destination
          */
-        if ( ! $country ) {
+        if (!$country) {
             $country = Mage::getStoreConfig('general/country/default');
         }
 
@@ -112,11 +114,9 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
      */
     public function getCurrentCurrency()
     {
-        $systemCurrency = Mage::app()->getLocale()->currency(
-            Mage::app()->getStore()->getCurrentCurrencyCode()
-        )->getSymbol();
+        $systemCurrency = trim(Mage::app()->getStore()->getCurrentCurrencyCode());
 
-        return KlarnaCurrency::fromCode(trim($systemCurrency));
+        return KlarnaCurrency::fromCode($systemCurrency);
     }
 
     /**
