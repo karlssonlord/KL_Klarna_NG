@@ -225,7 +225,7 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
                     /**
                      * Fetch the pclasses if required data is set
                      */
-                    if ( $pclassCurrency && $pclassLanguage && $pclassCountry ) {
+                    if ( ! is_null($pclassCurrency) && ! is_null($pclassLanguage) && ! is_null($pclassCountry) ) {
 
                         /**
                          * Setup custom configuration
