@@ -1,7 +1,5 @@
 // Fetch address and populare social security number
 function fetchKlarnaAddress(fieldId) {
-    console.log(fieldId);
-
     // Populate social security fields with the new social security number
     $$('.klarna_ssn').each(function(el) {
         $(el).value = $(fieldId).value;
@@ -90,12 +88,17 @@ function klarnaChangeAddress()
     };
 
     // Check if Less Friction is used
-    if( typeof Checkout !== 'undefined' ) {
+    if (typeof Checkout !== 'undefined' &&
+        typeof shippingAddress !== 'undefined' &&
+        typeof shippingAddress.inject === 'function'
+    ) {
         // Inject shipping address
         shippingAddress.inject($H(magentoAddress));
         billingAddress.inject($H(magentoAddress));
     } else {
-        // @todo Update standard Magento fields
+        $H(magentoAddress).each(function (pair) {
+            $$('[name="' + pair.key + '"]').first().setValue(pair.value);
+        });
     }
 
     // Query endpoint for updating address
@@ -105,5 +108,4 @@ function klarnaChangeAddress()
             // What should we do when the quote is updated?
         }
     });
-
 }

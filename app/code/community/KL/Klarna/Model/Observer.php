@@ -2,10 +2,15 @@
 /**
  * Observer
  */
-class KL_Klarna_Model_Observer extends Mage_Core_Model_Abstract {
+class KL_Klarna_Model_Observer
+    extends Mage_Core_Model_Abstract
+{
 
     /**
-     * @param $observer
+     * Admin system config changed section payment
+     *
+     * @param Varien_Event_Observer $observer
+     *
      * @return mixed
      */
     public function adminSystemConfigChangedSectionPayment($observer)
@@ -42,18 +47,30 @@ class KL_Klarna_Model_Observer extends Mage_Core_Model_Abstract {
     /**
      * Observer method for handling Klarna Checkout orders
      *
-     * @param Varien_Event_Observer @observer
+     * @param Varien_Event_Observer $observer
      *
      * @return Varien_Event_Observer
      */
     public function handleOrder($observer)
     {
-        Mage::getModel('klarna/klarnacheckout')
-            ->handleOrder();
+        $referer  = Mage::helper('core/http')->getHttpReferer();
+        $url      = Mage::getUrl('klarna/checkout');
+
+        if (strpos($url, $referer) !== false) {
+            $checkout = Mage::getModel('klarna/klarnacheckout');
+            $checkout->handleOrder();
+        }
 
         return $observer;
     }
 
+    /**
+     * Pre dispatch checkout
+     *
+     * @param Varien_Event_Observer $observer
+     *
+     * @return Varien_Event_Observer
+     */
     public function preDispatchCheckout($observer)
     {
 
@@ -90,6 +107,13 @@ class KL_Klarna_Model_Observer extends Mage_Core_Model_Abstract {
         return $observer;
     }
 
+    /**
+     * Set default payment method
+     *
+     * @param Varien_Event_Observer $observer
+     *
+     * @return Varien_Event_Observer
+     */
     public function setDefaultPaymentMethod($observer)
     {
         Mage::getSingleton('checkout/session')->setData('selected_payment', 'klarna_invoice');

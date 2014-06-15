@@ -1,9 +1,10 @@
 <?php
-
 /**
- * Class KL_Klarna_AddressController
+ * Address controller
  */
-class KL_Klarna_AddressController extends Mage_Core_Controller_Front_Action {
+class KL_Klarna_AddressController
+    extends Mage_Core_Controller_Front_Action
+{
 
     /**
      * Helper function for setting correct headers and data when responding
@@ -154,5 +155,4 @@ class KL_Klarna_AddressController extends Mage_Core_Controller_Front_Action {
          */
         return $this->jsonReponse(Mage::helper('klarna/json')->error($this->__('Unable to set address')));
     }
-
 }
