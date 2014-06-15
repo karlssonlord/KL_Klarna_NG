@@ -1,9 +1,13 @@
-// Fetch address and populare social security number
-function fetchKlarnaAddress(fieldId) {
+function updateKlarnaPaymentMethods(fieldId) {
     // Populate social security fields with the new social security number
     $$('.klarna_ssn').each(function(el) {
         $(el).value = $(fieldId).value;
     });
+}
+
+// Fetch address and populare social security number
+function fetchKlarnaAddress(fieldId) {
+    updateKlarnaPaymentMethods(fieldId);
 
     // Setup query url
     var queryUrl = addressEndpoint + 'ssn/' + $(fieldId).value;
