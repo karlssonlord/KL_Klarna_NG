@@ -313,7 +313,10 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         /**
          * Set billing address
          */
-        $billingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna($order->getBillingAddress());
+        $billingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna(
+            $order->getBillingAddress(),
+            $order->getCustomerEmail()
+        );
         $this->_klarnaOrder->setAddress(KlarnaFlags::IS_BILLING, $billingAddress);
 
         /**
@@ -321,7 +324,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
          */
         $shippingAddress = Mage::helper('klarna/address')->fromMagentoToKlarna(
             $order->getShippingAddress(),
-            $order->getBillingAddress()->getEmail()
+            $order->getCustomerEmail()
         );
         $this->_klarnaOrder->setAddress(KlarnaFlags::IS_SHIPPING, $shippingAddress);
 
@@ -358,6 +361,4 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
 
         return true;
     }
-
-
 }

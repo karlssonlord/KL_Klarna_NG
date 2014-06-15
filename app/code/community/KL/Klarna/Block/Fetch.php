@@ -1,6 +1,9 @@
 <?php
-class KL_Klarna_Block_Fetch extends Mage_Core_Block_Template
+class KL_Klarna_Block_Fetch
+    extends Mage_Core_Block_Template
 {
+    var $supportedCountries = array('SE');
+
     /**
      * Get URL for fetching address from SSN
      *
@@ -19,5 +22,33 @@ class KL_Klarna_Block_Fetch extends Mage_Core_Block_Template
     public function getUpdateAddressEndpoint()
     {
         return Mage::getUrl('klarna/address/update');
+    }
+
+    /**
+     * Can fetch
+     *
+     * @return boolean
+     */
+    public function canFetch()
+    {
+        $address = Mage::getSingleton('checkout/session')
+            ->getQuote()
+            ->getShippingAddress();
+
+        if (!$address) {
+            return false;
+        }
+
+        $country = $address->getCountry();
+
+        if (!$country) {
+            return false;
+        }
+
+        if (in_array($country, $this->supportedCountries)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
