@@ -249,8 +249,8 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
              */
             $this->_klarnaOrder->addArticle(
                 $qty,
-                $item->getSku(),
-                $item->getName(),
+                utf8_decode($item->getSku()),
+                utf8_decode($item->getName()),
                 $item->getPriceInclTax(),
                 $item->getTaxPercent(), // TAX rate
                 0, // Discount
@@ -265,7 +265,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
             $this->_klarnaOrder->addArticle(
                 1,
                 'shipping_fee',
-                Mage::helper('klarna')->__('Shipping fee'),
+                utf8_decode(Mage::helper('klarna')->__('Shipping fee')),
                 ($order->getShippingAmount() + $order->getShippingTaxAmount()), //price
                 (($order->getShippingTaxAmount() / $order->getShippingAmount()) * 100),
                 0, // Discount
@@ -280,7 +280,7 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
             $this->_klarnaOrder->addArticle(
                 1,
                 'invoice_fee',
-                Mage::helper('klarna')->__('Invoice fee'),
+                utf8_decode(Mage::helper('klarna')->__('Invoice fee')),
                 $order->getData('base_klarna_total'),
                 Mage::helper('klarna')->getConfig('fee_tax_percent', 'invoice'),
                 0, // Discount
