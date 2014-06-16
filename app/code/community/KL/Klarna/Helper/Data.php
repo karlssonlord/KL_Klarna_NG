@@ -80,6 +80,13 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         }
 
         /**
+         * Add remote IP address if it's a string
+         */
+        if ( is_string($message) ) {
+            $message = '[' . $_SERVER['REMOTE_ADDR'] . '] ' . $message;
+        }
+
+        /**
          * Log to our Magento log file
          */
         Mage::log($message, null, 'kl_klarna.log', $force);
@@ -131,7 +138,9 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      */
     public function getInvoiceLogo($width = 250, $country = null)
     {
-        if($country === null) $country = $this->getCountryCode();
+        if ( $country === null ) {
+            $country = $this->getCountryCode();
+        }
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/invoice/' . $country . '_invoice_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
             'merchant_id'
         );
@@ -147,7 +156,9 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      */
     public function getPartpaymentLogo($width = 250, $country = null)
     {
-        if($country === null) $country = $this->getCountryCode();
+        if ( $country === null ) {
+            $country = $this->getCountryCode();
+        }
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/account/' . $country . '_account_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
             'merchant_id'
         );
@@ -163,7 +174,9 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      */
     public function getRegularLogo($width = 250, $country = null)
     {
-        if($country === null) $country = $this->getCountryCode();
+        if ( $country === null ) {
+            $country = $this->getCountryCode();
+        }
         return 'https://cdn.klarna.com/public/images/' . $country . '/logos/v1/basic/' . $country . '_basic_logo_std_blue-black.png?width=' . $width . '&eid=' . $this->getConfig(
             'merchant_id'
         );
