@@ -65,6 +65,23 @@ class KL_Klarna_Model_Observer
     }
 
     /**
+     * Reset previous Klarna session IDs
+     *
+     * @param $observer
+     * @return mixed
+     */
+    public function customerLoginLogout($observer)
+    {
+        Mage::helper('klarna')
+            ->log('User logged in/logged out, destroying Klarna Checkout session');
+
+        Mage::helper('klarna/checkout')
+            ->setKlarnaCheckoutId(null);
+
+        return $observer;
+    }
+
+    /**
      * Pre dispatch checkout
      *
      * @param Varien_Event_Observer $observer

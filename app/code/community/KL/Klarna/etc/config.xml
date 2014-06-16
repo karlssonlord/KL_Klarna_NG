@@ -199,6 +199,24 @@
                     </klarna_checkout_checkout>
                 </observers>
             </controller_action_predispatch_klklarna_checkout_index>
+            <customer_login>
+                <observers>
+                    <klarna_checkout_checkout>
+                        <type>singleton</type>
+                        <class>klarna/observer</class>
+                        <method>customerLoginLogout</method>
+                    </klarna_checkout_checkout>
+                </observers>
+            </customer_login>
+            <customer_logout>
+                <observers>
+                    <klarna_checkout_checkout>
+                        <type>singleton</type>
+                        <class>klarna/observer</class>
+                        <method>customerLoginLogout</method>
+                    </klarna_checkout_checkout>
+                </observers>
+            </customer_logout>
         </events>
     </global>
     <klarna>
