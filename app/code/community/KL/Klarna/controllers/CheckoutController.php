@@ -53,9 +53,7 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
             /**
              * Clear the session
-             *
              * @see Mage_Checkout_OnepageController successAction
-             *
              */
             $this->getOnepage()->getCheckout()->clear();
 
