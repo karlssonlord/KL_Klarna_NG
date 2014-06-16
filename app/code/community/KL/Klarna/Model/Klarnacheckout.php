@@ -152,7 +152,7 @@ class KL_Klarna_Model_Klarnacheckout
                     $updateData = array(
                         'status' => 'created',
                         'merchant_reference' => array(
-                            'orderid1' => $magentoOrder->getIncrementId()
+                            'orderid1' => $magentoOrder->getIncrementId(),
                         )
                     );
 
@@ -168,7 +168,7 @@ class KL_Klarna_Model_Klarnacheckout
                 } else {
 
                     Mage::helper('klarna')->log(
-                        'Unable to acknowledge due to missing order in Magento.'
+                        'Unable to acknowledge due to missing order in Magento. (' . $checkoutId . ')'
                     );
 
                 }
@@ -176,7 +176,7 @@ class KL_Klarna_Model_Klarnacheckout
             } else {
 
                 Mage::helper('klarna')->log(
-                    'Unable to acknowledge due to order status from Klarna: ' . $order['status']
+                    'Unable to acknowledge due to order status from Klarna: ' . $order['status'] . ' (' . $checkoutId . ')'
                 );
 
             }
@@ -324,17 +324,20 @@ class KL_Klarna_Model_Klarnacheckout
          * Setup the create array
          */
         $klarnaData = array(
-            'purchase_country'  => $this->getCountry(),
+            'purchase_country' => $this->getCountry(),
             'purchase_currency' => $this->getCurrency(),
-            'locale'            => $this->getLocale(),
-            'merchant'          => array(
-                'id'               => $this->getMerchantId(),
-                'terms_uri'        => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
-                'checkout_uri'     => Mage::getUrl('klarna/checkout'),
+            'locale' => $this->getLocale(),
+            'merchant' => array(
+                'id' => $this->getMerchantId(),
+                'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
+                'checkout_uri' => Mage::getUrl('klarna/checkout'),
                 'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
-                'push_uri'         => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
+                'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
             ),
-            'cart'              => array('items' => $items)
+            'cart' => array('items' => $items),
+            'merchant_reference' => array(
+                'orderid2' => $this->getQuote()->getId()
+            )
         );
 
         Mage::helper('klarna')->log($klarnaData);
