@@ -137,7 +137,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         /**
          * Make sure social security number is set
          */
-        if ( ! $socialSecurityNumber && !Mage::app()->getRequest()->getParam('klarna_invoice_ssn', false) === false) {
+        if ( ! $socialSecurityNumber && ! Mage::app()->getRequest()->getParam('klarna_invoice_ssn', false) === false ) {
             Mage::helper('klarna')->log('Social security number not set.');
             Mage::throwException(Mage::helper('klarna')->__('Social security number not set.'));
         }
@@ -257,6 +257,19 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
          * Get a new Klarna instance
          */
         $klarnaOrderApi = Mage::getModel('klarna/api_order');
+
+        /**
+         * Make sure the state is correct
+         */
+        $orderStatus = $klarnaOrderApi->checkOrderStatus($authTrans->getTxnId());
+        if ( $orderStatus != KlarnaFlags::ACCEPTED ) {
+
+            Mage::helper('klarna')->log(
+                'Not activated. Tried to activate reservation "' . $authTrans->getTxnId() . '" but it had order status ' . $orderStatus
+            );
+
+            throw new Exception('Order not accepted at Klarna yet');
+        }
 
         /**
          * Activate invoice

@@ -114,6 +114,26 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
     }
 
     /**
+     * Check the reservation status if the order is declined or accepted
+     *
+     * @param $reservationNumber
+     * @return bool
+     */
+    public function checkOrderStatus($reservationNumber)
+    {
+        try {
+            $result = $this->_klarnaOrder->checkOrderStatus($reservationNumber);
+        } catch (KlarnaException $e) {
+            Mage::helper('klarna')->log(
+                '#' . $e->getCode() . ': ' . $e->getMessage()
+            );
+            return false;
+        }
+
+        return $result;
+    }
+
+    /**
      * Activate reservation
      *
      * @param $reservationNumber
