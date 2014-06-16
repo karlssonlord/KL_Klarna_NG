@@ -4,7 +4,7 @@
  * Class KL_Klarna_Helper_Data
  */
 class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
-    
+
     /**
      * Fetch configuration settings for
      *
@@ -86,6 +86,30 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
     }
 
     /**
+     * Get current Klarna country ID
+     *
+     * @author Erik Eng <erik@karlssonlord.com>
+     *
+     * @return null|string
+     */
+    public function getCountryId()
+    {
+        return Mage::getModel('klarna/klarna')->getCurrentCountry();
+    }
+
+    /**
+     * Get current Klarna country code
+     *
+     * @author Erik Eng <erik@karlssonlord.com>
+     *
+     * @return null|string
+     */
+    public function getCountryCode()
+    {
+        return $this->klarnaCountryToMagento($this->getCountryId());
+    }
+
+    /**
      * Convert Klarna country id to Magento string (ISO 2 char)
      *
      * @param int $klarnaCountryId Klarna country ID
@@ -105,8 +129,9 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      *
      * @return string
      */
-    public function getInvoiceLogo($width = 250, $country = 'SE')
+    public function getInvoiceLogo($width = 250, $country = null)
     {
+        if($country === null) $country = $this->getCountryCode();
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/invoice/' . $country . '_invoice_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
             'merchant_id'
         );
@@ -120,8 +145,9 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      *
      * @return string
      */
-    public function getPartpaymentLogo($width = 250, $country = 'SE')
+    public function getPartpaymentLogo($width = 250, $country = null)
     {
+        if($country === null) $country = $this->getCountryCode();
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/account/' . $country . '_account_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
             'merchant_id'
         );
@@ -135,8 +161,9 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      *
      * @return string
      */
-    public function getRegularLogo($width = 250, $country = 'SE')
+    public function getRegularLogo($width = 250, $country = null)
     {
+        if($country === null) $country = $this->getCountryCode();
         return 'https://cdn.klarna.com/public/images/' . $country . '/logos/v1/basic/' . $country . '_basic_logo_std_blue-black.png?width=' . $width . '&eid=' . $this->getConfig(
             'merchant_id'
         );
