@@ -19,7 +19,7 @@ class KL_Klarna_PingController extends Mage_Core_Controller_Front_Action {
         $emailAddress = false;
 
         // $serverName = str_replace('*.','', $_SERVER['SERVER_NAME']);
-        $serverName = '.animail.'; // Quick haxx since nginx settings are incorrect on staging.
+        $serverName = 'animail.'; // Quick haxx since nginx settings are incorrect on staging.
 
         /**
          * Check HTTP referer
