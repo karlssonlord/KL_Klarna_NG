@@ -112,21 +112,6 @@ class KL_Klarna_Model_Klarnacheckout
                         ->save();
 
                     /**
-                     * Fetch order status from config
-                     */
-                    $orderStatus = Mage::helper('klarna')->getConfig(
-                        'acknowledged_order_status',
-                        'klarna_checkout'
-                    );
-
-                    /**
-                     * Configure and save the order
-                     */
-                    $magentoOrder
-                        ->setState('processing')
-                        ->setStatus($orderStatus);
-
-                    /**
                      * Fetch the total amount reserved
                      */
                     $amountAuthorized = $order['cart']['total_price_including_tax'] / 100;
@@ -140,6 +125,21 @@ class KL_Klarna_Model_Klarnacheckout
                      * Authorize
                      */
                     $payment->authorize($magentoOrder->getPayment(), $amountAuthorized);
+
+                    /**
+                     * Fetch order status from config
+                     */
+                    $orderStatus = Mage::helper('klarna')->getConfig(
+                        'acknowledged_order_status',
+                        'klarna_checkout'
+                    );
+
+                    /**
+                     * Configure and save the order
+                     */
+                    $magentoOrder
+                        ->setState('processing')
+                        ->setStatus($orderStatus);
 
                     /**
                      * Save order again
