@@ -12,6 +12,58 @@ class KL_Klarna_Model_Klarnacheckout_Abstract
 {
 
     /**
+     * Convert fake float with 4 decimals to int
+     *
+     * @throws Exception
+     * @param $float
+     * @return int
+     */
+    public function fakeFloatToKlarnaInt($float)
+    {
+        /**
+         * Assure it's a string
+         */
+        if (!is_string($float)) {
+            throw new Exception('Incorrect input data, value is not a string');
+        }
+
+        /**
+         * Assure it has 4 decimals
+         */
+        $decimals = explode('.', $float);
+        if (strlen($decimals[1]) != 4) {
+            throw new Exception('Incorrect input data, expected 4 decimals');
+        }
+
+        /**
+         * Store the original value
+         */
+        $originalValue = $float;
+
+        /**
+         * Replace the "." for the decimals
+         */
+        $float = str_replace('.', '', $float);
+
+        /**
+         * Force int
+         */
+        $float = intval($float);
+
+        /**
+         * Remove the two extra decimals
+         */
+        $float = $float / 100;
+
+        /**
+         * Log the result
+         */
+        Mage::helper('klarna')->log('floatToKlarnaInt: ' . $originalValue . ' vs ' . $float);
+
+        return $float;
+    }
+
+    /**
      * Fetch country model selected
      *
      * @return mixed
