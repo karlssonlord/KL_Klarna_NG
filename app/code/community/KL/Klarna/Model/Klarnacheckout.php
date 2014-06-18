@@ -161,6 +161,21 @@ class KL_Klarna_Model_Klarnacheckout
                      */
                     $order->update($updateData);
 
+                    /**
+                     * Send new order e-mail
+                     */
+                    try {
+
+                        $order->sendNewOrderEmail();
+
+                    } catch (Exception $e) {
+
+                        Mage::helper('klarna')->log(
+                            'Unable to send new order email (' . $e->getMessage() . '), Magento ID ' . $magentoOrder->getIncrementId()
+                        );
+
+                    }
+
                     Mage::helper('klarna')->log(
                         'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId()
                     );
