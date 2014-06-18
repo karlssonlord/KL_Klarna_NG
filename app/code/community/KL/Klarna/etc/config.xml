@@ -288,6 +288,7 @@
                 <postalinvoice>0</postalinvoice>
                 <klarnajs>1</klarnajs>
                 <address_separator_br>1</address_separator_br>
+                <order_status>reserved</order_status>
             </klarna>
             <klarna_invoice>
                 <title>Klarna Invoice</title>
@@ -295,12 +296,14 @@
                 <model>klarna/payment_invoice</model>
                 <payment_action>authorize</payment_action>
                 <fee>0</fee>
+                <order_status>reserved</order_status>
             </klarna_invoice>
             <klarna_partpayment>
                 <title>Klarna Account</title>
                 <active>0</active>
                 <model>klarna/payment_partpayment</model>
                 <payment_action>authorize</payment_action>
+                <order_status>reserved</order_status>
             </klarna_partpayment>
             <klarna_specpayment>
                 <active>0</active>
