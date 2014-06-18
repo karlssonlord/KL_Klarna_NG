@@ -14,53 +14,30 @@ class KL_Klarna_Model_Klarnacheckout_Abstract
     /**
      * Convert fake float with 4 decimals to int
      *
-     * @throws Exception
      * @param $float
+     *
      * @return int
      */
     public function fakeFloatToKlarnaInt($float)
     {
-        /**
-         * Assure it's a string
-         */
-        if (!is_string($float)) {
-            throw new Exception('Incorrect input data, value is not a string');
-        }
+        $float = (string) $float;
 
         /**
          * Assure it has 4 decimals
          */
         $decimals = explode('.', $float);
-        if (strlen($decimals[1]) != 4) {
-            throw new Exception('Incorrect input data, expected 4 decimals');
+
+        if (count($decimals) == 1) {
+            return (int) $float * 100;
         }
 
-        /**
-         * Store the original value
-         */
-        $originalValue = $float;
+        if (strlen($decimals[1]) > 1) {
+            $string = $decimals[0] . substr($decimals[1], 0, 2);
+        } else {
+            $string = $decimals[0] . substr($decimals[1], 0, 1) . 0;
+        }
 
-        /**
-         * Replace the "." for the decimals
-         */
-        $float = str_replace('.', '', $float);
-
-        /**
-         * Force int
-         */
-        $float = intval($float);
-
-        /**
-         * Remove the two extra decimals
-         */
-        $float = $float / 100;
-
-        /**
-         * Log the result
-         */
-        Mage::helper('klarna')->log('floatToKlarnaInt: ' . $originalValue . ' vs ' . $float);
-
-        return $float;
+        return (int) $string;
     }
 
     /**
