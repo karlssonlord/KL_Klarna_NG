@@ -166,7 +166,7 @@ class KL_Klarna_Model_Klarnacheckout
                      */
                     try {
 
-                        $order->sendNewOrderEmail();
+                        $magentoOrder->sendNewOrderEmail();
 
                     } catch (Exception $e) {
 
