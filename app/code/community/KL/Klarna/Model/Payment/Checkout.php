@@ -1,7 +1,10 @@
 <?php
-
-class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract {
-
+/**
+ * Klarna Checkout payment method
+ */
+class KL_Klarna_Model_Payment_Checkout
+    extends KL_Klarna_Model_Payment_Abstract
+{
     /**
      * @var string
      */
@@ -10,12 +13,16 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
     /**
      * @var string
      */
-    #protected $_formBlockType = 'klarna/partpayment_form';
-
-    /**
-     * @var string
-     */
     protected $_infoBlockType = 'klarna/checkout_info';
+
+    public function __construct()
+    {
+        if (Mage::helper('klarna')->getVersion() === '0.0.5') {
+            $this->_canCapturePartial = false;
+        }
+
+        parent::__construct();
+    }
 
     /**
      * Validation
@@ -160,10 +167,14 @@ class KL_Klarna_Model_Payment_Checkout extends KL_Klarna_Model_Payment_Abstract 
         $apiModel = Mage::getModel('klarna/api_order');
 
         /**
-         * Activate whole invoice at Klarna
+         * Activate invoice at Klarna
          */
         if ( is_object($authTrans) ) {
-            $apiModel->activateReservation($authTrans->getTxnId(), $activate);
+            if (Mage::helper('klarna')->getVersion() === '0.0.5') {
+                $apiModel->activateReservation($authTrans->getTxnId());
+            } else {
+                $apiModel->activateReservation($authTrans->getTxnId(), $activate);
+            }
         } else {
             throw new Exception('No authorization transaction exists');
         }

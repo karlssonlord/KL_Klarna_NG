@@ -202,4 +202,13 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         return (bool)$this->getConfig('live');
     }
 
+    /**
+     * Get current module version
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return (string) Mage::getConfig()->getNode()->modules->KL_Klarna->version;
+    }
 }
