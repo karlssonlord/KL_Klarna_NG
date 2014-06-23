@@ -81,172 +81,166 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             );
 
             /**
-             * Compare the total amounts
+             * Amount matches, update the quote
              */
-            if ( $quoteTotal == $order['cart']['total_price_including_tax'] ) {
+            Mage::helper('klarna')->log('Amount matches. Configuring quote with data from Klarna');
 
-                /**
-                 * Amount matches, update the quote
-                 */
-                Mage::helper('klarna')->log('Amount matches. Configuring quote with data from Klarna');
+            /**
+             * Build shipping address
+             */
+            $shippingAddress = array();
+            if ( isset($order['shipping_address']['care_of']) ) {
+                $shippingAddress[] = $order['shipping_address']['care_of'];
+            }
+            $shippingAddress[] = $order['shipping_address']['street_address'];
+            $shippingAddress = implode("\n", $shippingAddress);
 
-                /**
-                 * Build shipping address
-                 */
-                $shippingAddress = array();
-                if ( isset($order['shipping_address']['care_of']) ) {
-                    $shippingAddress[] = $order['shipping_address']['care_of'];
-                }
-                $shippingAddress[] = $order['shipping_address']['street_address'];
-                $shippingAddress = implode("\n", $shippingAddress);
+            /**
+             * Build billing address
+             */
+            $billingAddress = array();
+            if ( isset($order['billing_address']['care_of']) ) {
+                $billingAddress[] = $order['billing_address']['care_of'];
+            }
+            $billingAddress[] = $order['billing_address']['street_address'];
+            $billingAddress = implode("\n", $billingAddress);
 
-                /**
-                 * Build billing address
-                 */
-                $billingAddress = array();
-                if ( isset($order['billing_address']['care_of']) ) {
-                    $billingAddress[] = $order['billing_address']['care_of'];
-                }
-                $billingAddress[] = $order['billing_address']['street_address'];
-                $billingAddress = implode("\n", $billingAddress);
+            /**
+             * Reconfigure the shipping address
+             */
+            $quote->getShippingAddress()
+                ->setFirstname($order['shipping_address']['given_name'])
+                ->setLastname($order['shipping_address']['family_name'])
+                ->setStreet($shippingAddress)
+                ->setPostcode($order['shipping_address']['postal_code'])
+                ->setCity($order['shipping_address']['city'])
+                ->setCountryId(strtoupper($order['shipping_address']['country']))
+                ->setEmail($order['shipping_address']['email'])
+                ->setTelephone($order['shipping_address']['phone'])
+                ->setSameAsBilling(0)
+                ->save();
 
-                /**
-                 * Reconfigure the shipping address
-                 */
-                $quote->getShippingAddress()
-                    ->setFirstname($order['shipping_address']['given_name'])
-                    ->setLastname($order['shipping_address']['family_name'])
-                    ->setStreet($shippingAddress)
-                    ->setPostcode($order['shipping_address']['postal_code'])
-                    ->setCity($order['shipping_address']['city'])
-                    ->setCountryId(strtoupper($order['shipping_address']['country']))
-                    ->setEmail($order['shipping_address']['email'])
-                    ->setTelephone($order['shipping_address']['phone'])
-                    ->setSameAsBilling(0)
-                    ->save();
+            /**
+             * Reconfigure the billing address
+             */
+            $quote->getBillingAddress()
+                ->setFirstname($order['shipping_address']['given_name'])
+                ->setLastname($order['shipping_address']['family_name'])
+                ->setStreet($billingAddress)
+                ->setPostcode($order['shipping_address']['postal_code'])
+                ->setCity($order['shipping_address']['city'])
+                ->setCountryId(strtoupper($order['shipping_address']['country']))
+                ->setEmail($order['shipping_address']['email'])
+                ->setTelephone($order['shipping_address']['phone'])
+                ->setSameAsBilling(0)
+                ->save();
 
-                /**
-                 * Reconfigure the billing address
-                 */
-                $quote->getBillingAddress()
-                    ->setFirstname($order['shipping_address']['given_name'])
-                    ->setLastname($order['shipping_address']['family_name'])
-                    ->setStreet($billingAddress)
-                    ->setPostcode($order['shipping_address']['postal_code'])
-                    ->setCity($order['shipping_address']['city'])
-                    ->setCountryId(strtoupper($order['shipping_address']['country']))
-                    ->setEmail($order['shipping_address']['email'])
-                    ->setTelephone($order['shipping_address']['phone'])
-                    ->setSameAsBilling(0)
-                    ->save();
+            /**
+             * Set payment information
+             */
+            $quote
+                ->getPayment()
+                ->setMethod('klarna_checkout')
+                ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
+                ->setTransactionId($checkoutId)
+                ->setIsTransactionClosed(0)
+                ->save();
 
-                /**
-                 * Set payment information
-                 */
-                $quote
-                    ->getPayment()
-                    ->setMethod('klarna_checkout')
-                    ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
-                    ->setTransactionId($checkoutId)
-                    ->setIsTransactionClosed(0)
-                    ->save();
+            /**
+             * Assign customer object
+             */
+            $quote
+                ->setCustomerFirstname($order['shipping_address']['given_name'])
+                ->setCustomerLastname($order['shipping_address']['family_name'])
+                ->setCustomerEmail($order['shipping_address']['email'])
+                ->save();
 
-                /**
-                 * Assign customer object
-                 */
-                $quote
-                    ->setCustomerFirstname($order['shipping_address']['given_name'])
-                    ->setCustomerLastname($order['shipping_address']['family_name'])
-                    ->setCustomerEmail($order['shipping_address']['email'])
-                    ->save();
+            /**
+             * Collect totals once more
+             */
+            $quote
+                ->collectTotals()
+                ->setIsActive(0)
+                ->save();
 
-                /**
-                 * Collect totals once more
-                 */
-                $quote
-                    ->collectTotals()
-                    ->setIsActive(0)
-                    ->save();
+            /**
+             * Feed quote object into sales model
+             */
+            $service = Mage::getModel('sales/service_quote', $quote);
 
-                /**
-                 * Feed quote object into sales model
-                 */
-                $service = Mage::getModel('sales/service_quote', $quote);
+            /**
+             * Submit the quote and generate order
+             */
+            $service->submitAll();
 
-                /**
-                 * Submit the quote and generate order
-                 */
-                $service->submitAll();
+            $this->_checkoutSession
+                ->setLastQuoteId($quote->getId())
+                ->setLastSuccessQuoteId($quote->getId())
+                ->clearHelperData();
 
-                $this->_checkoutSession
-                    ->setLastQuoteId($quote->getId())
-                    ->setLastSuccessQuoteId($quote->getId())
-                    ->clearHelperData();
+            /**
+             * Fetch the Magento Order
+             */
+            $magentoOrder = $service->getOrder();
 
-                /**
-                 * Fetch the Magento Order
-                 */
-                $magentoOrder = $service->getOrder();
+            if ( $magentoOrder ) {
 
-                if ( $magentoOrder ) {
-
-                    Mage::dispatchEvent(
-                        'checkout_type_onepage_save_order_after',
-                        array('order' => $magentoOrder, 'quote' => $quote)
-                    );
-
-                    /**
-                     * Add order information to the session
-                     */
-                    $this->_checkoutSession
-                        ->setLastOrderId($magentoOrder->getId())
-                        ->setLastRealOrderId($magentoOrder->getIncrementId());
-
-                }
-
-                /**
-                 * Configure and save the order
-                 */
-                $magentoOrder
-                    ->setState('pending')
-                    ->setStatus('pending');
-
-                /**
-                 * Save the order
-                 */
-                $magentoOrder->save();
+                Mage::dispatchEvent(
+                    'checkout_type_onepage_save_order_after',
+                    array('order' => $magentoOrder, 'quote' => $quote)
+                );
 
                 /**
                  * Add order information to the session
                  */
-                Mage::getSingleton('checkout/session')
+                $this->_checkoutSession
                     ->setLastOrderId($magentoOrder->getId())
                     ->setLastRealOrderId($magentoOrder->getIncrementId());
 
-                /**
-                 * Add recurring profiles information to the session
-                 */
-                $profiles = $service->getRecurringPaymentProfiles();
-                if ($profiles) {
-                    $ids = array();
-                    foreach ($profiles as $profile) {
-                        $ids[] = $profile->getId();
-                    }
-                    $this->_checkoutSession->setLastRecurringProfileIds($ids);
-                }
-
-                Mage::dispatchEvent(
-                    'checkout_submit_all_after',
-                    array('order' => $magentoOrder, 'quote' => $quote, 'recurring_profiles' => $profiles)
-                );
-
-                return $magentoOrder;
             }
+
+            /**
+             * Configure and save the order
+             */
+            $magentoOrder
+                ->setState('pending')
+                ->setStatus('pending');
+
+            /**
+             * Save the order
+             */
+            $magentoOrder->save();
+
+            /**
+             * Add order information to the session
+             */
+            Mage::getSingleton('checkout/session')
+                ->setLastOrderId($magentoOrder->getId())
+                ->setLastRealOrderId($magentoOrder->getIncrementId());
+
+            /**
+             * Add recurring profiles information to the session
+             */
+            $profiles = $service->getRecurringPaymentProfiles();
+            if ($profiles) {
+                $ids = array();
+                foreach ($profiles as $profile) {
+                    $ids[] = $profile->getId();
+                }
+                $this->_checkoutSession->setLastRecurringProfileIds($ids);
+            }
+
+            Mage::dispatchEvent(
+                'checkout_submit_all_after',
+                array('order' => $magentoOrder, 'quote' => $quote, 'recurring_profiles' => $profiles)
+            );
+
+            return $magentoOrder;
 
         } else {
 
             // Unable to find a matching quote!!!
-            Mage::helper('klarna')->log('Unable to find matching quote when about to create Klarna order for quote id ' . $quote->getId());
+            Mage::helper('klarna')->log('Unable to find matching quote when about to create Klarna order');
 
             return false;
 
