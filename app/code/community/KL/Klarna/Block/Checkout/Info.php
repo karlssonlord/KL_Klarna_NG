@@ -47,14 +47,20 @@ class KL_Klarna_Block_Checkout_Info extends KL_Klarna_Block_Info {
             /**
              * Fetch the order
              */
-            $this->_klarnaOrder = $checkout->getOrder($this->getCompleteCheckoutID());
+            try {
+                $this->_klarnaOrder = $checkout->getOrder($this->getCompleteCheckoutID());
+            } catch (Exception $e) {
+                $this->_klarnaOrder = null;
+            }
 
         }
 
         /**
          * Return field if set
          */
-        return $this->_klarnaOrder->offsetGet($field);
+        if ( $this->_klarnaOrder ) {
+            return $this->_klarnaOrder->offsetGet($field);
+        }
     }
 
     /**

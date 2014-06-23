@@ -1,5 +1,6 @@
 <img src="<?php print $this->getLogo(); ?>" width="100"/><br/>
 
+<?php if ($this->getKlarnaReservation()): ?>
 <table cellspacing="0" class="form-list">
     <tbody>
         <tr>
@@ -24,4 +25,7 @@
         </tr>
     </tbody>
 </table>
+<?php else: ?>
+    <em><?php echo $this->__('No active reservation exists'); ?></em>
+<?php endif; ?>
 <br />
