@@ -77,7 +77,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
              * Make a note about the amounts
              */
             Mage::helper('klarna')->log(
-                'Comparing amount quote:' . $quoteTotal . ' and Klarna ' . $order['cart']['total_price_including_tax']
+                'Comparing amount quote:' . $quoteTotal . ' and Klarna ' . $order['cart']['total_price_including_tax'] .  ' for quote id ' . $quote->getId()
             );
 
             /**
@@ -246,7 +246,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         } else {
 
             // Unable to find a matching quote!!!
-            Mage::helper('klarna')->log('Unable to find matching quote when about to create Klarna order');
+            Mage::helper('klarna')->log('Unable to find matching quote when about to create Klarna order for quote id ' . $quote->getId());
 
             return false;
 
