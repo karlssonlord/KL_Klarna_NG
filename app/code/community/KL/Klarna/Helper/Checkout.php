@@ -186,4 +186,98 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
 
         return true;
     }
+
+    public function createOrderFromQuote($quoteId)
+    {
+        $quote = Mage::getModel('sales/quote')->load($quoteId);
+
+        if ($quote->getId() && $quote->getKlarnaCheckout()) {
+            $checkout    = Mage::getModel('klarna/klarnacheckout');
+            $reservation = $checkout->getOrder($checkoutId);
+
+            $shippingAddress = array();
+            if ( isset($reservation['shipping_address']['care_of']) ) {
+                $shippingAddress[] = $reservation['shipping_address']['care_of'];
+            }
+            $shippingAddress[] = $reservation['shipping_address']['street_address'];
+            $shippingAddress = implode("\n", $shippingAddress);
+
+            $billingAddress = array();
+            if ( isset($reservation['billing_address']['care_of']) ) {
+                $billingAddress[] = $reservation['billing_address']['care_of'];
+            }
+            $billingAddress[] = $reservation['billing_address']['street_address'];
+            $billingAddress = implode("\n", $billingAddress);
+
+            $quote->getShippingAddress()
+                ->setFirstname($reservation['shipping_address']['given_name'])
+                ->setLastname($reservation['shipping_address']['family_name'])
+                ->setStreet($shippingAddress)
+                ->setPostcode($reservation['shipping_address']['postal_code'])
+                ->setCity($reservation['shipping_address']['city'])
+                ->setCountryId(strtoupper($reservation['shipping_address']['country']))
+                ->setEmail($reservation['shipping_address']['email'])
+                ->setTelephone($reservation['shipping_address']['phone'])
+                ->setSameAsBilling(0)
+                ->save();
+
+            $quote->getBillingAddress()
+                ->setFirstname($reservation['shipping_address']['given_name'])
+                ->setLastname($reservation['shipping_address']['family_name'])
+                ->setStreet($billingAddress)
+                ->setPostcode($reservation['shipping_address']['postal_code'])
+                ->setCity($reservation['shipping_address']['city'])
+                ->setCountryId(strtoupper($reservation['shipping_address']['country']))
+                ->setEmail($reservation['shipping_address']['email'])
+                ->setTelephone($reservation['shipping_address']['phone'])
+                ->save();
+
+            $quote
+                ->getPayment()
+                ->setMethod('klarna_checkout')
+                ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
+                ->setTransactionId($checkoutId)
+                ->setIsTransactionClosed(0)
+                ->save();
+
+            $quote
+                ->setCustomerFirstname($reservation['shipping_address']['given_name'])
+                ->setCustomerLastname($reservation['shipping_address']['family_name'])
+                ->setCustomerEmail($reservation['shipping_address']['email'])
+                ->save();
+
+            $quote
+                ->collectTotals()
+                ->setIsActive(0)
+                ->save();
+
+            $service = Mage::getModel('sales/service_quote', $quote);
+
+            $service->submitAll();
+            $order = $service->getOrder();
+
+            if ($order) {
+                Mage::dispatchEvent(
+                    'checkout_type_onepage_save_order_after',
+                    array('order' => $order, 'quote' => $quote)
+                );
+
+                $order
+                    ->setState('pending')
+                    ->setStatus('pending');
+
+                $order->save();
+
+                $profiles = $service->getRecurringPaymentProfiles();
+
+                Mage::dispatchEvent(
+                    'checkout_submit_all_after',
+                    array('order' => $order, 'quote' => $quote, 'recurring_profiles' => $profiles)
+                );
+
+                return $order->getIncrementId();
+            }
+        }
+        return 0;
+    }
 }

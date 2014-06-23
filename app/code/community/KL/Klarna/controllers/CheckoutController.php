@@ -110,4 +110,11 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         Mage::getModel('klarna/klarnacheckout')->acknowledge($_REQUEST['klarna_order']);
     }
 
+    public function convertAction()
+    {
+        $quoteId = Mage::app()->getRequest()->getParam('qid');
+        $orderId = Mage::helper('klarna/checkout')->createOrderFromQuote($quoteId);
+        echo $orderId;
+        die();
+    }
 }
