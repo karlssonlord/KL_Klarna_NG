@@ -193,6 +193,7 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
 
         if ($quote->getId() && $quote->getKlarnaCheckout()) {
             $checkout    = Mage::getModel('klarna/klarnacheckout');
+            $checkoutId  = $quote->getKlarnaCheckout();
             $reservation = $checkout->getOrder($checkoutId);
 
             $shippingAddress = array();
