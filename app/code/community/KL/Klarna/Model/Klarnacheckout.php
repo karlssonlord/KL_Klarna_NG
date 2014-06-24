@@ -215,6 +215,11 @@ class KL_Klarna_Model_Klarnacheckout
          */
         if ( Mage::helper('klarna/checkout')->getKlarnaCheckoutId() ) {
 
+            /**
+             * Log the event
+             */
+            Mage::helper('klarna')->log('Trying to fetch existing KCO order from Klarna using ' . Mage::helper('klarna/checkout')->getKlarnaCheckoutId());
+
             try {
 
                 /**
@@ -235,9 +240,9 @@ class KL_Klarna_Model_Klarnacheckout
             } catch (Exception $e) {
 
                 /**
-                 * Something went wrong, unset the checkout id
+                 * Log the event
                  */
-                Mage::helper('klarna/checkout')->setKlarnaCheckoutId(false);
+                Mage::helper('klarna')->log('Unable to get existing Klarna Order ID. Error received: ' . $e->getMessage());
 
                 return false;
             }
@@ -245,6 +250,11 @@ class KL_Klarna_Model_Klarnacheckout
             return $order;
 
         }
+
+        /**
+         * Log the event
+         */
+        Mage::helper('klarna')->log('No existing checkout ID when fetching order from Klarna, returning false.');
 
         return false;
 
