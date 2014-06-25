@@ -135,6 +135,13 @@ class KL_Klarna_Model_Klarnacheckout
                     );
 
                     /**
+                     * Log what status and state we're setting
+                     */
+                    Mage::helper('klarna')->log(
+                        'Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId()
+                    );
+
+                    /**
                      * Configure and save the order
                      */
                     $magentoOrder
