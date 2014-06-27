@@ -106,6 +106,12 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             $billingAddress = implode("\n", $billingAddress);
 
             /**
+             * Fetch delivery instructions and door code
+             */
+            $doorCode = $quote->getShippingAddress()->getData('door_code');
+            $deliveryInstructions = $quote->getShippingAddress()->getData('delivery_instructions');
+
+            /**
              * Reconfigure the shipping address
              */
             $quote->getShippingAddress()
@@ -118,6 +124,8 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                 ->setEmail($order['shipping_address']['email'])
                 ->setTelephone($order['shipping_address']['phone'])
                 ->setSameAsBilling(0)
+                ->setData('door_code', $doorCode)
+                ->setData('delivery_instructions', $deliveryInstructions)
                 ->save();
 
             /**
@@ -133,6 +141,8 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                 ->setEmail($order['shipping_address']['email'])
                 ->setTelephone($order['shipping_address']['phone'])
                 ->setSameAsBilling(0)
+                ->setData('door_code', $doorCode)
+                ->setData('delivery_instructions', $deliveryInstructions)
                 ->save();
 
             /**
@@ -189,6 +199,19 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                     'checkout_type_onepage_save_order_after',
                     array('order' => $magentoOrder, 'quote' => $quote)
                 );
+
+                /**
+                 * Make sure delivery instructions and door code is set
+                 */
+                $magentoOrder->getBillingAddress()
+                    ->setData('door_code', $doorCode)
+                    ->setData('delivery_instructions', $deliveryInstructions)
+                    ->save();
+
+                $magentoOrder->getShippingAddress()
+                    ->setData('door_code', $doorCode)
+                    ->setData('delivery_instructions', $deliveryInstructions)
+                    ->save();
 
                 /**
                  * Add order information to the session
