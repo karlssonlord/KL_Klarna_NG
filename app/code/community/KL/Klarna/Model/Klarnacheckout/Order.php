@@ -41,7 +41,22 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
          * Make sure it was found
          */
         if ( ! $checkoutId ) {
-            throw new Exception('No checkout ID exists');
+            throw new Exception('No checkout ID exists (at create method)');
+        }
+
+        /**
+         * Look for orders with the same checkout id
+         */
+        $magentoOrderSearch = Mage::getModel('sales/order')
+            ->getCollection()
+            ->addFieldToFilter('klarna_checkout', $checkoutId)
+            ->getFirstItem();
+
+        /**
+         * Make sure nothing was found
+         */
+        if ( $magentoOrderSearch->getId() ) {
+            throw new Exception('Order with checkout ID "' . $checkoutId . '" already exists (at create method)');
         }
 
         /**
@@ -77,7 +92,8 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
              * Make a note about the amounts
              */
             Mage::helper('klarna')->log(
-                'Comparing amount quote:' . $quoteTotal . ' and Klarna ' . $order['cart']['total_price_including_tax'] .  ' for quote id ' . $quote->getId()
+                'Comparing amount quote:' . $quoteTotal . ' and Klarna ' . $order['cart']['total_price_including_tax'] . ' for quote id ' . $quote->getId(
+                )
             );
 
             /**
@@ -245,7 +261,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
              * Add recurring profiles information to the session
              */
             $profiles = $service->getRecurringPaymentProfiles();
-            if ($profiles) {
+            if ( $profiles ) {
                 $ids = array();
                 foreach ($profiles as $profile) {
                     $ids[] = $profile->getId();
@@ -264,6 +280,90 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
 
             // Unable to find a matching quote!!!
             Mage::helper('klarna')->log('Unable to find matching quote when about to create Klarna order');
+
+            return false;
+
+        }
+
+    }
+
+    /**
+     * Abort the creation of the order and cancel the reservation
+     *
+     * @return bool
+     */
+    public function abortCreate()
+    {
+        /**
+         * Fetch checkout ID from session
+         */
+        $checkoutId = Mage::helper('klarna/checkout')->getKlarnaCheckoutId();
+
+        /**
+         * Make sure it was found
+         */
+        if ( ! $checkoutId ) {
+            Mage::helper('klarna')->log('Unable to cancel reservation at abortCreate due to missing checkout id');
+            return false;
+        }
+
+        /**
+         * Fetch the order from Klarna
+         */
+        try {
+            $order = $this->_klarnacheckout->getOrder($checkoutId);
+        } catch (Exception $e) {
+            Mage::helper('klarna')->log(
+                'Unable to cancel reservation at abortCreate due to missing reservation number. Exception: ' . $e->getMessage(
+                )
+            );
+            return false;
+        }
+
+        /**
+         * Check for reservation number
+         */
+        $reservationNumber = $order['reservation'];
+
+        /**
+         * Make sure it was found
+         */
+        if ( ! $reservationNumber ) {
+            Mage::helper('klarna')->log(
+                'Unable to cancel reservation at abortCreate due to missing reservation number'
+            );
+            return false;
+        }
+
+        /**
+         * Try to cancel the reservation
+         */
+        try {
+
+            /**
+             * Load the Klarna API library
+             */
+            $klarnaApi = Mage::getModel('klarna/api_order');
+
+            /**
+             * Cancel the reservation
+             */
+            $result = $klarnaApi->cancelReservation($reservationNumber);
+
+            Mage::helper('klarna')->log(
+                'Reservation (' . $checkoutId . ') canceled at abortCreate with result: ' . $result
+            );
+
+            return true;
+
+        } catch (Exception $e) {
+
+            /**
+             * Log the event
+             */
+            Mage::helper('klarna')->log(
+                'Reservation (' . $checkoutId . ') NOT canceled at abortCreate: ' . $e->getMessage()
+            );
 
             return false;
 
