@@ -92,8 +92,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
              * Make a note about the amounts
              */
             Mage::helper('klarna')->log(
-                'Comparing amount quote:' . $quoteTotal . ' and Klarna ' . $order['cart']['total_price_including_tax'] . ' for quote id ' . $quote->getId(
-                )
+                'Comparing amount quote:' . $quoteTotal . ' and Klarna ' . $order['cart']['total_price_including_tax'] . ' for quote id ' . $quote->getId()
             );
 
             /**
