@@ -354,9 +354,19 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                 'Reservation (' . $checkoutId . ') canceled at abortCreate with result: ' . $result
             );
 
+            /**
+             * Reset the checkout ID to prevent any other problems
+             */
+            Mage::helper('klarna/checkout')->setKlarnaCheckoutId('');
+
             return true;
 
         } catch (Exception $e) {
+
+            /**
+             * Set session message
+             */
+            Mage::getSingleton('checkout/session')->addError(Mage::helper('klarna')->__('Unable to checkout order. Please try again or contact customer services.'));
 
             /**
              * Log the event
@@ -364,6 +374,11 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             Mage::helper('klarna')->log(
                 'Reservation (' . $checkoutId . ') NOT canceled at abortCreate: ' . $e->getMessage()
             );
+
+            /**
+             * Reset the checkout ID to prevent any other problems
+             */
+            Mage::helper('klarna/checkout')->setKlarnaCheckoutId('');
 
             return false;
 

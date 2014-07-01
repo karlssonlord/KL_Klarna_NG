@@ -83,6 +83,12 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             Mage::helper('klarna')->log('Exception when trying to create order: ' . $e->getMessage());
 
             /**
+             * Set session message
+             * Disable since checkout won't show session messages
+             */
+            //Mage::getSingleton('checkout/session')->addError( Mage::helper('klarna')->__('Unable to create order. Please try again or contact customer services.') );
+
+            /**
              * Abort the creation of order and make sure the reservation is released
              */
             Mage::getModel('klarna/klarnacheckout_order')->abortCreate();
@@ -90,7 +96,7 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             /**
              * Redirect to frontpage
              */
-            $this->_redirect('/');
+            $this->_redirectUrl( Mage::helper('animail')->getCheckoutUrl() );
         }
 
     }
