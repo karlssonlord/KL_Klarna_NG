@@ -9,21 +9,28 @@ class KL_Klarna_Model_Payment_Partpayment extends KL_Klarna_Model_Payment_Abstra
 
     protected $_pclassTypeId = 0;
 
+    /**
+     * Check whether payment method can be used
+     *
+     * @param Mage_Sales_Model_Quote|null $quote
+     *
+     * @return bool Returns true if payment method is available
+     *
+     * @see Mage_Payment_Model_Method_Abstract::isAvailable
+     */
     public function isAvailable($quote = null)
     {
-        /**
-         * Setup count of possible pclasses
-         */
-        $pclasses = Mage::helper('klarna/pclass')->getAvailable(1, $quote);
+        $isAvailable = parent::isAvailable();
 
-        /**
-         * If atleast one was found, enable the method
-         */
-        if (count($pclasses) > 0) {
-            return true;
+        if ($isAvailable) {
+            $pclasses = Mage::helper('klarna/pclass')->getAvailable(1, $quote);
+
+            if (count($pclasses) == 0) {
+                $isAvailable = false;
+            }
         }
 
-        return false;
+        return $isAvailable;
     }
 
     /**
