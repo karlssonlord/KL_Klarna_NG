@@ -1,31 +1,36 @@
-<img src="<?php print $this->getLogo(); ?>" width="100"/><br/>
-
-<?php if ($this->getKlarnaReservation()): ?>
-<table cellspacing="0" class="form-list">
-    <tbody>
-        <tr>
-            <td class="label"><label><?php print Mage::helper('klarna')->__('Status'); ?></label></td>
-            <td class="value"><strong><?php print $this->getKlarnaStatus(); ?></strong></td>
-        </tr>
-        <tr>
-            <td class="label"><label><?php print Mage::helper('klarna')->__('Reference'); ?></label></td>
-            <td class="value"><strong><?php print $this->getKlarnaReference(); ?></strong></td>
-        </tr>
-        <tr>
-            <td class="label"><label><?php print Mage::helper('klarna')->__('Reservation'); ?></label></td>
-            <td class="value"><strong><?php print $this->getKlarnaReservation(); ?></strong></td>
-        </tr>
-        <tr>
-            <td class="label"><label><?php print Mage::helper('klarna')->__('Purchase country'); ?></label></td>
-            <td class="value"><strong><?php print $this->getKlarnaPurchaseCountry(); ?></strong></td>
-        </tr>
-        <tr>
-            <td class="label"><label><?php print Mage::helper('klarna')->__('Purchase currency'); ?></label></td>
-            <td class="value"><strong><?php print $this->getKlarnaPurchaseCurrency(); ?></strong></td>
-        </tr>
-    </tbody>
-</table>
+<?php if (!strpos($_SERVER['REQUEST_URI'], 'pdfdocs')): ?>
+    <img src="<?php print $this->getLogo(); ?>" width="100"/><br/>
+    <?php if ($this->getKlarnaReservation()): ?>
+    <table cellspacing="0" class="form-list">
+        <tbody>
+            <tr>
+                <td class="label"><label><?php print Mage::helper('klarna')->__('Status'); ?></label></td>
+                <td class="value"><strong><?php print $this->getKlarnaStatus(); ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label><?php print Mage::helper('klarna')->__('Reference'); ?></label></td>
+                <td class="value"><strong><?php print $this->getKlarnaReference(); ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label><?php print Mage::helper('klarna')->__('Reservation'); ?></label></td>
+                <td class="value"><strong><?php print $this->getKlarnaReservation(); ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label><?php print Mage::helper('klarna')->__('Purchase country'); ?></label></td>
+                <td class="value"><strong><?php print $this->getKlarnaPurchaseCountry(); ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label><?php print Mage::helper('klarna')->__('Purchase currency'); ?></label></td>
+                <td class="value"><strong><?php print $this->getKlarnaPurchaseCurrency(); ?></strong></td>
+            </tr>
+        </tbody>
+    </table>
+    <?php else: ?>
+        <em><?php echo $this->__('No active reservation exists'); ?></em>
+    <?php endif; ?>
+    <br />
 <?php else: ?>
-    <em><?php echo $this->__('No active reservation exists'); ?></em>
+
+    <?php print Mage::helper('klarna')->__('Klarna Checkout'); ?>
+
 <?php endif; ?>
-<br />
