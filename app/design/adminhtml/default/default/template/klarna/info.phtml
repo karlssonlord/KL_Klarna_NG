@@ -1,36 +1,44 @@
-<img src="<?php print $this->getLogo(); ?>" width="100"/><br/>
+<?php if (!strpos($_SERVER['REQUEST_URI'], 'pdf')): ?>
 
-<table cellspacing="0" class="form-list">
-    <tbody>
-        <?php if ($this->getSocialSecurityNumber()): ?>
+    <img src="<?php print $this->getLogo(); ?>" width="100"/><br/>
+
+    <table cellspacing="0" class="form-list">
+        <tbody>
+            <?php if ($this->getSocialSecurityNumber()): ?>
+                <tr>
+                    <td class="label"><label><?php print Mage::helper('klarna')->__('Social security number'); ?></label></td>
+                    <td class="value"><strong><?php print $this->getSocialSecurityNumber(); ?></strong></td>
+                </tr>
+            <?php endif; ?>
+
             <tr>
-                <td class="label"><label><?php print Mage::helper('klarna')->__('Social security number'); ?></label></td>
-                <td class="value"><strong><?php print $this->getSocialSecurityNumber(); ?></strong></td>
+                <td class="label"><label><?php print Mage::helper('klarna')->__('Reservation number'); ?></label></td>
+                <td class="value"><strong><?php print $this->getTxnId(); ?></strong></td>
             </tr>
-        <?php endif; ?>
 
-        <tr>
-            <td class="label"><label><?php print Mage::helper('klarna')->__('Reservation number'); ?></label></td>
-            <td class="value"><strong><?php print $this->getTxnId(); ?></strong></td>
-        </tr>
+            <?php if($this->getInvoiceUrl()): ?>
+            <tr>
+                <td class="label"><label><?php print Mage::helper('klarna')->__('PDF Invoice'); ?></label></td>
+                <td class="value"><strong><a href="<?php print $this->getInvoiceUrl(); ?>" target="_blank">PDF-invoice</a></strong></td>
+            </tr>
 
-        <?php if($this->getInvoiceUrl()): ?>
-        <tr>
-            <td class="label"><label><?php print Mage::helper('klarna')->__('PDF Invoice'); ?></label></td>
-            <td class="value"><strong><a href="<?php print $this->getInvoiceUrl(); ?>" target="_blank">PDF-invoice</a></strong></td>
-        </tr>
+            <tr>
+                <td class="label"><label><?php print Mage::helper('klarna')->__('Sent by e-mail'); ?></label></td>
+                <td class="value"><strong><?php print $this->sentByEmail(); ?></strong></td>
+            </tr>
 
-        <tr>
-            <td class="label"><label><?php print Mage::helper('klarna')->__('Sent by e-mail'); ?></label></td>
-            <td class="value"><strong><?php print $this->sentByEmail(); ?></strong></td>
-        </tr>
+            <tr>
+                <td class="label"><label><?php print Mage::helper('klarna')->__('Sent by postal'); ?></label></td>
+                <td class="value"><strong><?php print $this->sentByPostal(); ?></strong></td>
+            </tr>
+            <?php endif; ?>
 
-        <tr>
-            <td class="label"><label><?php print Mage::helper('klarna')->__('Sent by postal'); ?></label></td>
-            <td class="value"><strong><?php print $this->sentByPostal(); ?></strong></td>
-        </tr>
-        <?php endif; ?>
+        </tbody>
+    </table>
+    <br />
 
-    </tbody>
-</table>
-<br />
+<?php else: ?>
+
+    <?php print Mage::helper('klarna')->__('Klarna'); ?>
+
+<?php endif; ?>
