@@ -61,8 +61,7 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
              * Redirect if order wasn't created
              */
             if ( ! $orderObject ) {
-                $this->_redirectUrl(Mage::helper('core/url')->getHomeUrl());
-                return $this;
+                throw new Exception('Tried to fetch order from Klarna without success at CheckoutController.');
             }
 
             /**
@@ -94,7 +93,7 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             Mage::getModel('klarna/klarnacheckout_order')->abortCreate();
 
             /**
-             * Redirect to frontpage
+             * Redirect to checkout
              */
             $this->_redirectUrl( Mage::helper('animail')->getCheckoutUrl() );
         }
