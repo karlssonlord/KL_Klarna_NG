@@ -353,28 +353,6 @@ class KL_Klarna_Model_Klarnacheckout
         }
 
         /**
-         * Setup the create array
-         */
-        $klarnaData = array(
-            'purchase_country' => $this->getCountry(),
-            'purchase_currency' => $this->getCurrency(),
-            'locale' => $this->getLocale(),
-            'merchant' => array(
-                'id' => $this->getMerchantId(),
-                'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
-                'checkout_uri' => Mage::getUrl('klarna/checkout'),
-                'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
-                'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
-            ),
-            'cart' => array('items' => $items),
-            'merchant_reference' => array(
-                'orderid2' => $this->getQuote()->getId()
-            )
-        );
-
-        Mage::helper('klarna')->log($klarnaData);
-
-        /**
          * Fetch existing Klarna Order
          */
         $order = $this->getExistingKlarnaOrder();
@@ -383,6 +361,18 @@ class KL_Klarna_Model_Klarnacheckout
          * Update or create the order
          */
         if ( $order ) {
+
+            /**
+             * Setup the update array
+             */
+            $klarnaData = array(
+                'cart' => array('items' => $items),
+                'merchant_reference' => array(
+                    'orderid2' => $this->getQuote()->getId()
+                )
+            );
+
+            Mage::helper('klarna')->log($klarnaData);
 
             /**
              * Update the data
@@ -415,6 +405,28 @@ class KL_Klarna_Model_Klarnacheckout
          * Create order if nothing is set
          */
         if ( ! $order ) {
+
+            /**
+             * Setup the create array
+             */
+            $klarnaData = array(
+                'purchase_country' => $this->getCountry(),
+                'purchase_currency' => $this->getCurrency(),
+                'locale' => $this->getLocale(),
+                'merchant' => array(
+                    'id' => $this->getMerchantId(),
+                    'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
+                    'checkout_uri' => Mage::getUrl('klarna/checkout'),
+                    'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
+                    'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
+                ),
+                'cart' => array('items' => $items),
+                'merchant_reference' => array(
+                    'orderid2' => $this->getQuote()->getId()
+                )
+            );
+
+            Mage::helper('klarna')->log($klarnaData);
 
             $klarnaData['gui']['options'] = array('disable_autofocus');
 
