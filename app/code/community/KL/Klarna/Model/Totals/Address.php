@@ -54,7 +54,7 @@ class KL_Klarna_Model_Totals_Address
                     /**
                      * Fetch payment method invoice fee
                      */
-                    $fee = $helper->getConfig('fee', $payment->getCode());
+                    $fee = $helper->getConfig('fee', $paymentCode);
 
                     /**
                      * Add store view currency amount
@@ -85,7 +85,7 @@ class KL_Klarna_Model_Totals_Address
                 /**
                  * Remove fee if any other payment option
                  */
-                if ($payment->getCode() !== 'klarna_invoice') {
+                if ($paymentCode !== 'klarna_invoice') {
                     $address->setKlarnaTotal(null);
                     $address->setBaseKlarnaTotal(null);
 
