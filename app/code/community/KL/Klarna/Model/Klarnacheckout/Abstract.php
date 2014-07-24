@@ -2,7 +2,7 @@
 /**
  * Include Klarna Checkout library
  */
-require_once('Klarna/Checkout.php');
+require_once('Klarna/kco_php/src/Klarna/Checkout.php');
 
 /**
  * Class KL_Klarna_Model_Klarnacheckout_Abstract
