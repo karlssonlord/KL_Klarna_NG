@@ -9,4 +9,9 @@
             <block type="klarna/fetch" name="klarna_fetch_address" as="klarna_fetch_address" before="checkout.payment.methods" template="klarna/address/fetch.phtml"/>
         </reference>
     </checkout_onepage_index>
+    <sales_email_order_items>
+        <reference name="order_totals">
+            <block name="kl_klarna_invoice_fee" type="klarna/order_totals_fee" />
+        </reference>
+    </sales_email_order_items>
 </layout>
