@@ -2,12 +2,20 @@
 class KL_Klarna_Model_Totals_Address
     extends Mage_Sales_Model_Quote_Address_Total_Abstract
 {
+    protected $_calculator = null;
+
+    public function __construct()
+    {
+        $this->setCode('klarna_total');
+        $this->_calculator = Mage::getSingleton('tax/calculation');
+    }
+
     /**
      * Calculate your total value
      *
      * @param Mage_Sales_Model_Quote_Address $address Quote address
      *
-     * @return $this|Mage_Sales_Model_Quote_Address_Total_Abstract
+     * @return Mage_Sales_Model_Quote_Address_Total_Abstract
      */
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
@@ -38,7 +46,7 @@ class KL_Klarna_Model_Totals_Address
                     $paymentCode = false;
                 }
 
-                $helper->log('Quote found with ID ' . $quote->getId());
+                $helper->log('Quote found with ID ' . $quote->getId() . ' ' . $address->getAddressType());
 
                 /**
                  * Make sure it's a payment that has a fee and it's a shipping
@@ -47,14 +55,16 @@ class KL_Klarna_Model_Totals_Address
                 if ($address->getAddressType() == 'shipping'
                     && $paymentCode == 'klarna_invoice'
                 ) {
-                    $helper->log(
-                        'Updating quote since we\'re using ' . $paymentCode
-                    );
+                    $helper->log('Updating quote since we\'re using ' . $paymentCode);
 
                     /**
                      * Fetch payment method invoice fee
                      */
-                    $fee = $helper->getConfig('fee', $paymentCode);
+                    $fee           = $helper->getConfig('fee', $paymentCode);
+                    $calc          = $this->_calculator;
+                    $rate          = Mage::getStoreConfig('payment/klarna_invoice/fee_tax_percent');
+                    $taxAmount     = $fee - ($fee * 1 / (1 + ($rate / 100)));
+                    $baseTaxAmount = $taxAmount;
 
                     /**
                      * Add store view currency amount
@@ -79,6 +89,13 @@ class KL_Klarna_Model_Totals_Address
                         ->setKlarnaTotal($fee)
                         ->setBaseKlarnaTotal($fee);
 
+                    $address->setKlarnaTaxAmount($taxAmount);
+                    $address->setBaseKlarnaTaxAmount($taxAmount);
+                    $address->setTaxAmount($address->getTaxAmount() + $taxAmount);
+                    $address->setBaseTaxAmount($address->getBaseTaxAmount() + $baseTaxAmount);
+                    $address->setGrandTotal($address->getGrandTotal() + $fee);
+                    $address->setBaseGrandTotal($address->getBaseGrandTotal() + $fee);
+
                     Mage::helper('klarna')->log('Set fee ' . $fee);
                 }
 
@@ -92,11 +109,16 @@ class KL_Klarna_Model_Totals_Address
                     $address->getQuote()
                         ->setKlarnaTotal(null)
                         ->setBaseKlarnaTotal(null);
+
+                    $address->setKlarnaTaxAmount(null);
+                    $address->setBaseKlarnaTaxAmount(null);
+
+                    $address->getQuote()
+                        ->setKlarnaTaxAmount(null)
+                        ->setBaseKlarnaTaxAmount(null);
                 }
             } catch (Exception $e) {
-                $helper->log(
-                    'Exception when calling collect: ' . $e->getMessage()
-                );
+                $helper->log('Exception when calling collect: ' . $e->getMessage());
             }
         }
 
