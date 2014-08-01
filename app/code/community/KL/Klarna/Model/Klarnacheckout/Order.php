@@ -30,12 +30,11 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         $this->_customerSession = Mage::getSingleton('customer/session');
     }
 
-    public function create()
+    public function create($checkoutId = false)
     {
-        /**
-         * Fetch checkout ID from session
-         */
-        $checkoutId = Mage::helper('klarna/checkout')->getKlarnaCheckoutId();
+        if ($checkoutId === false) {
+            $checkoutId = Mage::helper('klarna/checkout')->getKlarnaCheckoutId();
+        }
 
         /**
          * Make sure it was found
@@ -43,6 +42,8 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         if ( ! $checkoutId ) {
             throw new Exception('No checkout ID exists (at create method)');
         }
+
+        Mage::helper('klarna')->log($checkoutId, true);
 
         /**
          * Look for orders with the same checkout id
@@ -70,7 +71,6 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         $quote = Mage::getModel('sales/quote')
             ->getCollection()
             ->addFieldToFilter('klarna_checkout', $checkoutId)
-            ->addFieldToFilter('is_active', 1)
             ->getFirstItem();
 
         /**
@@ -81,7 +81,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             /**
              * Make a notice in the log
              */
-            Mage::helper('klarna')->log('Creating order at success page from quote id ' . $quote->getId());
+            Mage::helper('klarna/log')->log($quote, 'Create order', true);
 
             /**
              * Convert our total amount the Klarna way
@@ -91,14 +91,10 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             /**
              * Make a note about the amounts
              */
-            Mage::helper('klarna')->log(
-                'Comparing amount quote:' . $quoteTotal . ' and Klarna ' . $order['cart']['total_price_including_tax'] . ' for quote id ' . $quote->getId()
+            Mage::helper('klarna/log')->log(
+                $quote,
+                'Comparing amount quote:' . $quoteTotal . ' and Klarna ' . $order['cart']['total_price_including_tax']
             );
-
-            /**
-             * Amount matches, update the quote
-             */
-            Mage::helper('klarna')->log('Amount matches. Configuring quote with data from Klarna');
 
             /**
              * Build shipping address
