@@ -60,45 +60,16 @@ class KL_Klarna_Model_Klarnacheckout
      */
     public function acknowledge($checkoutId)
     {
-        Mage::helper('klarna')->log('Request to acknowledge ' . $checkoutId);
-
-        /**
-         * So sorry for this. Klarna is doing the callback so quick that
-         * we haven't had time to create the order yet. We will handle
-         * this later in the project. Best for now is to sleep for a while
-         * until the order has been created.
-         */
-        sleep(10);
-
-        /**
-         * Load the order
-         */
         try {
-
-            /**
-             * Fetch order
-             */
             $order = $this->getOrder($checkoutId);
 
-            Mage::helper('klarna')->log('Acknowledge: Order status: ' . $order['status']);
+            if ($order['status'] == 'checkout_complete') {
 
-            /**
-             * Make sure the order status is correct
-             */
-            if ( $order['status'] == 'checkout_complete' ) {
+                $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
+                    ->create($checkoutId);
 
-                /**
-                 * Load Magento order
-                 */
-                $magentoOrder = Mage::getModel('sales/order')
-                    ->getCollection()
-                    ->addFieldToFilter('klarna_checkout', $checkoutId)
-                    ->getFirstItem();
-
-                /**
-                 * Make sure order was found
-                 */
                 if ( $magentoOrder->getId() ) {
+                    $quote = $magentoOrder->getQuote();
 
                     /**
                      * Set the payment information
@@ -138,7 +109,9 @@ class KL_Klarna_Model_Klarnacheckout
                      * Log what status and state we're setting
                      */
                     Mage::helper('klarna')->log(
-                        'Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId()
+                        $quote,
+                        'Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId(),
+                        true
                     );
 
                     /**
@@ -177,14 +150,18 @@ class KL_Klarna_Model_Klarnacheckout
 
                     } catch (Exception $e) {
 
-                        Mage::helper('klarna')->log(
-                            'Unable to send new order email (' . $e->getMessage() . '), Magento ID ' . $magentoOrder->getIncrementId()
+                        Mage::helper('klarna/log')->log(
+                            $quote,
+                            'Unable to send new order email (' . $e->getMessage() . '), Magento ID ' . $magentoOrder->getIncrementId(),
+                            true
                         );
 
                     }
 
-                    Mage::helper('klarna')->log(
-                        'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId()
+                    Mage::helper('klarna/log')->log(
+                        $quote,
+                        'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId(),
+                        true
                     );
 
                 } else {
@@ -225,7 +202,13 @@ class KL_Klarna_Model_Klarnacheckout
             /**
              * Log the event
              */
-            Mage::helper('klarna')->log('Trying to fetch existing KCO order from Klarna using ' . Mage::helper('klarna/checkout')->getKlarnaCheckoutId());
+            $quote = $this->getQuote();
+
+            Mage::helper('klarna/log')->log(
+                $quote,
+                'Trying to fetch existing KCO order from Klarna using '
+                    . Mage::helper('klarna/checkout')->getKlarnaCheckoutId()
+            );
 
             try {
 

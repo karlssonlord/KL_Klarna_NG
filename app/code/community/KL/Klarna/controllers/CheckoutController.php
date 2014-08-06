@@ -39,65 +39,30 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
     /**
      * Display the success page
+     *
+     * @return void
      */
     public function successAction()
     {
+        $quote = $this->_getQuote();
+
+        Mage::helper('klarna/log')->log($quote, "successAction");
+
+        $quoteId = $quote->getId();
+
         /**
-         * Create the order
+         * Clear the session
+         *
+         * @see Mage_Checkout_OnepageController successAction
          */
-        try {
-            /**
-             * Create the order
-             */
-            $orderObject = Mage::getModel('klarna/klarnacheckout_order')->create();
+        $this->getOnepage()->getCheckout()->clear();
 
-            /**
-             * Clear the session
-             * @see Mage_Checkout_OnepageController successAction
-             */
-            $this->getOnepage()->getCheckout()->clear();
+        Mage::getSingleton('checkout/session')->setLastQuoteId($quoteId);
 
-            /**
-             * Redirect if order wasn't created
-             */
-            if ( ! $orderObject ) {
-                throw new Exception('Tried to fetch order from Klarna without success at CheckoutController.');
-            }
-
-            /**
-             * Render layout
-             */
-            $this->loadLayout();
-            $layout = $this->getLayout();
-            $block = $layout->getBlock('klarna_success');
-            $block->setOrder($orderObject);
-
-            $this->renderLayout();
-
-        } catch (Exception $e) {
-
-            /**
-             * Log the exception
-             */
-            Mage::helper('klarna')->log('Exception when trying to create order: ' . $e->getMessage());
-
-            /**
-             * Set session message
-             * Disable since checkout won't show session messages
-             */
-            //Mage::getSingleton('checkout/session')->addError( Mage::helper('klarna')->__('Unable to create order. Please try again or contact customer services.') );
-
-            /**
-             * Abort the creation of order and make sure the reservation is released
-             */
-            Mage::getModel('klarna/klarnacheckout_order')->abortCreate();
-
-            /**
-             * Redirect to checkout
-             */
-            $this->_redirectUrl( Mage::helper('animail')->getCheckoutUrl() );
-        }
-
+        $this->loadLayout();
+        $layout = $this->getLayout();
+        $block  = $layout->getBlock('klarna_success');
+        $this->renderLayout();
     }
 
     /**
@@ -114,9 +79,6 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
     public function pushAction()
     {
-        /**
-         * Acknowledge order
-         */
         Mage::getModel('klarna/klarnacheckout')->acknowledge($_REQUEST['klarna_order']);
     }
 
