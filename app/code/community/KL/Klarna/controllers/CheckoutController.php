@@ -48,12 +48,16 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
         Mage::helper('klarna/log')->log($quote, "successAction");
 
+        $quoteId = $quote->getId();
+
         /**
          * Clear the session
          *
          * @see Mage_Checkout_OnepageController successAction
          */
         $this->getOnepage()->getCheckout()->clear();
+
+        Mage::getSingleton('checkout/session')->setLastQuoteId($quoteId);
 
         $this->loadLayout();
         $layout = $this->getLayout();

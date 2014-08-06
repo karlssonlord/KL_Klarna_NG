@@ -38,4 +38,17 @@ class KL_Klarna_Block_Checkout_Klarna_Success
             return $order['gui']['snippet'];
         }
     }
+
+    public function getLastQuote()
+    {
+        $quote   = false;
+        $session = Mage::getSingleton('checkout/session');
+        $quoteId = $session->getLastQuoteId();
+
+        if ($quoteId) {
+            $quote = Mage::getModel('sales/quote')->load($quoteId);
+        }
+
+        return $quote;
+    }
 }
