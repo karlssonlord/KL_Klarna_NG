@@ -28,11 +28,6 @@ class KL_Klarna_Block_Checkout_Klarna_Success
             $order->fetch();
 
             /**
-             * Reset the Klarna Checkout ID
-             */
-            Mage::helper('klarna/checkout')->setKlarnaCheckoutId(false);
-
-            /**
              * Return HTML snippet
              */
             return $order['gui']['snippet'];

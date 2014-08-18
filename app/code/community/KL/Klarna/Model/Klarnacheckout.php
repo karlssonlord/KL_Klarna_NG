@@ -68,7 +68,7 @@ class KL_Klarna_Model_Klarnacheckout
                 $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
                     ->create($checkoutId);
 
-                if ( $magentoOrder->getId() ) {
+                if ( $magentoOrder && $magentoOrder->getId() ) {
                     $quote = $magentoOrder->getQuote();
 
                     /**
@@ -108,11 +108,7 @@ class KL_Klarna_Model_Klarnacheckout
                     /**
                      * Log what status and state we're setting
                      */
-                    Mage::helper('klarna')->log(
-                        $quote,
-                        'Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId(),
-                        true
-                    );
+                    Mage::helper('klarna')->log('Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId());
 
                     /**
                      * Configure and save the order
@@ -181,6 +177,8 @@ class KL_Klarna_Model_Klarnacheckout
             }
 
         } catch (Exception $e) {
+            Mage::helper('klarna')->log('Cannot acknowledge: ' . $e->getMessage());
+
             // Do nothing for now
             die('e: ' . $e->getMessage());
         }

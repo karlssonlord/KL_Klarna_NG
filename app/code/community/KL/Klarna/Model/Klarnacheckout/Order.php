@@ -76,7 +76,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         /**
          * Make sure quote was found
          */
-        if ( $quote->getId() ) {
+        if ( $quote && $quote->getId() ) {
 
             /**
              * Make a notice in the log
