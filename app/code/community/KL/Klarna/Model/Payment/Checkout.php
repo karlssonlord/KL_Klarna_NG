@@ -194,7 +194,37 @@ class KL_Klarna_Model_Payment_Checkout
      */
     public function refund(Varien_Object $payment, $amount)
     {
-        throw new Exception('Refund online not implemented');
-    }
+        /**
+         * Fetch the order
+         */
+        try {
+            $klarnaOrder = Mage::getModel('klarna/klarnacheckout')->getOrder(
+                $payment->getAdditionalInformation('klarnaCheckoutId')
+            );
+        } catch (Exception $e) {
+            Mage::throwException('No order exists');
+        }
 
+        /**
+         * Return field if set
+         */
+        if ($klarnaOrder) {
+            $invoiceNumber = $klarnaOrder->offsetGet('reservation');
+        } else {
+            Mage::throwException('No invoice exists');
+        }
+
+        /**
+         * Fetch Klarna API Order model
+         */
+        $apiModel = Mage::getModel('klarna/api_order');
+        $return = $apiModel->createRefund($amount, $invoiceNumber);
+        if($return) {
+            $payment->getOrder()
+                ->addStatusHistoryComment('Klarna refund successful, Klarna refund invoice id: ' . $invoiceNumber)
+                ->save();
+            return $this;
+        }
+        Mage::throwException('Refund was not created');
+    }
 }
