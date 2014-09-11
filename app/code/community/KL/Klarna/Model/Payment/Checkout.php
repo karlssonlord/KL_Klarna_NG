@@ -194,6 +194,8 @@ class KL_Klarna_Model_Payment_Checkout
      */
     public function refund(Varien_Object $payment, $amount)
     {
+        throw new Exception('Refund online not implemented');
+        
         /**
          * Fetch the order
          */
