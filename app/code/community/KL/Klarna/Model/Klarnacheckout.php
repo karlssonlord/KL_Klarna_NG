@@ -60,6 +60,16 @@ class KL_Klarna_Model_Klarnacheckout
      */
     public function acknowledge($checkoutId)
     {
+        /**
+         * Make a note in the logs
+         */
+        Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] Acknowledge method called for checkout id');
+
+        /**
+         * Avoid timeouts in PHP to allow the script to finish
+         */
+        set_time_limit(0);
+
         try {
             $order = $this->getOrder($checkoutId);
 
@@ -72,12 +82,21 @@ class KL_Klarna_Model_Klarnacheckout
                     ->loadByCheckoutId($checkoutId);
 
                 /**
-                 * Try to create the order if it was not found
+                 * What to do if the order exists
                  */
-                if (!$magentoOrder) {
+                if ( !$magentoOrder || !$magentoOrder->getId() ) {
 
+                    Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] No previous order found, trying to create...');
+
+                    /**
+                     * Try to create the order if it was not found
+                     */
                     $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
                         ->create($checkoutId);
+
+                } else {
+
+                    Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] Existing order found for checkout id');
 
                 }
 
@@ -85,18 +104,41 @@ class KL_Klarna_Model_Klarnacheckout
                  * Make sure the Magento order exists
                  */
                 if ( $magentoOrder && $magentoOrder->getId() ) {
+
+                    /**
+                     * Load the quote
+                     */
                     $quote = $magentoOrder->getQuote();
+
+                    /**
+                     * Fetch payment (if any)
+                     */
+                    $magentoOrderPayment = $magentoOrder
+                        ->getPayment();
+
+                    /**
+                     * Check if we should add the payment information or not
+                     */
+                    $skipPaymentInformation = false;
+                    if ($magentoOrderPayment && $magentoOrderPayment->getAdditionalInformation()) {
+                        $additionalInfo = $magentoOrderPayment->getAdditionalInformation();
+                        if (isset($additionalInfo['klarnaCheckoutId'])) {
+                            $skipPaymentInformation = true;
+                            Mage::helper('klarna/log')->log($quote, '[' . $checkoutId . '] Additional information already exists. Skipping!');
+                        }
+                    }
 
                     /**
                      * Set the payment information
                      */
-                    $magentoOrder
-                        ->getPayment()
-                        ->setMethod('klarna_checkout')
-                        ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
-                        ->setTransactionId($checkoutId)
-                        ->setIsTransactionClosed(0)
-                        ->save();
+                    if (!$skipPaymentInformation) {
+                        $magentoOrderPayment
+                            ->setMethod('klarna_checkout')
+                            ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
+                            ->setTransactionId($checkoutId)
+                            ->setIsTransactionClosed(0)
+                            ->save();
+                    }
 
                     /**
                      * Fetch the total amount reserved
@@ -124,7 +166,10 @@ class KL_Klarna_Model_Klarnacheckout
                     /**
                      * Log what status and state we're setting
                      */
-                    Mage::helper('klarna')->log('Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId());
+                    Mage::helper('klarna/log')->log(
+                        $quote,
+                        'Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId()
+                    );
 
                     /**
                      * Configure and save the order
@@ -178,7 +223,8 @@ class KL_Klarna_Model_Klarnacheckout
 
                 } else {
 
-                    Mage::helper('klarna')->log(
+                    Mage::helper('klarna/log')->log(
+                        null,
                         'Unable to acknowledge due to missing order in Magento. (' . $checkoutId . ')'
                     );
 
@@ -186,14 +232,18 @@ class KL_Klarna_Model_Klarnacheckout
 
             } else {
 
-                Mage::helper('klarna')->log(
+                Mage::helper('klarna/log')->log(
+                    null,
                     'Unable to acknowledge due to order status from Klarna: ' . $order['status'] . ' (' . $checkoutId . ')'
                 );
 
             }
 
         } catch (Exception $e) {
-            Mage::helper('klarna')->log('Cannot acknowledge: ' . $e->getMessage());
+            Mage::helper('klarna/log')->log(
+                null,
+                'Cannot acknowledge: ' . $e->getMessage()
+            );
 
             // Do nothing for now
             die('e: ' . $e->getMessage());
