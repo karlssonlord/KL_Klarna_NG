@@ -51,6 +51,22 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         $quoteId = $quote->getId();
 
         /**
+         *
+         * (un)subscribe to newsletter
+         */
+        $quote           = Mage::getSingleton('checkout/session')->getQuote();
+        $email           = $quote->getShippingAddress()->getEmail();
+
+        if (Mage::getSingleton('checkout/session')->getWantsNewsletter()){
+            Mage::getModel('newsletter/subscriber')->subscribe($email);
+        } else {
+            $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
+            if ($subscriber->getSubscriberStatus()){
+                $subscriber->unsubscribe();
+            }
+        }
+
+        /**
          * Clear the session
          *
          * @see Mage_Checkout_OnepageController successAction
@@ -64,6 +80,7 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         $block  = $layout->getBlock('klarna_success');
         $this->renderLayout();
     }
+
 
     /**
      * Get quote
