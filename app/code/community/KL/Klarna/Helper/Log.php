@@ -37,13 +37,25 @@ class KL_Klarna_Helper_Log
 
         $url = Mage::helper('core/url')->getCurrentUrl();
 
-        $data = sprintf(
-            "Quote ID: %d | IP: %s | URL: %s | %s",
-            $quote->getId(),
-            $_SERVER['REMOTE_ADDR'],
-            $url,
-            $message
-        );
+        /**
+         * Make sure it's an object
+         */
+        if (is_object($quote) && $quote instanceof Mage_Sales_Model_Quote) {
+            $data = sprintf(
+                "Quote ID: %d | IP: %s | URL: %s | %s",
+                $quote->getId(),
+                $_SERVER['REMOTE_ADDR'],
+                $url,
+                $message
+            );
+        } else {
+            $data = sprintf(
+                "Quote ID: [NONE GIVEN] | IP: %s | URL: %s | %s",
+                $_SERVER['REMOTE_ADDR'],
+                $url,
+                $message
+            );
+        }
 
         Mage::log($data, null, self::LOG_FILE, $force);
     }
