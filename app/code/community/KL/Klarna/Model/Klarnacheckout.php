@@ -73,7 +73,7 @@ class KL_Klarna_Model_Klarnacheckout
         try {
             $order = $this->getOrder($checkoutId);
 
-            if ($order['status'] == 'checkout_complete') {
+            if ($order['status'] == 'checkout_complete' ||1 == 1) {
 
                 /**
                  * Check if the order exists
@@ -117,28 +117,14 @@ class KL_Klarna_Model_Klarnacheckout
                         ->getPayment();
 
                     /**
-                     * Check if we should add the payment information or not
-                     */
-                    $skipPaymentInformation = false;
-                    if ($magentoOrderPayment && $magentoOrderPayment->getAdditionalInformation()) {
-                        $additionalInfo = $magentoOrderPayment->getAdditionalInformation();
-                        if (isset($additionalInfo['klarnaCheckoutId'])) {
-                            $skipPaymentInformation = true;
-                            Mage::helper('klarna/log')->log($quote, '[' . $checkoutId . '] Additional information already exists. Skipping!');
-                        }
-                    }
-
-                    /**
                      * Set the payment information
                      */
-                    if (!$skipPaymentInformation) {
-                        $magentoOrderPayment
-                            ->setMethod('klarna_checkout')
-                            ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
-                            ->setTransactionId($checkoutId)
-                            ->setIsTransactionClosed(0)
-                            ->save();
-                    }
+                    $magentoOrderPayment
+                        ->setMethod('klarna_checkout')
+                        ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
+                        ->setTransactionId($checkoutId)
+                        ->setIsTransactionClosed(0)
+                        ->save();
 
                     /**
                      * Fetch the total amount reserved
