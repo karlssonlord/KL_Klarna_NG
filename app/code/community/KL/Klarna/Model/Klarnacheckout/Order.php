@@ -30,6 +30,19 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         $this->_customerSession = Mage::getSingleton('customer/session');
     }
 
+    public function loadByCheckoutId($checkoutId)
+    {
+        /**
+         * Look for orders with the same checkout id
+         */
+        $magentoOrderSearch = Mage::getModel('sales/order')
+            ->getCollection()
+            ->addFieldToFilter('klarna_checkout', $checkoutId)
+            ->getFirstItem();
+
+        return $magentoOrderSearch;
+    }
+
     public function create($checkoutId = false)
     {
         if ($checkoutId === false) {

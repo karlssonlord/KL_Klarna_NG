@@ -65,9 +65,25 @@ class KL_Klarna_Model_Klarnacheckout
 
             if ($order['status'] == 'checkout_complete') {
 
+                /**
+                 * Check if the order exists
+                 */
                 $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
-                    ->create($checkoutId);
+                    ->loadByCheckoutId($checkoutId);
 
+                /**
+                 * Try to create the order if it was not found
+                 */
+                if (!$magentoOrder) {
+
+                    $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
+                        ->create($checkoutId);
+
+                }
+
+                /**
+                 * Make sure the Magento order exists
+                 */
                 if ( $magentoOrder && $magentoOrder->getId() ) {
                     $quote = $magentoOrder->getQuote();
 
