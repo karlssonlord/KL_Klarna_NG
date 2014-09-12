@@ -73,7 +73,7 @@ class KL_Klarna_Model_Klarnacheckout
         try {
             $order = $this->getOrder($checkoutId);
 
-            if ($order['status'] == 'checkout_complete' ||1 == 1) {
+            if ($order['status'] == 'checkout_complete') {
 
                 /**
                  * Check if the order exists
