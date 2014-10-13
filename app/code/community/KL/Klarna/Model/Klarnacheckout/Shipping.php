@@ -84,8 +84,7 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
             'quantity' => 1,
             'unit_price' => intval($shippingPrice * 100),
             'discount_rate' => 0, // Not needed since Magento gives us the actual price
-            'tax_rate' => ceil(($shippingTaxPercent * 100)),
-            'type' => 'shipping_fee'
+            'tax_rate' => ceil(($shippingTaxPercent * 100))
         );
 
         return $shipping;
