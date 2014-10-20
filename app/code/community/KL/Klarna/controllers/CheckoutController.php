@@ -77,7 +77,15 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
         $this->loadLayout();
         $layout = $this->getLayout();
-        $block  = $layout->getBlock('klarna_success');
+        $layout->getBlock('klarna_success');
+
+        /*
+         * We need to deactivate the current quote manually here since the quote will be converted into an order only
+         * upon push call from Klarna to the store
+         */
+        $quote->setIsActive(false);
+        $quote->save();
+
         $this->renderLayout();
     }
 
