@@ -218,6 +218,15 @@
                 </observers>
             </customer_logout>
         </events>
+        <template>
+            <email>
+                <kl_klarna module="Core">
+                    <label>KL Klarna Error Notification</label>
+                    <file>kl/klarna/notification.html</file>
+                    <type>html</type>
+                </kl_klarna>
+            </email>
+        </template>
     </global>
     <klarna>
         <countries>
