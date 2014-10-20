@@ -96,6 +96,13 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
     public function pushAction()
     {
+        $klarnaId = $_REQUEST['klarna_order'];
+
+        /**
+         * Workaround: Avoid duplicate orders through Klarna being impatient with Magento order creation
+         */
+        if (Mage::getModel('klarna/pushlock')->isLocked($klarnaId)) die('IS LOCKED');
+        die('NOT LOCKED');
         Mage::getModel('klarna/klarnacheckout')->acknowledge($_REQUEST['klarna_order']);
     }
 

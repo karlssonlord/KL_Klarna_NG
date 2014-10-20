@@ -226,6 +226,15 @@ class KL_Klarna_Model_Klarnacheckout
             }
 
         } catch (Exception $e) {
+
+            /**
+             * Remove the order lock: allow Klarna to make subsequent push retries
+             */
+            Mage::getModel('klarna/pushlock')->unLock($checkoutId);
+
+            /**
+             * Log error
+             */
             Mage::helper('klarna/log')->log(
                 null,
                 'Cannot acknowledge: ' . $e->getMessage()
@@ -451,6 +460,7 @@ class KL_Klarna_Model_Klarnacheckout
                     'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
                     'checkout_uri' => Mage::getUrl('klarna/checkout'),
                     'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
+                    'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
                     'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
                 ),
                 'cart' => array('items' => $items),

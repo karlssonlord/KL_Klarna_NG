@@ -2,7 +2,7 @@
 <config>
     <modules>
         <KL_Klarna>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
         </KL_Klarna>
     </modules>
     <frontend>
@@ -59,6 +59,9 @@
                     <pclass>
                         <table>klarna_pclass</table>
                     </pclass>
+                    <pushlock>
+                        <table>klarna_pushlock</table>
+                    </pushlock>
                 </entities>
             </klarna_resource>
         </models>
