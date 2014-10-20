@@ -18,6 +18,7 @@ class KL_Klarna_Model_Klarnacheckout
      */
     protected function getKlarnaConnector()
     {
+
         /**
          * Setup the connector if not set
          */
@@ -60,6 +61,8 @@ class KL_Klarna_Model_Klarnacheckout
      */
     public function acknowledge($checkoutId)
     {
+        $errorEmailMessages = array();
+
         /**
          * Make a note in the logs
          */
@@ -121,7 +124,8 @@ class KL_Klarna_Model_Klarnacheckout
                      */
                     $magentoOrderPayment
                         ->setMethod('klarna_checkout')
-                        ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
+                        ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId,
+                                                         'orderInfo' => $order ))
                         ->setTransactionId($checkoutId)
                         ->setIsTransactionClosed(0)
                         ->save();
@@ -193,12 +197,15 @@ class KL_Klarna_Model_Klarnacheckout
 
                     } catch (Exception $e) {
 
+                        $errorMessage = 'Unable to send new order email (' . $e->getMessage() . '), Magento ID ' .
+                            $magentoOrder->getIncrementId();
+                        $errorEmailMessages[] = $errorMessage;
+
                         Mage::helper('klarna/log')->log(
                             $quote,
-                            'Unable to send new order email (' . $e->getMessage() . '), Magento ID ' . $magentoOrder->getIncrementId(),
+                            $errorMessage,
                             true
                         );
-
                     }
 
                     Mage::helper('klarna/log')->log(
@@ -209,26 +216,48 @@ class KL_Klarna_Model_Klarnacheckout
 
                 } else {
 
+                    $errorMessage = 'Unable to acknowledge due to missing order in Magento. (' . $checkoutId . ')';
+                    $errorEmailMessages[] = $errorMessage;
+
                     Mage::helper('klarna/log')->log(
                         null,
-                        'Unable to acknowledge due to missing order in Magento. (' . $checkoutId . ')'
+                        $errorMessage
                     );
 
                 }
 
             } else {
 
+                $errorMessage = 'Unable to acknowledge due to order status from Klarna: ' . $order['status'] .
+                    ' (' . $checkoutId . ')';
+                $errorEmailMessages[] = $errorMessage;
+
                 Mage::helper('klarna/log')->log(
                     null,
-                    'Unable to acknowledge due to order status from Klarna: ' . $order['status'] . ' (' . $checkoutId . ')'
+                    $errorMessage
                 );
 
             }
+            if(!empty($errorEmailMessages)) {
+                Mage::helper('klarna')->sendErrorEmail(implode("\n", $errorEmailMessages));
+            }
 
         } catch (Exception $e) {
+
+            /**
+             * Remove the order lock: allow Klarna to make subsequent push retries
+             */
+            Mage::getModel('klarna/pushlock')->unLock($checkoutId);
+
+            $errorMessage = 'Cannot acknowledge: ' . $e->getMessage();
+            Mage::helper('klarna')->sendErrorEmail($errorMessage);
+
+            /**
+             * Log error
+             */
             Mage::helper('klarna/log')->log(
                 null,
-                'Cannot acknowledge: ' . $e->getMessage()
+                $errorMessage
             );
 
             // Do nothing for now
@@ -452,7 +481,7 @@ class KL_Klarna_Model_Klarnacheckout
                     'checkout_uri' => Mage::getUrl('klarna/checkout'),
                     'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
                     'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
-//                    'validation_uri' => Mage::getUrl('klarna/checkout/validate', array('_forced_secure' => true)),
+                    'validation_uri' => Mage::getUrl('klarna/checkout/validate', array('_forced_secure' => true)),
                 ),
                 'cart' => array('items' => $items),
                 'merchant_reference' => array(
