@@ -18,6 +18,7 @@ class KL_Klarna_Model_Klarnacheckout
      */
     protected function getKlarnaConnector()
     {
+
         /**
          * Setup the connector if not set
          */
@@ -121,7 +122,8 @@ class KL_Klarna_Model_Klarnacheckout
                      */
                     $magentoOrderPayment
                         ->setMethod('klarna_checkout')
-                        ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId))
+                        ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId,
+                                                         'orderInfo' => $order ))
                         ->setTransactionId($checkoutId)
                         ->setIsTransactionClosed(0)
                         ->save();
