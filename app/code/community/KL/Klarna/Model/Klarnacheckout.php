@@ -463,7 +463,7 @@ class KL_Klarna_Model_Klarnacheckout
                     'checkout_uri' => Mage::getUrl('klarna/checkout'),
                     'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
                     'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
-                    'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
+                    'validation_uri' => Mage::getUrl('klarna/checkout/validate', array('_forced_secure' => true)),
                 ),
                 'cart' => array('items' => $items),
                 'merchant_reference' => array(

@@ -5,3 +5,5 @@ app/design/adminhtml/default/default/template/* app/design/adminhtml/default/def
 app/design/frontend/base/default/template/*     app/design/frontend/base/default/template/
 app/design/frontend/base/default/layout/*       app/design/frontend/base/default/layout/
 skin/frontend/base/default/js/*                 skin/frontend/base/default/js/
+app/locale/en_US/template/email/kl/*            app/locale/en_US/template/email/kl/
+app/locale/sv_SE/template/email/kl/*            app/locale/sv_SE/template/email/kl/
