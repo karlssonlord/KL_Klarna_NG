@@ -138,7 +138,7 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
                 '',
                 $errorEmailMessage
             );
-            $this->_sendErrorEmail($errorEmailMessage);
+            Mage::helper('klarna')->sendErrorEmail($errorEmailMessage);
 
             $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure'), 303);
             return;
@@ -229,7 +229,7 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         if($error) {
             $errorEmailMessage = implode("\n", $errorMessages);
 
-            $this->_sendErrorEmail($errorEmailMessage, $quote);
+            Mage::helper('klarna')->sendErrorEmail($errorEmailMessage, $quote);
 
             $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure', $isStockArray), 303);
             Mage::helper('klarna/log')->log(
@@ -258,49 +258,5 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             Mage::getSingleton("core/session")->addError('We could  not fulfil your order. Please try again or contact our support.');
         }
         $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout'));
-    }
-
-    /**
-     * Sends the error email message to the email address set in the backend
-     *
-     * @param $errorEmailMessage The actual error message to be sent
-     * @param $quote The quote object the message concerns.
-     *
-     * @return void
-     */
-    protected function _sendErrorEmail($errorEmailMessage, $quote = '') {
-        $email = Mage::getStoreConfig('payment/klarna_checkout/validation_email');
-        try {
-            $sentSuccess = Mage::getModel('core/email_template')
-                ->sendTransactional(
-                    'kl_klarna',
-                    array(
-                        'name' => 'Magento',
-                        'email' => 'notifications@karlssonlord.com'
-                    ),
-                    $email,
-                    null,
-                    array(
-                        'message' => $errorEmailMessage,
-                    ),
-                    null
-                )
-                ->getSentSuccess();
-            if($sentSuccess) {
-                Mage::helper('klarna/log')->log(
-                    $quote,
-                    'Error notification has been sent successfully to ' . $email
-                );
-                return $sentSuccess;
-            }
-        }
-        catch (Exception $e) {
-            Mage::helper('klarna/log')->log(
-                $quote,
-                $e->getMessage()
-            );
-            return false;
-        }
-        return false;
     }
 }

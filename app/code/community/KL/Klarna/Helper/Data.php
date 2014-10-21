@@ -211,4 +211,50 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
     {
         return (string) Mage::getConfig()->getNode()->modules->KL_Klarna->version;
     }
+
+
+    /**
+     * Sends the error email message to the email address set in the backend
+     *
+     * @param $errorEmailMessage The actual error message to be sent
+     * @param $quote The quote object the message concerns.
+     *
+     * @return void
+     */
+    protected function sendErrorEmail($errorEmailMessage, $quote = '') {
+        $email = Mage::getStoreConfig('payment/klarna_checkout/validation_email');
+        try {
+            $sentSuccess = Mage::getModel('core/email_template')
+                ->sendTransactional(
+                    'kl_klarna',
+                    array(
+                        'name' => 'Magento',
+                        'email' => 'notifications@karlssonlord.com'
+                    ),
+                    $email,
+                    null,
+                    array(
+                        'message' => $errorEmailMessage,
+                    ),
+                    null
+                )
+                ->getSentSuccess();
+            if($sentSuccess) {
+                Mage::helper('klarna/log')->log(
+                    $quote,
+                    'Error notification has been sent successfully to ' . $email
+                );
+                return $sentSuccess;
+            }
+        }
+        catch (Exception $e) {
+            Mage::helper('klarna/log')->log(
+                $quote,
+                $e->getMessage()
+            );
+            return false;
+        }
+        return false;
+    }
+
 }
