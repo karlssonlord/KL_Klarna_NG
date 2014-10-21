@@ -221,7 +221,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      *
      * @return void
      */
-    protected function sendErrorEmail($errorEmailMessage, $quote = '') {
+    public function sendErrorEmail($errorEmailMessage, $quote = '') {
         $email = Mage::getStoreConfig('payment/klarna_checkout/validation_email');
         try {
             $sentSuccess = Mage::getModel('core/email_template')
