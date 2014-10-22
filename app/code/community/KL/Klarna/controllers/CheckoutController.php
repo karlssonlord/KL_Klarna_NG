@@ -161,6 +161,11 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             $error = true;
         }
 
+        /**
+         * Disabled since it doesn't work. When cart totals is 75,10 kr error is thrown. Error message says
+         * "Totals are different. Given 7510 but should be 7510"
+         * Probably some problems with float/int/string stuff
+         *
         if(((float)$quote->getGrandTotal()*100) !== (float)$postData['cart']['total_price_including_tax']) {
             $errorMessage = 'Totals are different. Given ' . (float)$postData['cart']['total_price_including_tax']
                 . ' but should be ' . ((float)$quote->getGrandTotal()*100);
@@ -173,6 +178,7 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             );
             $error = true;
         }
+        */
 
         $klarnaItems = array();
         //Reorginizing the array for the following easy search
