@@ -249,7 +249,7 @@ class KL_Klarna_Model_Klarnacheckout
              */
             Mage::getModel('klarna/pushlock')->unLock($checkoutId);
 
-            $errorMessage = 'Cannot acknowledge: ' . $e->getMessage();
+            $errorMessage =  'CheckoutId = "' . $checkoutId . '"; Cannot acknowledge: ' . $e->getMessage();
             Mage::helper('klarna')->sendErrorEmail($errorMessage);
 
             /**
