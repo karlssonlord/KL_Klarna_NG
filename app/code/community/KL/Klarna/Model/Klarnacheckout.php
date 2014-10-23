@@ -572,8 +572,15 @@ class KL_Klarna_Model_Klarnacheckout
 
             /**
              * Store session ID in session
+             * We also make a check for duplicated checkoutID
              */
-            Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
+            if(!Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation())) {
+                $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
+                $order->create($klarnaData);
+                $order->fetch();
+                Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
+            }
+
         }
 
         return $order['gui']['snippet'];
