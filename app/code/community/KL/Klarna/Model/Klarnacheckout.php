@@ -125,7 +125,7 @@ class KL_Klarna_Model_Klarnacheckout
                     $magentoOrderPayment
                         ->setMethod('klarna_checkout')
                         ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId,
-                                                         'orderInfo' => $order ))
+                                                         'orderInfo' => $order->marshal() ))
                         ->setTransactionId($checkoutId)
                         ->setIsTransactionClosed(0)
                         ->save();
