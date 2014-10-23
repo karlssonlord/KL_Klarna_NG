@@ -129,128 +129,25 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
      */
     public function validateAction()
     {
-        $error = false;
-        $postData = json_decode(file_get_contents('php://input'), true);
-        if(empty($postData)) {
-            $errorEmailMessage = 'No data has been posted.';
+        $input = json_decode(file_get_contents('php://input'), true);
 
-            Mage::helper('klarna/log')->log(
-                '',
-                $errorEmailMessage
-            );
-            Mage::helper('klarna')->sendErrorEmail($errorEmailMessage);
+        try {
+            $this->validateRequestValidator->validate($input);
+
+        } catch (KL_Klarna_Model_Exception_InvalidRequest $e) {
 
             $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure'), 303);
-            return;
+
+        } catch (KL_Klarna_Model_Exception_UnsalableProduct $e) {
+
+            $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure', array('is_stock' => 1)), 303);
+
+        } catch (KL_Klarna_Model_Exception_KlarnaOrderQuoteMismatch $e) {
+
+            $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure'), 303);
         }
 
-        $quoteId = $postData['merchant_reference']['orderid2'];
-        $quote = Mage::getModel('sales/quote')->load($quoteId);
-        $isStockArray = array();
-
-        if(strtolower($quote->getQuoteCurrencyCode()) !== strtolower($postData['purchase_currency'])) {
-            $errorMessage = 'Currency mismatch. Given ' . strtolower($postData['purchase_currency']) .
-                ' but should be ' . strtolower($quote->getQuoteCurrencyCode());
-
-            $errorMessages[] = $errorMessage;
-
-            Mage::helper('klarna/log')->log(
-                $quote,
-                $errorMessage
-            );
-            $error = true;
-        }
-
-        /**
-         * Disabled since it doesn't work. When cart totals is 75,10 kr error is thrown. Error message says
-         * "Totals are different. Given 7510 but should be 7510"
-         * Probably some problems with float/int/string stuff
-         *
-        if(((float)$quote->getGrandTotal()*100) !== (float)$postData['cart']['total_price_including_tax']) {
-            $errorMessage = 'Totals are different. Given ' . (float)$postData['cart']['total_price_including_tax']
-                . ' but should be ' . ((float)$quote->getGrandTotal()*100);
-
-            $errorMessages[] = $errorMessage;
-
-            Mage::helper('klarna/log')->log(
-                $quote,
-                $errorMessage
-            );
-            $error = true;
-        }
-        */
-
-        $klarnaItems = array();
-        //Reorginizing the array for the following easy search
-        foreach($postData['cart']['items'] as $klarnaItem) {
-            if($klarnaItem['type'] === 'physical') {
-                $klarnaItems[$klarnaItem['reference']] = $klarnaItem;
-            }
-        }
-
-        foreach($quote->getAllVisibleItems() as $quoteItem) {
-            if(empty($klarnaItems[$quoteItem->getSku()])) {
-                $errorMessage = 'Item with SKU ' . $quoteItem->getSku()
-                    . ' doesn\'t exist in the Klarna cart ' . ((float)$quote->getGrandTotal()*100);
-
-                $errorMessages[] = $errorMessage;
-
-                Mage::helper('klarna/log')->log(
-                    $quote,
-                    $errorMessage
-                );
-                $error = true;
-            } else {
-                if(!Mage::getModel('catalog/product')->load($quoteItem->getProductId())->isSalable()) {
-                    $errorMessage = 'Item with SKU ' . $quoteItem->getSku()
-                        . ' is not salable ' . ((float)$quote->getGrandTotal()*100);
-
-                    $errorMessages[] = $errorMessage;
-
-                    $isStockArray = array('is_stock' => 1);
-                    Mage::helper('klarna/log')->log(
-                        $quote,
-                        $errorMessage
-                    );
-                    $error = true;
-                } else {
-                    unset($klarnaItems[$quoteItem->getSku()]);
-                }
-            }
-        }
-
-        if(count($klarnaItems) > 0) {
-            $errorMessage = 'Klarna cart and Magento quote do not match. Klarna cart contains more products than Magento
-             quote';
-
-            $errorMessages[] = $errorMessage;
-
-            Mage::helper('klarna/log')->log(
-                $quote,
-                $errorMessage
-            );
-            $error = true;
-        }
-
-        if($error) {
-            $errorEmailMessage = implode("\n", $errorMessages);
-
-            Mage::helper('klarna')->sendErrorEmail($errorEmailMessage, $quote);
-
-            $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure', $isStockArray), 303);
-            Mage::helper('klarna/log')->log(
-                $quote,
-                var_export($postData, true)
-            );
-        } else {
-            $this->getResponse()->setHttpResponseCode(200);
-        }
-
-        Mage::helper('klarna/log')->log(
-            $quote,
-            'Check is finished'
-        );
-
+        $this->getResponse()->setHttpResponseCode(200);
     }
 
     /**
