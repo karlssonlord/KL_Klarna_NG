@@ -54,7 +54,6 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
          *
          * (un)subscribe to newsletter
          */
-        $quote           = Mage::getSingleton('checkout/session')->getQuote();
         $email           = $quote->getShippingAddress()->getEmail();
 
         if (Mage::getSingleton('checkout/session')->getWantsNewsletter()){
@@ -85,6 +84,20 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
          */
         $quote->setIsActive(false);
         $quote->save();
+
+        /*
+         * We create a new empty quote here for the future use. Should be considered as a precaution to avoid using
+         * old active quotes from the past.
+         */
+        Mage::getModel('sales/quote')
+            ->assignCustomer(
+                Mage::getSingleton('customer/session')->getCustomer()
+            )
+            ->setIsActive(true)
+            ->setStoreId(
+                Mage::app()->getStore()->getStoreId()
+            )
+            ->save();
 
         $this->renderLayout();
     }
