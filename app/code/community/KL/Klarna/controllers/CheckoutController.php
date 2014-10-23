@@ -7,6 +7,13 @@ require_once Mage::getModuleDir('controllers', 'Mage_Checkout') . DS . 'OnepageC
  */
 class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
+    protected $validateRequestValidator;
+
+    public function __construct()
+    {
+        $this->validateRequestValidator = new KL_Klarna_Model_Validation_KlarnaValidateRequest();
+    }
+
     /**
      * Display the checkout
      *
