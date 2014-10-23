@@ -77,7 +77,7 @@ class KL_Klarna_Model_Validation_KlarnaValidateRequest
 
 
     /**
-     * Get the klarna checkout Id from the request object by parsing the push_ur string
+     * Get the klarna checkout Id from the request object by parsing the push_uri string
      *
      * @param $request
      * @return mixed

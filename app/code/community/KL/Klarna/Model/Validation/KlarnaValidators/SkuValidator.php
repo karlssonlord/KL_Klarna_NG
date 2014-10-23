@@ -2,8 +2,20 @@
 
 class KL_Klarna_Model_Validation_KlarnaValidators_SkuValidator implements KL_Klarna_Model_Validation_KlarnaValidators_RequestValidator
 {
-    protected $error;
+    /**
+     * @var mixed
+     */
+    protected $error = false;
 
+    protected $unsalable;
+
+    /**
+     * @param Mage_Sales_Model_Quote $quote
+     * @param $klarnasValidationRequestObject
+     * @param $klarnaId
+     * @throws KL_Klarna_Model_Exception_UnsalableProduct
+     * @return bool
+     */
     public function validate(Mage_Sales_Model_Quote $quote, $klarnasValidationRequestObject, $klarnaId)
     {
         $klarnaItems = $this->extractCartItems($klarnasValidationRequestObject);
@@ -22,11 +34,12 @@ class KL_Klarna_Model_Validation_KlarnaValidators_SkuValidator implements KL_Kla
                     $klarnaId
                 );
 
-                return false;
             } else {
                 if( ! Mage::getModel('catalog/product')->load($quoteItem->getProductId())->isSalable()) {
-                    $this->error = 'Item with SKU ' . $quoteItem->getSku()
-                        . ' is not salable ' . ((float)$quote->getGrandTotal()*100);
+                    $this->unsalable = sprintf('Item with SKU %s is not salable. Grand total: %f',
+                        $quoteItem->getSku(),
+                        (float)$quote->getGrandTotal()*100
+                    );
 
                     Mage::helper('klarna/log')->message(
                         $quote,
@@ -37,16 +50,24 @@ class KL_Klarna_Model_Validation_KlarnaValidators_SkuValidator implements KL_Kla
                 } else {
                     unset($klarnaItems[$quoteItem->getSku()]);
                 }
-
-                return false;
             }
         }
 
+        if ($this->unsalable) {
+            throw new KL_Klarna_Model_Exception_UnsalableProduct($this->unsalable);
+        }
+
+        if ($this->error) {
+            return false;
+        }
         return true;
 
 
     }
 
+    /**
+     * @return bool
+     */
     public function getError()
     {
         return $this->error;
