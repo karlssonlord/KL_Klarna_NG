@@ -19,10 +19,20 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
      * Store Klarna Checkout ID in the session
      *
      * @param $checkoutId
-     * @return $this
+     * @return boolean|$this
      */
     public function setKlarnaCheckoutId($checkoutId)
     {
+        /*
+         * Make a check for duplicated $checkoutId
+         */
+        if(!empty($checkoutId)) {
+            $quoteId = Mage::getModel('sales/quote')->load($checkoutId, 'klarna_checkout')->getId();
+            if($quoteId) {
+                return false;
+            }
+        }
+
         /**
          * Update the session
          */
