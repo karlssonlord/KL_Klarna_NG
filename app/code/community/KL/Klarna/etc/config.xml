@@ -329,4 +329,16 @@
             </klarna_checkout>
         </payment>
     </default>
+    <crontab>
+        <jobs>
+            <kl_klarna>
+                <schedule>
+                    <cron_expr>15/* * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>klarna/cron_cleanpushlocktable::clean</model>
+                </run>
+            </kl_klarna>
+        </jobs>
+    </crontab>
 </config>
