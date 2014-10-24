@@ -19,9 +19,8 @@ class KL_Klarna_Model_Validation_KlarnaValidators_ItemsCountValidator implements
          * Let's see if the number of items match... should be fun
          * TODO: this could never have return valid before..? $numberOfWtf +=1
          */
-        if (count($this->extractCartItems($klarnasValidationRequestObject)) > 0) {
-            $this->error = 'Klarna cart and Magento quote do not match. Klarna cart contains more products than Magento
-             quote';
+        if ($this->numberOfItemsDoNotMatch($quote, $klarnasValidationRequestObject)) {
+            $this->error = 'Klarna cart and Magento quote do not match. Klarna cart contains more products than Magento quote';
 
             Mage::helper('klarna/log')->message(
                 $quote,
@@ -55,12 +54,25 @@ class KL_Klarna_Model_Validation_KlarnaValidators_ItemsCountValidator implements
     {
         $klarnaItems = array();
 
-        foreach ($request['cart']['items'] as $klarnaItem) {
+        /**
+         * Extract only the 'physical' items, ie not shipping and things like that.
+         */
+        foreach ($request->cart['items'] as $klarnaItem) {
             if ($klarnaItem['type'] === 'physical') {
                 $klarnaItems[$klarnaItem['reference']] = $klarnaItem;
             }
         }
 
         return $klarnaItems;
+    }
+
+    /**
+     * @param Mage_Sales_Model_Quote $quote
+     * @param $klarnasValidationRequestObject
+     * @return bool
+     */
+    protected function numberOfItemsDoNotMatch(Mage_Sales_Model_Quote $quote, $klarnasValidationRequestObject)
+    {
+        return count($this->extractCartItems($klarnasValidationRequestObject)) !== count($quote->getAllVisibleItems());
     }
 }

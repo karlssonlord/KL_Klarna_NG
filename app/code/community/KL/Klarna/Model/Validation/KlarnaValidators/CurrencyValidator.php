@@ -11,7 +11,7 @@ class KL_Klarna_Model_Validation_KlarnaValidators_CurrencyValidator implements K
          */
         if ($this->hasCurrencyMisMatch($klarnasValidationRequestObject, $quote)) {
             $this->error = sprintf('Currency mismatch. Given %s but should have been %s',
-                strtoupper($klarnasValidationRequestObject['purchase_currency']),
+                strtoupper($klarnasValidationRequestObject->purchaseCurrency),
                 strtoupper($quote->getQuoteCurrencyCode())
             );
 
@@ -40,6 +40,6 @@ class KL_Klarna_Model_Validation_KlarnaValidators_CurrencyValidator implements K
      */
     protected function hasCurrencyMisMatch($request, $quote)
     {
-        return strtolower($quote->getQuoteCurrencyCode()) !== strtolower($request['purchase_currency']);
+        return strtolower($quote->getQuoteCurrencyCode()) !== strtolower($request->purchaseCurrency);
     }
 }

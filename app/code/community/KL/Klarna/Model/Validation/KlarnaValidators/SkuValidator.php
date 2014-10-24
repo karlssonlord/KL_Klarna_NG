@@ -81,7 +81,7 @@ class KL_Klarna_Model_Validation_KlarnaValidators_SkuValidator implements KL_Kla
     {
         $klarnaItems = array();
         // Reorganising the array for easier iteration
-        foreach ($request->cart->items as $klarnaItem) {
+        foreach ($request->cart['items'] as $klarnaItem) {
             if ($klarnaItem['type'] === 'physical') {
                 $klarnaItems[$klarnaItem['reference']] = $klarnaItem;
             }

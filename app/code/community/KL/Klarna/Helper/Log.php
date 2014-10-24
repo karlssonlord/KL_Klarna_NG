@@ -104,7 +104,11 @@ class KL_Klarna_Helper_Log extends Mage_Core_Helper_Abstract
          * Check if there is reservedOrderId on the quote object.
          * That could be useful
          */
-        $reservedOrderId = $quote->getReservedOrderId();
+        $reservedOrderId = null;
+        if (is_object($quote)) {
+            $reservedOrderId = $quote->getReservedOrderId();
+        }
+
         if ($reservedOrderId) {
             return 'Reserved order ID: '.(string) $reservedOrderId;
         }

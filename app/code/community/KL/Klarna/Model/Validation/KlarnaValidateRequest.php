@@ -10,7 +10,7 @@ class KL_Klarna_Model_Validation_KlarnaValidateRequest
     protected $validators = array(
         'CurrencyValidator',
         'SkuValidator',
-        'ItemCountValidator'
+        'ItemsCountValidator'
     );
 
     /**
@@ -84,7 +84,7 @@ class KL_Klarna_Model_Validation_KlarnaValidateRequest
      */
     private function getKlarnaId($request)
     {
-        $parts = parse_url($request->merchant->push_uri);
+        $parts = parse_url($request->merchant['push_uri']);
         parse_str($parts['query'], $queryString);
 
         return $queryString['klarna_order'];
@@ -113,7 +113,8 @@ class KL_Klarna_Model_Validation_KlarnaValidateRequest
     private function buildInstance($validator)
     {
         $namespace = 'KL_Klarna_Model_Validation_KlarnaValidators_';
+        $className = $namespace.$validator;
 
-        return new $namespace.$validator;
+        return new $className;
     }
 } 
