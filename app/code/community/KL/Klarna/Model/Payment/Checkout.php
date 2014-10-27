@@ -17,7 +17,7 @@ class KL_Klarna_Model_Payment_Checkout
 
     public function __construct()
     {
-        if (Mage::helper('klarna')->getVersion() === '0.0.5') {
+        if (Mage::helper('klarna')->getVersion() === '0.0.6') {
             $this->_canCapturePartial = false;
         }
 
@@ -170,7 +170,7 @@ class KL_Klarna_Model_Payment_Checkout
          * Activate invoice at Klarna
          */
         if ( is_object($authTrans) ) {
-            if (Mage::helper('klarna')->getVersion() === '0.0.5') {
+            if (Mage::helper('klarna')->getVersion() === '0.0.6') {
                 $apiModel->activateReservation($authTrans->getTxnId());
             } else {
                 $apiModel->activateReservation($authTrans->getTxnId(), $activate);
