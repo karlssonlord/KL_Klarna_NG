@@ -144,16 +144,19 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             $this->validateRequestValidator->validate($input);
 
         } catch (KL_Klarna_Model_Exception_InvalidRequest $e) {
-            
-            $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure'), 303);
+            $location = Mage::getUrl('klarna/checkout/failure');
+            $this->send303($location);
+            //$this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure'), 303);
 
         } catch (KL_Klarna_Model_Exception_UnsalableProduct $e) {
-
-            $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure', array('is_stock' => 1)), 303);
+            $location = Mage::getUrl('klarna/checkout/failure?is_stock=1');
+            $this->send303($location);
+            //$this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure', array('is_stock' => 1)), 303);
 
         } catch (KL_Klarna_Model_Exception_KlarnaOrderQuoteMismatch $e) {
-
-            $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure'), 303);
+            $location = Mage::getUrl('klarna/checkout/failure');
+            $this->send303($location);
+            //$this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure'), 303);
         }
 
         $this->getResponse()->setHttpResponseCode(200);
@@ -170,5 +173,12 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             Mage::getSingleton("core/session")->addError('We could  not fulfil your order. Please try again or contact our support.');
         }
         $this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout'));
+    }
+
+    public function send303($location)
+    {
+        header("HTTP/1.1 303 See Other");
+        header("Location: {$location}");
+        exit;
     }
 }
