@@ -339,6 +339,14 @@
                     <model>klarna/cron_cleanpushlocktable::clean</model>
                 </run>
             </kl_klarna>
+            <kl_klarna_order_check>
+                <schedule>
+                    <cron_expr>5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>klarna/cron_order::check</model>
+                </run>
+            </kl_klarna_order_check>
         </jobs>
     </crontab>
 </config>
