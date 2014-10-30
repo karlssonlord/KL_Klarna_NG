@@ -125,7 +125,7 @@ class KL_Klarna_Model_Klarnacheckout
                     $magentoOrderPayment
                         ->setMethod('klarna_checkout')
                         ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId,
-                                                         'orderInfo' => $order ))
+                                                         'orderInfo' => $order->marshal() ))
                         ->setTransactionId($checkoutId)
                         ->setIsTransactionClosed(0)
                         ->save();
@@ -249,7 +249,7 @@ class KL_Klarna_Model_Klarnacheckout
              */
             Mage::getModel('klarna/pushlock')->unLock($checkoutId);
 
-            $errorMessage = 'Cannot acknowledge: ' . $e->getMessage();
+            $errorMessage =  'CheckoutId = "' . $checkoutId . '"; Cannot acknowledge: ' . $e->getMessage();
             Mage::helper('klarna')->sendErrorEmail($errorMessage);
 
             /**
@@ -572,8 +572,15 @@ class KL_Klarna_Model_Klarnacheckout
 
             /**
              * Store session ID in session
+             * We also make a check for duplicated checkoutID
              */
-            Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
+            if(!Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation())) {
+                $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
+                $order->create($klarnaData);
+                $order->fetch();
+                Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
+            }
+
         }
 
         return $order['gui']['snippet'];

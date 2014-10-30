@@ -2,6 +2,12 @@
 
 Next generation Klarna module
 
+## Caveats
+
+### Upgrading the version of the module
+
+There is a check in Model/Payment/Checkout.php that depends on Module Version. If bumping the version, please have a look at this.
+
 ## Installation
 
 ## Klarna Legacy
