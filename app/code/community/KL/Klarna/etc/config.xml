@@ -333,7 +333,7 @@
         <jobs>
             <kl_klarna>
                 <schedule>
-                    <cron_expr>15/* * * * *</cron_expr>
+                    <cron_expr>0,15,30,45 * * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>klarna/cron_cleanpushlocktable::clean</model>
