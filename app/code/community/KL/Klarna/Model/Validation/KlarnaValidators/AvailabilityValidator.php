@@ -11,6 +11,7 @@ class KL_Klarna_Model_Validation_KlarnaValidators_AvailabilityValidator implemen
      * @param Mage_Sales_Model_Quote $quote
      * @param $klarnasValidationRequest
      * @param $klarnaId
+     * @return boolean
      */
     public function validate(Mage_Sales_Model_Quote $quote, $klarnasValidationRequest, $klarnaId)
     {
@@ -21,6 +22,8 @@ class KL_Klarna_Model_Validation_KlarnaValidators_AvailabilityValidator implemen
                 $this->validateSimpleProduct($item);
             }
         }
+
+        return true;
     }
 
     /**
