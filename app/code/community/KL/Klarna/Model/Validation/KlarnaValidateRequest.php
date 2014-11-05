@@ -9,6 +9,7 @@ class KL_Klarna_Model_Validation_KlarnaValidateRequest
      */
     protected $validators = array(
         'SkuValidator',
+        'AvailabilityValidator',
         'CurrencyValidator',
         'ItemsCountValidator'
     );

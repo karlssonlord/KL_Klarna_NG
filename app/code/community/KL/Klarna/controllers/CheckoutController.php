@@ -156,20 +156,18 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         try {
             $this->validateRequestValidator->validate($input);
 
-        } catch (KL_Klarna_Model_Exception_InvalidRequest $e) {
+        } catch (KL_Klarna_Model_Exception_InsufficientStockLevel $e) {
+            Mage::helper('klarna')->sendErrorEmail($e->getMessage(), null);
             $location = Mage::getUrl('klarna/checkout/failure');
             $this->send303($location);
-            //$this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure'), 303);
 
-        } catch (KL_Klarna_Model_Exception_UnsalableProduct $e) {
+        }  catch (KL_Klarna_Model_Exception_UnsalableProduct $e) {
             $location = Mage::getUrl('klarna/checkout/failure').'?is_stock=1';
             $this->send303($location);
-            //$this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure', array('is_stock' => 1)), 303);
 
-        } catch (KL_Klarna_Model_Exception_KlarnaOrderQuoteMismatch $e) {
+        }  catch (Exception $e) {
             $location = Mage::getUrl('klarna/checkout/failure');
             $this->send303($location);
-            //$this->getResponse()->setRedirect(Mage::getUrl('klarna/checkout/failure'), 303);
         }
 
         $this->getResponse()->setHttpResponseCode(200);
