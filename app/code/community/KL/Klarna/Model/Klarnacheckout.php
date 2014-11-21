@@ -494,7 +494,7 @@ class KL_Klarna_Model_Klarnacheckout
             $validationUrl = Mage::getUrl('klarna/checkout/validate', array('_forced_secure' => true));
 
             /**
-             * Make sure it's https, only add it to Klaran then
+             * Make sure the link uses https, only add it to Klarna if it is
              */
             if (substr($validationUrl, 0, 5) == 'https') {
                 $klarnaData['merchant']['validation_uri'] = $validationUrl;
