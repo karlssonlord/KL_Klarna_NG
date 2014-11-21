@@ -480,14 +480,25 @@ class KL_Klarna_Model_Klarnacheckout
                     'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
                     'checkout_uri' => Mage::getUrl('klarna/checkout'),
                     'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
-                    'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}',
-                    'validation_uri' => Mage::getUrl('klarna/checkout/validate', array('_forced_secure' => true)),
+                    'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}'
                 ),
                 'cart' => array('items' => $items),
                 'merchant_reference' => array(
                     'orderid2' => $this->getQuote()->getId()
                 )
             );
+
+            /**
+             * Set the validation URL
+             */
+            $validationUrl = Mage::getUrl('klarna/checkout/validate', array('_forced_secure' => true));
+
+            /**
+             * Make sure it's https, only add it to Klaran then
+             */
+            if (substr($validationUrl, 0, 5) == 'https') {
+                $klarnaData['merchant']['validation_uri'] = $validationUrl;
+            }
 
             Mage::helper('klarna')->log($klarnaData);
 
