@@ -142,7 +142,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
             $country = $this->getCountryCode();
         }
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/invoice/' . $country . '_invoice_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
-            'merchant_id'
+            'merchant_id_legacy'
         );
     }
 
@@ -160,7 +160,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
             $country = $this->getCountryCode();
         }
         return 'https://cdn.klarna.com/public/images/' . $country . '/badges/v1/account/' . $country . '_account_badge_std_blue.png?width=' . $width . '&eid=' . $this->getConfig(
-            'merchant_id'
+            'merchant_id_legacy'
         );
     }
 
@@ -178,7 +178,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
             $country = $this->getCountryCode();
         }
         return 'https://cdn.klarna.com/public/images/' . $country . '/logos/v1/basic/' . $country . '_basic_logo_std_blue-black.png?width=' . $width . '&eid=' . $this->getConfig(
-            'merchant_id'
+            'merchant_id_legacy'
         );
     }
 

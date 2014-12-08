@@ -31,7 +31,7 @@ class KL_Klarna_Block_Form
      */
     public function getEid()
     {
-        return Mage::helper('klarna')->getConfig('merchant_id');
+        return Mage::helper('klarna')->getConfig('merchant_id_legacy');
     }
 
     /**

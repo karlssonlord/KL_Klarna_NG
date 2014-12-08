@@ -8,7 +8,7 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
          * Configure the Klarna object with default data
          */
         $this
-            ->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id'))
+            ->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id_legacy'))
             ->setSharedSecret(Mage::helper('klarna')->getConfig('shared_secret'))
             ->setServer($this->getCurrentServer())
             ->setPclassStorage('mysql')

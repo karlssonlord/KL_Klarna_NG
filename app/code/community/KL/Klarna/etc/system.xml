@@ -18,6 +18,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </merchant_id>
+                        <merchant_id_legacy translate="label">
+                            <label>Merchant id legacy</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Used in the legacy method (not KCO)</comment>
+                        </merchant_id_legacy>
                         <shared_secret translate="label">
                             <label>Shared secret</label>
                             <frontend_type>text</frontend_type>

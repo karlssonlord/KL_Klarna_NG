@@ -11,6 +11,16 @@ class KL_Klarna_Model_Klarnacheckout
      */
     protected $_connector;
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        /**
+         * Force the right merchant ID
+         */
+        $this->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id'));
+    }
+
     /**
      * Get the Klarna Connector
      *

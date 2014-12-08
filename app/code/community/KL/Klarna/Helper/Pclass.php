@@ -149,7 +149,7 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
             /**
              * Check if invoice or account is enabled
              */
-            $eidStoreSpecific = Mage::getStoreConfig('payment/klarna/merchant_id', $_eachStoreId);
+            $eidStoreSpecific = Mage::getStoreConfig('payment/klarna/merchant_id_legacy', $_eachStoreId);
             $invoiceEnabled = Mage::getStoreConfig('payment/klarna_invoice/active', $_eachStoreId);
             $accountEnabled = Mage::getStoreConfig('payment/klarna_partpayment/active', $_eachStoreId);
 
@@ -237,7 +237,7 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
                             ->setCountry($pclassCountry)
                             ->setLanguage($pclassLanguage)
                             ->setCurrency($pclassCurrency)
-                            ->setMerchantId(Mage::getStoreConfig('payment/klarna/merchant_id', $_eachStoreId))
+                            ->setMerchantId(Mage::getStoreConfig('payment/klarna/merchant_id_legacy', $_eachStoreId))
                             ->setSharedSecret(
                                 Mage::getStoreConfig('payment/klarna/shared_secret', $_eachStoreId)
                             )
