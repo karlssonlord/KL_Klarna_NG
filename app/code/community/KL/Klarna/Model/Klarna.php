@@ -9,7 +9,7 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
          */
         $this
             ->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id_legacy'))
-            ->setSharedSecret(Mage::helper('klarna')->getConfig('shared_secret'))
+            ->setSharedSecret(Mage::helper('klarna')->getConfig('shared_secret_legacy'))
             ->setServer($this->getCurrentServer())
             ->setPclassStorage('mysql')
             ->setPclassStorageUri($this->getDbUri())

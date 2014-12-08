@@ -239,7 +239,7 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
                             ->setCurrency($pclassCurrency)
                             ->setMerchantId(Mage::getStoreConfig('payment/klarna/merchant_id_legacy', $_eachStoreId))
                             ->setSharedSecret(
-                                Mage::getStoreConfig('payment/klarna/shared_secret', $_eachStoreId)
+                                Mage::getStoreConfig('payment/klarna/shared_secret_legacy', $_eachStoreId)
                             )
                             ->setServer($mode);
 

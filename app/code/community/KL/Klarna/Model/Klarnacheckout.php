@@ -16,9 +16,11 @@ class KL_Klarna_Model_Klarnacheckout
         parent::__construct();
 
         /**
-         * Force the right merchant ID
+         * Force the right merchant ID and shared secret
          */
-        $this->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id'));
+        $this
+            ->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id'))
+            ->setSharedSecret(Mage::helper('klarna')->getConfig('shared_secret'));
     }
 
     /**
