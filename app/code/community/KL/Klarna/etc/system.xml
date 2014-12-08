@@ -11,22 +11,14 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <merchant_id translate="label">
-                            <label>Merchant id</label>
+                            <label>Merchant ID</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <comment>Used in the Klarna Checkout only</comment>
                         </merchant_id>
-                        <merchant_id_legacy translate="label">
-                            <label>Merchant id legacy</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment>Used in the legacy method (not KCO)</comment>
-                        </merchant_id_legacy>
                         <shared_secret translate="label">
                             <label>Shared secret</label>
                             <frontend_type>text</frontend_type>
@@ -34,7 +26,17 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <comment>Used in the Klarna Checkout only</comment>
                         </shared_secret>
+                        <merchant_id_legacy translate="label">
+                            <label>Merchant ID legacy</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Used in the legacy checkout only</comment>
+                        </merchant_id_legacy>
                         <shared_secret_legacy translate="label">
                             <label>Shared secret legacy</label>
                             <frontend_type>text</frontend_type>
@@ -42,7 +44,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Used in the legacy method (not KCO)</comment>
+                            <comment>Used in the legacy checkout only</comment>
                         </shared_secret_legacy>
                         <live translate="label">
                             <label>Live server</label>
