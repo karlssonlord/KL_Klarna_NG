@@ -36,9 +36,16 @@ function fetchKlarnaAddress(fieldId) {
 
                 // Setup the address line
                 var addressLine =
+                    (address.company ? address.company + klarnaAddressGlue : '') +
                     (address.fname && address.lname ? address.fname + ' ' + address.lname + klarnaAddressGlue : '') +
                     address.street + klarnaAddressGlue +
                     address.zip + ' ' + address.city;
+
+                // When it's a company, we do not have the fname and lname variables
+                if (address.company) {
+                    address.fname = address.company;
+                    address.lname = '-';
+                }
 
                 // Build the hidden address fields with hash
                 $H(address).each(function(addressLine) {
@@ -55,6 +62,7 @@ function fetchKlarnaAddress(fieldId) {
                 }
                 selectBox += '/>';
                 selectBox += ' <label for="klarna_address_key_' + address.hash + '" class="klarna-address-label">'+addressLine+'</label>';
+                selectBox += '<br class="clear" />';
 
             });
 
