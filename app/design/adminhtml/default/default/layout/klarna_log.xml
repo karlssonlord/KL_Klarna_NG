@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<layout>
+    <klarna_adminhtml_log_index>
+        <reference name="content">
+            <block type="klarna/adminhtml_log" name="cms_block"/>
+        </reference>
+    </klarna_adminhtml_log_index>
+    <klarna_adminhtml_log_new>
+        <update handle="klarna_adminhtml_log_edit"/>
+    </klarna_adminhtml_log_new>
+    <klarna_adminhtml_log_edit>
+        <update handle="editor"/>
+        <reference name="content">
+            <block type="klarna/adminhtml_log_edit" name="cms_block_edit"></block>
+        </reference>
+    </klarna_adminhtml_log_edit>
+</layout>

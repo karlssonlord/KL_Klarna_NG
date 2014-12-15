@@ -222,37 +222,59 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      * @return void
      */
     public function sendErrorEmail($errorEmailMessage, $quote = '') {
+        $reportingMethod = Mage::getStoreConfig('payment/klarna_checkout/reporting_method');
         $email = Mage::getStoreConfig('payment/klarna_checkout/validation_email');
-        try {
-            $sentSuccess = Mage::getModel('core/email_template')
-                ->sendTransactional(
-                    'kl_klarna',
-                    array(
-                        'name' => 'Magento',
-                        'email' => 'notifications@karlssonlord.com'
-                    ),
-                    $email,
-                    null,
-                    array(
-                        'message' => $errorEmailMessage,
-                    ),
-                    null
-                )
-                ->getSentSuccess();
-            if($sentSuccess) {
+        if($reportingMethod == 'email' && !empty($email)) {
+            try {
+                $sentSuccess = Mage::getModel('core/email_template')
+                    ->sendTransactional(
+                        'kl_klarna',
+                        array(
+                            'name' => 'Magento',
+                            'email' => 'notifications@karlssonlord.com'
+                        ),
+                        $email,
+                        null,
+                        array(
+                            'message' => $errorEmailMessage,
+                        ),
+                        null
+                    )
+                    ->getSentSuccess();
+                if($sentSuccess) {
+                    Mage::helper('klarna/log')->log(
+                        $quote,
+                        'Error notification has been sent successfully to ' . $email
+                    );
+                    return $sentSuccess;
+                }
+            }
+            catch (Exception $e) {
                 Mage::helper('klarna/log')->log(
                     $quote,
-                    'Error notification has been sent successfully to ' . $email
+                    $e->getMessage()
                 );
-                return $sentSuccess;
+                return false;
             }
-        }
-        catch (Exception $e) {
-            Mage::helper('klarna/log')->log(
-                $quote,
-                $e->getMessage()
-            );
-            return false;
+        } elseif($reportingMethod == 'db') {
+            $quoteId = '';
+            $storeId = '';
+            $klarnaCheckoutId = '';
+            if($quote) {
+                $quoteId = $quote->getId();
+                $storeId = $quote->getStoreId();
+                $klarnaCheckoutId = $quote->getKlarnaCheckout();
+            }
+            $id = Mage::getModel('klarna/log')
+                ->setKlarnaCheckoutId($klarnaCheckoutId)
+                ->setStoreId($storeId)
+                ->setQuoteId($quoteId)
+                ->setOrderId()
+                ->setMessage($errorEmailMessage)
+                ->setCreatedAt(Mage::getModel('core/date')->date('Y-m-d H:i:s'))
+                ->save()
+                ->getId();
+            var_dump($id);
         }
         return false;
     }

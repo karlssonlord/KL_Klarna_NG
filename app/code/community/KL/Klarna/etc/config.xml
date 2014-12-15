@@ -2,7 +2,7 @@
 <config>
     <modules>
         <KL_Klarna>
-            <version>0.0.6</version>
+            <version>0.0.7</version>
         </KL_Klarna>
     </modules>
     <frontend>
@@ -62,6 +62,9 @@
                     <pushlock>
                         <table>klarna_pushlock</table>
                     </pushlock>
+                    <log>
+                        <table>klarna_log</table>
+                    </log>
                 </entities>
             </klarna_resource>
         </models>
@@ -231,6 +234,65 @@
             </email>
         </template>
     </global>
+    <admin>
+        <routers>
+            <klarna>
+                <use>admin</use>
+                <args>
+                    <module>KL_Klarna</module>
+                    <frontName>klarna</frontName>
+                </args>
+            </klarna>
+        </routers>
+    </admin>
+    <adminhtml>
+        <menu>
+            <report>
+                <children>
+                    <kl_log translate="title" module="core">
+                        <title>Klarna Logs</title>
+                        <action>klarna/adminhtml_log</action>
+                        <sort_order>999</sort_order>
+                    </kl_log>
+                </children>
+            </report>
+        </menu>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <report>
+                            <children>
+                                <kl_log translate="title" module="core">
+                                    <title>Klarna Logs</title>
+                                    <sort_order>999</sort_order>
+                                </kl_log>
+                            </children>
+                        </report>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <kl_log translate="title" module="core">
+                                            <title>Klarna Logs</title>
+                                            <sort_order>9999</sort_order>
+                                        </kl_log>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <klarna_log>
+                    <file>klarna_log.xml</file>
+                </klarna_log>
+            </updates>
+        </layout>
+    </adminhtml>
     <klarna>
         <countries>
             <se>
