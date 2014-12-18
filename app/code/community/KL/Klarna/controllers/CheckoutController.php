@@ -50,6 +50,8 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
         Mage::helper('klarna/log')->log($quote, "successAction");
 
+        Mage::dispatchEvent('klarna_checkout_controller_success_before', array('quote' => $quote));
+
         $quoteId = $quote->getId();
 
         /**
