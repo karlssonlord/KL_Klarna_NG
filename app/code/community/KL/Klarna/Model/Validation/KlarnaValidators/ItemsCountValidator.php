@@ -59,7 +59,7 @@ class KL_Klarna_Model_Validation_KlarnaValidators_ItemsCountValidator implements
          */
         foreach ($request->cart['items'] as $klarnaItem) {
             if ($klarnaItem['type'] === 'physical') {
-                $klarnaItems[$klarnaItem['reference']] = $klarnaItem;
+                $klarnaItems[] = $klarnaItem;
             }
         }
 
