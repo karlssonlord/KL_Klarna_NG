@@ -57,59 +57,49 @@ class KL_Klarna_Model_Klarnacheckout
     public function getExistingKlarnaOrder()
     {
         /**
-         * Try to load existing order
+         * Try to get the current klarna checkout id
          */
-        if ( Mage::helper('klarna/checkout')->getKlarnaCheckoutId() ) {
+        $checkoutId = Mage::helper('klarna/checkout')->getKlarnaCheckoutId();
+
+        /**
+         * If not found then log and return false
+         */
+        if (!$checkoutId) {
 
             /**
              * Log the event
              */
-            $quote = $this->getQuote();
+            Mage::helper('klarna')->log('No existing checkout ID when fetching order from Klarna, returning false.');
 
-            Mage::helper('klarna/log')->log(
-                $quote,
-                'Trying to fetch existing KCO order from Klarna using '
-                    . Mage::helper('klarna/checkout')->getKlarnaCheckoutId()
-            );
-
-            try {
-
-                /**
-                 * Fetch checkout ID from session
-                 */
-                $checkoutId = Mage::helper('klarna/checkout')->getKlarnaCheckoutId();
-
-                /**
-                 * Fetch the checkout
-                 */
-                $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
-
-                /**
-                 * Fetch the order
-                 */
-                $order->fetch();
-
-            } catch (Exception $e) {
-
-                /**
-                 * Log the event
-                 */
-                Mage::helper('klarna')->log('Unable to get existing Klarna Order ID. Error received: ' . $e->getMessage());
-
-                return false;
-            }
-
-            return $order;
-
+            return false;
         }
 
-        /**
-         * Log the event
-         */
-        Mage::helper('klarna')->log('No existing checkout ID when fetching order from Klarna, returning false.');
+        try {
 
-        return false;
+            Mage::helper('klarna/log')->log(
+                $this->getQuote(),
+                'Trying to fetch existing KCO order from Klarna using '
+                . Mage::helper('klarna/checkout')->getKlarnaCheckoutId()
+            );
 
+            /**
+             * Fetch the order
+             */
+            $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
+
+            $order->fetch();
+
+        } catch (Exception $e) {
+
+            /**
+             * Log the event
+             */
+            Mage::helper('klarna')->log('Unable to get existing Klarna Order ID. Error received: ' . $e->getMessage());
+
+            return false;
+        }
+
+        return $order;
     }
 
     /**
@@ -182,7 +172,7 @@ class KL_Klarna_Model_Klarnacheckout
         }
 
         if ($order) {
-            // Right, there was an order already, so we want to update this order to reflect cart changes
+            // Right, we have an order already, so I need to update this order to reflect cart changes
             $updatedOrder = $this->updateExistingOrder($order, $items);
 
             return $this->getKlarnaHtml($updatedOrder);
@@ -309,9 +299,6 @@ class KL_Klarna_Model_Klarnacheckout
                         ->setState('processing')
                         ->setStatus($orderStatus);
 
-                    /**
-                     * Save order again
-                     */
                     $magentoOrder->save();
 
                     /**
@@ -667,8 +654,7 @@ class KL_Klarna_Model_Klarnacheckout
         /**
          * Fetch from Klarna
          */
-        $order->fetch();
-        return $order;
+        return $order->fetch();
     }
 
     /**
