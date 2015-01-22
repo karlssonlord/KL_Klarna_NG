@@ -386,6 +386,223 @@ class KL_Klarna_Model_Klarnacheckout
      */
     public function handleOrder()
     {
+        // The reason we are here is because either cart has been edited so the Klarna order needs update,
+        // or we haven't yet created a KCO session. In any case we need to prepare the updated cart first.
+        $items = $this->prepareOrderItems();
+
+        // Okay so now we look for an existing order over at Klarna
+        $order = $this->getExistingKlarnaOrder();
+
+        // TODO: Set recurring flag, or start new session? If new session, destroy the old?
+        if ($this->getQuote()->getIsSubscription()) {
+
+        }
+
+        if ($order) {
+            // Right, there was an order already, so we want to update this order to reflect cart changes
+            $updatedOrder = $this->updateExistingOrder($order, $items);
+
+            return $this->getKlarnaHtml($updatedOrder);
+        }
+
+        // Okay we have a clean slate so start a new session over at Klarna
+        $order = $this->createNewOrder($items);
+
+        return $this->getKlarnaHtml($order);
+    }
+
+    /**
+     * @param $items
+     * @return Klarna_Checkout_Order
+     */
+    private function createNewOrder($items)
+    {
+        /**
+         * Setup the create array
+         */
+        $klarnaData = array(
+            'recurring' => (boolean)$this->getQuote()->getIsSubscription(),
+            'purchase_country' => $this->getCountry(),
+            'purchase_currency' => $this->getCurrency(),
+            'locale' => $this->getLocale(),
+            'merchant' => array(
+                'id' => $this->getMerchantId(),
+                'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
+                'checkout_uri' => Mage::getUrl('klarna/checkout'),
+                'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
+                'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}'
+            ),
+            'cart' => array('items' => $items),
+            'merchant_reference' => array(
+                'orderid2' => $this->getQuote()->getId()
+            )
+        );
+
+        /**
+         * Set the validation URL
+         */
+        $validationUrl = Mage::getUrl('klarna/checkout/validate', array('_forced_secure' => true));
+
+        /**
+         * Make sure the link uses https, only add it to Klarna if it is
+         */
+        if (substr($validationUrl, 0, 5) == 'https') {
+            $klarnaData['merchant']['validation_uri'] = $validationUrl;
+        }
+
+        Mage::helper('klarna')->log($klarnaData);
+
+        $klarnaData['gui']['options'] = array('disable_autofocus');
+
+        /**
+         * Check if we should use the mobile gui
+         * This can only be set when first creating the checkout session
+         */
+        if ($this->useMobileGui()) {
+            $klarnaData['gui']['layout'] = 'mobile';
+        }
+
+        /**
+         * Prefill information from current user
+         */
+        if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+
+            /**
+             * Fetch current user
+             */
+            $currentUser = Mage::getSingleton('customer/session')->getCustomer();
+
+            /**
+             * Make sure the variable in the array is defined
+             */
+            if (!isset($klarnaData['shipping_address'])) {
+                $klarnaData['shipping_address'] = array();
+            }
+
+            /**
+             * Set the e-mail
+             */
+            $klarnaData['shipping_address']['email'] = $currentUser->getEmail();
+
+            /**
+             * Fetch the default shipping address
+             */
+            $defaultShippingAddressId = $currentUser->getDefaultShipping();
+            if ($defaultShippingAddressId) {
+
+                /**
+                 * Load the address
+                 */
+                $defaultShippingAddress = $address = Mage::getModel('customer/address')->load(
+                    $defaultShippingAddressId
+                );
+
+                /**
+                 * Prefill postcode
+                 */
+                if ($defaultShippingAddress->getPostcode()) {
+                    $klarnaData['shipping_address']['postal_code'] = $defaultShippingAddress->getPostcode();
+                }
+
+            }
+
+            /**
+             * Prefill using test credentials if it's a test environment
+             */
+            if (!Mage::helper('klarna')->isLive()) {
+                $klarnaData['shipping_address']['email'] = 'checkout-se@testdrive.klarna.com';
+                $klarnaData['shipping_address']['postal_code'] = '12345';
+            }
+
+        }
+
+        /**
+         * Fetch empty Klarna order
+         */
+        $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
+
+        /**
+         * Create the order
+         */
+        $order->create($klarnaData);
+
+        /**
+         * Fetch from Klarna
+         */
+        $order->fetch();
+
+        /**
+         * Store session ID in session
+         * We also make a check for duplicated checkoutID
+         */
+        if (!Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation())) {
+            $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
+            $order->create($klarnaData);
+            $order->fetch();
+            Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
+            return $order;
+        }
+        return $order;
+    }
+
+    /**
+     * @param $order
+     * @param $items
+     * @return bool
+     */
+    private function updateExistingOrder($order, $items)
+    {
+        if (isset($order['recurring'])) {
+            //
+        }
+
+        /**
+         * Setup the update array
+         */
+        $klarnaData = array(
+            'cart' => array('items' => $items),
+            'merchant_reference' => array(
+                'orderid2' => $this->getQuote()->getId()
+            )
+        );
+
+        Mage::helper('klarna')->log($klarnaData);
+
+        /**
+         * Update the data
+         */
+        try {
+
+            /**
+             * Update Klarna
+             */
+            $order->update($klarnaData);
+            return $order;
+
+            /**
+             * Store session ID in session (again)
+             */
+            Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
+            return $order;
+
+        } catch (Exception $e) {
+
+            Mage::helper('klarna')->log($e->getMessage());
+
+            /**
+             * Terminate the object, this will make us create a new order
+             */
+            $order = false;
+            return $order;
+        }
+        return $order;
+    }
+
+    /**
+     * @return array
+     */
+    private function prepareOrderItems()
+    {
         /**
          * Setup the items array
          */
@@ -402,7 +619,7 @@ class KL_Klarna_Model_Klarnacheckout
          * Add shipping method and the cost
          */
         $shipping = Mage::getModel('klarna/klarnacheckout_shipping')->build();
-        if ( $shipping ) {
+        if ($shipping) {
             $items[] = $shipping;
         }
 
@@ -410,192 +627,20 @@ class KL_Klarna_Model_Klarnacheckout
          * Handle discounts
          */
         $discounts = Mage::getModel('klarna/klarnacheckout_discount')->build($this->getQuote());
-        if ( $discounts ) {
+        if ($discounts) {
             $items[] = $discounts;
+            return $items;
         }
+        return $items;
+    }
 
-        /**
-         * Fetch existing Klarna Order
-         */
-        $order = $this->getExistingKlarnaOrder();
-
-        /**
-         * Update or create the order
-         */
-        if ( $order ) {
-
-            /**
-             * Setup the update array
-             */
-            $klarnaData = array(
-                'cart' => array('items' => $items),
-                'merchant_reference' => array(
-                    'orderid2' => $this->getQuote()->getId()
-                )
-            );
-
-            Mage::helper('klarna')->log($klarnaData);
-
-            /**
-             * Update the data
-             */
-            try {
-
-                /**
-                 * Update Klarna
-                 */
-                $order->update($klarnaData);
-
-                /**
-                 * Store session ID in session (again)
-                 */
-                Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
-
-            } catch (Exception $e) {
-
-                Mage::helper('klarna')->log($e->getMessage());
-
-                /**
-                 * Terminate the object, this will make us create a new order
-                 */
-                $order = false;
-            }
-
-        }
-
-        /**
-         * Create order if nothing is set
-         */
-        if ( ! $order ) {
-
-            /**
-             * Setup the create array
-             */
-            $klarnaData = array(
-                'purchase_country' => $this->getCountry(),
-                'purchase_currency' => $this->getCurrency(),
-                'locale' => $this->getLocale(),
-                'merchant' => array(
-                    'id' => $this->getMerchantId(),
-                    'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
-                    'checkout_uri' => Mage::getUrl('klarna/checkout'),
-                    'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
-                    'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}'
-                ),
-                'cart' => array('items' => $items),
-                'merchant_reference' => array(
-                    'orderid2' => $this->getQuote()->getId()
-                )
-            );
-
-            /**
-             * Set the validation URL
-             */
-            $validationUrl = Mage::getUrl('klarna/checkout/validate', array('_forced_secure' => true));
-
-            /**
-             * Make sure the link uses https, only add it to Klarna if it is
-             */
-            if (substr($validationUrl, 0, 5) == 'https') {
-                $klarnaData['merchant']['validation_uri'] = $validationUrl;
-            }
-
-            Mage::helper('klarna')->log($klarnaData);
-
-            $klarnaData['gui']['options'] = array('disable_autofocus');
-
-            /**
-             * Check if we should use the mobile gui
-             * This can only be set when first creating the checkout session
-             */
-            if ( $this->useMobileGui() ) {
-                $klarnaData['gui']['layout'] = 'mobile';
-            }
-
-            /**
-             * Prefill information from current user
-             */
-            if ( Mage::getSingleton('customer/session')->isLoggedIn() ) {
-
-                /**
-                 * Fetch current user
-                 */
-                $currentUser = Mage::getSingleton('customer/session')->getCustomer();
-
-                /**
-                 * Make sure the variable in the array is defined
-                 */
-                if ( ! isset($klarnaData['shipping_address']) ) {
-                    $klarnaData['shipping_address'] = array();
-                }
-
-                /**
-                 * Set the e-mail
-                 */
-                $klarnaData['shipping_address']['email'] = $currentUser->getEmail();
-
-                /**
-                 * Fetch the default shipping address
-                 */
-                $defaultShippingAddressId = $currentUser->getDefaultShipping();
-                if ( $defaultShippingAddressId ) {
-
-                    /**
-                     * Load the address
-                     */
-                    $defaultShippingAddress = $address = Mage::getModel('customer/address')->load(
-                        $defaultShippingAddressId
-                    );
-
-                    /**
-                     * Prefill postcode
-                     */
-                    if ( $defaultShippingAddress->getPostcode() ) {
-                        $klarnaData['shipping_address']['postal_code'] = $defaultShippingAddress->getPostcode();
-                    }
-
-                }
-
-                /**
-                 * Prefill using test credentials if it's a test environment
-                 */
-                if ( ! Mage::helper('klarna')->isLive() ) {
-                    $klarnaData['shipping_address']['email'] = 'checkout-se@testdrive.klarna.com';
-                    $klarnaData['shipping_address']['postal_code'] = '12345';
-                }
-
-            }
-
-            /**
-             * Fetch empty Klarna order
-             */
-            $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
-
-            /**
-             * Create the order
-             */
-            $order->create($klarnaData);
-
-            /**
-             * Fetch from Klarna
-             */
-            $order->fetch();
-
-            /**
-             * Store session ID in session
-             * We also make a check for duplicated checkoutID
-             */
-            if(!Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation())) {
-                $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
-                $order->create($klarnaData);
-                $order->fetch();
-                Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
-            }
-
-        }
-
+    /**
+     * @param $order
+     * @return mixed
+     */
+    private function getKlarnaHtml($order)
+    {
         return $order['gui']['snippet'];
-
     }
 
 }
