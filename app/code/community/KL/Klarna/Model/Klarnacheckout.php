@@ -44,226 +44,9 @@ class KL_Klarna_Model_Klarnacheckout
      */
     public function getOrder($checkoutId)
     {
-        /**
-         * Fetch order from Klarna
-         */
         $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
-        $order->fetch();
 
-        return $order;
-    }
-
-    /**
-     * Acknowledge order and create it in our system
-     *
-     * @param $checkoutId
-     * @return void
-     */
-    public function acknowledge($checkoutId)
-    {
-        $errorEmailMessages = array();
-
-        /**
-         * Make a note in the logs
-         */
-        Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] Acknowledge method called for checkout id');
-
-        /**
-         * Avoid timeouts in PHP to allow the script to finish
-         */
-        set_time_limit(0);
-
-        try {
-            $order = $this->getOrder($checkoutId);
-
-            if ($order['status'] == 'checkout_complete') {
-
-                /**
-                 * Check if the order exists
-                 */
-                $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
-                    ->loadByCheckoutId($checkoutId);
-
-                /**
-                 * What to do if the order exists
-                 */
-                if ( !$magentoOrder || !$magentoOrder->getId() ) {
-
-                    Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] No previous order found, trying to create...');
-
-                    /**
-                     * Try to create the order if it was not found
-                     */
-                    $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
-                        ->create($checkoutId);
-
-                } else {
-
-                    Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] Existing order found for checkout id');
-
-                }
-
-                /**
-                 * Make sure the Magento order exists
-                 */
-                if ( $magentoOrder && $magentoOrder->getId() ) {
-
-                    /**
-                     * Load the quote
-                     */
-                    $quote = $magentoOrder->getQuote();
-
-                    /**
-                     * Fetch payment (if any)
-                     */
-                    $magentoOrderPayment = $magentoOrder
-                        ->getPayment();
-
-                    /**
-                     * Set the payment information
-                     */
-                    $magentoOrderPayment
-                        ->setMethod('klarna_checkout')
-                        ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId,
-                                                         'orderInfo' => $order->marshal() ))
-                        ->setTransactionId($checkoutId)
-                        ->setIsTransactionClosed(0)
-                        ->save();
-
-                    /**
-                     * Fetch the total amount reserved
-                     */
-                    $amountAuthorized = $order['cart']['total_price_including_tax'] / 100;
-
-                    /**
-                     * Set payment information on order object
-                     */
-                    $payment = $magentoOrder->getPayment();
-
-                    /**
-                     * Authorize
-                     */
-                    $payment->authorize($magentoOrder->getPayment(), $amountAuthorized);
-
-                    /**
-                     * Fetch order status from config
-                     */
-                    $orderStatus = Mage::helper('klarna')->getConfig(
-                        'acknowledged_order_status',
-                        'klarna_checkout'
-                    );
-
-                    /**
-                     * Log what status and state we're setting
-                     */
-                    Mage::helper('klarna/log')->log(
-                        $quote,
-                        'Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId()
-                    );
-
-                    /**
-                     * Configure and save the order
-                     */
-                    $magentoOrder
-                        ->setState('processing')
-                        ->setStatus($orderStatus);
-
-                    /**
-                     * Save order again
-                     */
-                    $magentoOrder->save();
-
-                    /**
-                     * Setup update data
-                     */
-                    $updateData = array(
-                        'status' => 'created',
-                        'merchant_reference' => array(
-                            'orderid1' => $magentoOrder->getIncrementId(),
-                        )
-                    );
-
-                    /**
-                     * Update order
-                     */
-                    $order->update($updateData);
-
-                    /**
-                     * Send new order e-mail
-                     */
-                    try {
-
-                        $magentoOrder->sendNewOrderEmail();
-
-                    } catch (Exception $e) {
-
-                        $errorMessage = 'Unable to send new order email (' . $e->getMessage() . '), Magento ID ' .
-                            $magentoOrder->getIncrementId();
-                        $errorEmailMessages[] = $errorMessage;
-
-                        Mage::helper('klarna/log')->log(
-                            $quote,
-                            $errorMessage,
-                            true
-                        );
-                    }
-
-                    Mage::helper('klarna/log')->log(
-                        $quote,
-                        'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId(),
-                        true
-                    );
-
-                } else {
-
-                    $errorMessage = 'Unable to acknowledge due to missing order in Magento. (' . $checkoutId . ')';
-                    $errorEmailMessages[] = $errorMessage;
-
-                    Mage::helper('klarna/log')->log(
-                        null,
-                        $errorMessage
-                    );
-
-                }
-
-            } else {
-
-                $errorMessage = 'Unable to acknowledge due to order status from Klarna: ' . $order['status'] .
-                    ' (' . $checkoutId . ')';
-                $errorEmailMessages[] = $errorMessage;
-
-                Mage::helper('klarna/log')->log(
-                    null,
-                    $errorMessage
-                );
-
-            }
-            if(!empty($errorEmailMessages)) {
-                Mage::helper('klarna')->sendErrorEmail(implode("\n", $errorEmailMessages));
-            }
-
-        } catch (Exception $e) {
-
-            /**
-             * Remove the order lock: allow Klarna to make subsequent push retries
-             */
-            Mage::getModel('klarna/pushlock')->unLock($checkoutId);
-
-            $errorMessage =  'CheckoutId = "' . $checkoutId . '"; Cannot acknowledge: ' . $e->getMessage();
-            Mage::helper('klarna')->sendErrorEmail($errorMessage);
-
-            /**
-             * Log error
-             */
-            Mage::helper('klarna/log')->log(
-                null,
-                $errorMessage
-            );
-
-            // Do nothing for now
-            die('e: ' . $e->getMessage());
-        }
-
+        return $order->fetch();
     }
 
     /**
@@ -412,6 +195,219 @@ class KL_Klarna_Model_Klarnacheckout
     }
 
     /**
+     * Acknowledge order and create it in our system
+     *
+     * @param $checkoutId
+     * @return void
+     */
+    public function acknowledge($checkoutId)
+    {
+        $errorEmailMessages = array();
+
+        /**
+         * Make a note in the logs
+         */
+        Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] Acknowledge method called for checkout id');
+
+        /**
+         * Avoid timeouts in PHP to allow the script to finish
+         */
+        set_time_limit(0);
+
+        try {
+            $order = $this->getOrder($checkoutId);
+
+            if ($order['status'] == 'checkout_complete') {
+
+                /**
+                 * Check if the order exists
+                 */
+                $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
+                    ->loadByCheckoutId($checkoutId);
+
+                /**
+                 * What to do if the order exists
+                 */
+                if ( !$magentoOrder || !$magentoOrder->getId() ) {
+
+                    Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] No previous order found, trying to create...');
+
+                    /**
+                     * Try to create the order if it was not found
+                     */
+                    $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
+                        ->create($checkoutId);
+
+                } else {
+
+                    Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] Existing order found for checkout id');
+
+                }
+
+                /**
+                 * Make sure the Magento order exists
+                 */
+                if ( $magentoOrder && $magentoOrder->getId() ) {
+
+                    /**
+                     * Load the quote
+                     */
+                    $quote = $magentoOrder->getQuote();
+
+                    /**
+                     * Fetch payment (if any)
+                     */
+                    $magentoOrderPayment = $magentoOrder
+                        ->getPayment();
+
+                    /**
+                     * Set the payment information
+                     */
+                    $magentoOrderPayment
+                        ->setMethod('klarna_checkout')
+                        ->setAdditionalInformation(array('klarnaCheckoutId' => $checkoutId,
+                                'orderInfo' => $order->marshal() ))
+                        ->setTransactionId($checkoutId)
+                        ->setIsTransactionClosed(0)
+                        ->save();
+
+                    /**
+                     * Fetch the total amount reserved
+                     */
+                    $amountAuthorized = $order['cart']['total_price_including_tax'] / 100;
+
+                    /**
+                     * Set payment information on order object
+                     */
+                    $payment = $magentoOrder->getPayment();
+
+                    /**
+                     * Authorize
+                     */
+                    $payment->authorize($magentoOrder->getPayment(), $amountAuthorized);
+
+                    /**
+                     * Fetch order status from config
+                     */
+                    $orderStatus = Mage::helper('klarna')->getConfig(
+                        'acknowledged_order_status',
+                        'klarna_checkout'
+                    );
+
+                    /**
+                     * Log what status and state we're setting
+                     */
+                    Mage::helper('klarna/log')->log(
+                        $quote,
+                        'Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId()
+                    );
+
+                    /**
+                     * Configure and save the order
+                     */
+                    $magentoOrder
+                        ->setState('processing')
+                        ->setStatus($orderStatus);
+
+                    /**
+                     * Save order again
+                     */
+                    $magentoOrder->save();
+
+                    /**
+                     * Setup update data
+                     */
+                    $updateData = array(
+                        'status' => 'created',
+                        'merchant_reference' => array(
+                            'orderid1' => $magentoOrder->getIncrementId(),
+                        )
+                    );
+
+                    /**
+                     * Update order
+                     */
+                    $order->update($updateData);
+
+                    /**
+                     * Send new order e-mail
+                     */
+                    try {
+
+                        $magentoOrder->sendNewOrderEmail();
+
+                    } catch (Exception $e) {
+
+                        $errorMessage = 'Unable to send new order email (' . $e->getMessage() . '), Magento ID ' .
+                            $magentoOrder->getIncrementId();
+                        $errorEmailMessages[] = $errorMessage;
+
+                        Mage::helper('klarna/log')->log(
+                            $quote,
+                            $errorMessage,
+                            true
+                        );
+                    }
+
+                    Mage::helper('klarna/log')->log(
+                        $quote,
+                        'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId(),
+                        true
+                    );
+
+                } else {
+
+                    $errorMessage = 'Unable to acknowledge due to missing order in Magento. (' . $checkoutId . ')';
+                    $errorEmailMessages[] = $errorMessage;
+
+                    Mage::helper('klarna/log')->log(
+                        null,
+                        $errorMessage
+                    );
+
+                }
+
+            } else {
+
+                $errorMessage = 'Unable to acknowledge due to order status from Klarna: ' . $order['status'] .
+                    ' (' . $checkoutId . ')';
+                $errorEmailMessages[] = $errorMessage;
+
+                Mage::helper('klarna/log')->log(
+                    null,
+                    $errorMessage
+                );
+
+            }
+            if(!empty($errorEmailMessages)) {
+                Mage::helper('klarna')->sendErrorEmail(implode("\n", $errorEmailMessages));
+            }
+
+        } catch (Exception $e) {
+
+            /**
+             * Remove the order lock: allow Klarna to make subsequent push retries
+             */
+            Mage::getModel('klarna/pushlock')->unLock($checkoutId);
+
+            $errorMessage =  'CheckoutId = "' . $checkoutId . '"; Cannot acknowledge: ' . $e->getMessage();
+            Mage::helper('klarna')->sendErrorEmail($errorMessage);
+
+            /**
+             * Log error
+             */
+            Mage::helper('klarna/log')->log(
+                null,
+                $errorMessage
+            );
+
+            // Do nothing for now
+            die('e: ' . $e->getMessage());
+        }
+
+    }
+
+    /**
      * @param $items
      * @return Klarna_Checkout_Order
      */
@@ -420,23 +416,7 @@ class KL_Klarna_Model_Klarnacheckout
         /**
          * Setup the create array
          */
-        $klarnaData = array(
-            'recurring' => (boolean)$this->getQuote()->getIsSubscription(),
-            'purchase_country' => $this->getCountry(),
-            'purchase_currency' => $this->getCurrency(),
-            'locale' => $this->getLocale(),
-            'merchant' => array(
-                'id' => $this->getMerchantId(),
-                'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
-                'checkout_uri' => Mage::getUrl('klarna/checkout'),
-                'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
-                'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}'
-            ),
-            'cart' => array('items' => $items),
-            'merchant_reference' => array(
-                'orderid2' => $this->getQuote()->getId()
-            )
-        );
+        $klarnaData = $this->prepareKlarnaDataObject($items);
 
         /**
          * Set the validation URL
@@ -446,9 +426,7 @@ class KL_Klarna_Model_Klarnacheckout
         /**
          * Make sure the link uses https, only add it to Klarna if it is
          */
-        if (substr($validationUrl, 0, 5) == 'https') {
-            $klarnaData['merchant']['validation_uri'] = $validationUrl;
-        }
+        $klarnaData = $this->addValidationCallbackUrl($validationUrl, $klarnaData);
 
         Mage::helper('klarna')->log($klarnaData);
 
@@ -458,13 +436,155 @@ class KL_Klarna_Model_Klarnacheckout
          * Check if we should use the mobile gui
          * This can only be set when first creating the checkout session
          */
-        if ($this->useMobileGui()) {
-            $klarnaData['gui']['layout'] = 'mobile';
-        }
+        $klarnaData = $this->handleMobileGui($klarnaData);
 
         /**
          * Prefill information from current user
          */
+        $klarnaData = $this->prefillUserData($klarnaData);
+
+        /**
+         * Fetch empty Klarna order
+         */
+        $order = $this->fetchNewKlarnaOrderInstance($klarnaData);
+
+        /**
+         * Store session ID in session
+         * We also make a check for duplicated checkoutID
+         */
+        if (!Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation())) {
+            $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
+            $order->create($klarnaData);
+            $order->fetch();
+            Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
+        }
+
+        return $order;
+    }
+
+    /**
+     * @param $order
+     * @param $items
+     * @return bool
+     */
+    private function updateExistingOrder($order, $items)
+    {
+        /**
+         * Setup the update array
+         */
+        $klarnaData = array(
+            'cart' => array('items' => $items),
+            'merchant_reference' => array(
+                'orderid2' => $this->getQuote()->getId()
+            )
+        );
+
+        Mage::helper('klarna')->log($klarnaData);
+
+        try {
+
+            $order->update($klarnaData);
+
+            /**
+             * Store session ID in session (again)
+             */
+            Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
+
+        } catch (Exception $e) {
+
+            Mage::helper('klarna')->log($e->getMessage());
+
+            /**
+             * Terminate the object, this will make us create a new order
+             */
+            return false;
+
+        }
+
+        return $order;
+    }
+
+    /**
+     * @return array
+     */
+    private function prepareOrderItems()
+    {
+        $items = $this->addQuoteItems();
+        $items = $this->addShippingDetails($items);
+        $items = $this->handleDiscounts($items);
+
+        return $items;
+    }
+
+    /**
+     * @param $order
+     * @return mixed
+     */
+    private function getKlarnaHtml($order)
+    {
+        return $order['gui']['snippet'];
+    }
+
+    /**
+     * @param $items
+     * @return array
+     */
+    private function handleDiscounts($items)
+    {
+        /**
+         * Handle discounts
+         */
+        $discounts = Mage::getModel('klarna/klarnacheckout_discount')->build($this->getQuote());
+        if ($discounts) {
+            $items[] = $discounts;
+            return $items;
+        }
+        return $items;
+    }
+
+    /**
+     * @param $items
+     * @return array
+     */
+    private function addShippingDetails($items)
+    {
+        /**
+         * Add shipping method and the cost
+         */
+        $shipping = Mage::getModel('klarna/klarnacheckout_shipping')->build();
+        if ($shipping) {
+            $items[] = $shipping;
+            return $items;
+        }
+        return $items;
+    }
+
+    /**
+     * @return array
+     */
+    private function addQuoteItems()
+    {
+        /**
+         * Setup the items array
+         */
+        $items = array();
+
+        /**
+         * Add all visible items from quote
+         */
+        foreach ($this->getQuote()->getAllVisibleItems() as $item) {
+            $items[] = Mage::getModel('klarna/klarnacheckout_item')->build($item);
+        }
+
+        return $items;
+    }
+
+    /**
+     * @param $klarnaData
+     * @return mixed
+     */
+    private function prefillUserData($klarnaData)
+    {
         if (Mage::getSingleton('customer/session')->isLoggedIn()) {
 
             /**
@@ -513,12 +633,30 @@ class KL_Klarna_Model_Klarnacheckout
                 $klarnaData['shipping_address']['email'] = 'checkout-se@testdrive.klarna.com';
                 $klarnaData['shipping_address']['postal_code'] = '12345';
             }
-
         }
 
-        /**
-         * Fetch empty Klarna order
-         */
+        return $klarnaData;
+    }
+
+    /**
+     * @param $klarnaData
+     * @return mixed
+     */
+    private function handleMobileGui($klarnaData)
+    {
+        if ($this->useMobileGui()) {
+            $klarnaData['gui']['layout'] = 'mobile';
+        }
+
+        return $klarnaData;
+    }
+
+    /**
+     * @param $klarnaData
+     * @return Klarna_Checkout_Order
+     */
+    private function fetchNewKlarnaOrderInstance($klarnaData)
+    {
         $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
 
         /**
@@ -530,117 +668,48 @@ class KL_Klarna_Model_Klarnacheckout
          * Fetch from Klarna
          */
         $order->fetch();
-
-        /**
-         * Store session ID in session
-         * We also make a check for duplicated checkoutID
-         */
-        if (!Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation())) {
-            $order = new Klarna_Checkout_Order($this->getKlarnaConnector());
-            $order->create($klarnaData);
-            $order->fetch();
-            Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
-            return $order;
-        }
         return $order;
     }
 
     /**
-     * @param $order
      * @param $items
-     * @return bool
+     * @return array
      */
-    private function updateExistingOrder($order, $items)
+    private function prepareKlarnaDataObject($items)
     {
-        if (isset($order['recurring'])) {
-            //
-        }
-
-        /**
-         * Setup the update array
-         */
         $klarnaData = array(
+            'recurring' => (boolean)$this->getQuote()->getIsSubscription(),
+            'purchase_country' => $this->getCountry(),
+            'purchase_currency' => $this->getCurrency(),
+            'locale' => $this->getLocale(),
+            'merchant' => array(
+                'id' => $this->getMerchantId(),
+                'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
+                'checkout_uri' => Mage::getUrl('klarna/checkout'),
+                'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
+                'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}'
+            ),
             'cart' => array('items' => $items),
             'merchant_reference' => array(
                 'orderid2' => $this->getQuote()->getId()
             )
         );
 
-        Mage::helper('klarna')->log($klarnaData);
-
-        /**
-         * Update the data
-         */
-        try {
-
-            /**
-             * Update Klarna
-             */
-            $order->update($klarnaData);
-            return $order;
-
-            /**
-             * Store session ID in session (again)
-             */
-            Mage::helper('klarna/checkout')->setKlarnaCheckoutId($order->getLocation());
-            return $order;
-
-        } catch (Exception $e) {
-
-            Mage::helper('klarna')->log($e->getMessage());
-
-            /**
-             * Terminate the object, this will make us create a new order
-             */
-            $order = false;
-            return $order;
-        }
-        return $order;
+        return $klarnaData;
     }
 
     /**
-     * @return array
-     */
-    private function prepareOrderItems()
-    {
-        /**
-         * Setup the items array
-         */
-        $items = array();
-
-        /**
-         * Add all visible items from quote
-         */
-        foreach ($this->getQuote()->getAllVisibleItems() as $item) {
-            $items[] = Mage::getModel('klarna/klarnacheckout_item')->build($item);
-        }
-
-        /**
-         * Add shipping method and the cost
-         */
-        $shipping = Mage::getModel('klarna/klarnacheckout_shipping')->build();
-        if ($shipping) {
-            $items[] = $shipping;
-        }
-
-        /**
-         * Handle discounts
-         */
-        $discounts = Mage::getModel('klarna/klarnacheckout_discount')->build($this->getQuote());
-        if ($discounts) {
-            $items[] = $discounts;
-            return $items;
-        }
-        return $items;
-    }
-
-    /**
-     * @param $order
+     * @param $validationUrl
+     * @param $klarnaData
      * @return mixed
      */
-    private function getKlarnaHtml($order)
+    private function addValidationCallbackUrl($validationUrl, $klarnaData)
     {
-        return $order['gui']['snippet'];
+        if (substr($validationUrl, 0, 5) == 'https') {
+            $klarnaData['merchant']['validation_uri'] = $validationUrl;
+        }
+
+        return $klarnaData;
     }
 
 }
