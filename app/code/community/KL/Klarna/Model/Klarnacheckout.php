@@ -667,7 +667,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     private function makeMagentoPayment($klarnaOrder, $magentoOrder, $amountAuthorized)
     {
-// Authorize
+        // Authorize
         $magentoOrder->getPayment()->authorize($magentoOrder->getPayment(), $amountAuthorized);
 
         // Update Magento order status
@@ -710,11 +710,11 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
     private function handleRecurringToken($klarnaOrder)
     {
         // TODO: snatch a recurring_token if available, and save it to the subscription(?)
-        if (isset($klarnaOrder->marshal()['recurring_token'])) {
-
-            // load subscription and put the token there
-
-        }
+//        if (isset($klarnaOrder->marshal()['recurring_token'])) {
+//
+//            // load subscription and put the token there
+//
+//        }
     }
 
 }
