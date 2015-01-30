@@ -13,7 +13,7 @@
 class KL_Klarna_Model_Klarnacheckout_RecurringOrder implements Klarna_Checkout_ResourceInterface, ArrayAccess
 {
     /**
-     *
+     *  Content type header string
      */
     const CONTENT_TYPE = 'application/vnd.klarna.checkout.recurring-order-v1+json';
 
@@ -60,16 +60,20 @@ class KL_Klarna_Model_Klarnacheckout_RecurringOrder implements Klarna_Checkout_R
     {
         $this->subscription = $subscription;
 
-        $this->create($this->buildKlarnaOrderObject($quote, $subscription));
+        $this->create($this->buildKlarnaOrderObject($quote));
     }
 
     /**
+     * Spins up a builder object that creates the Klarna order array
+     *
      * @param $quote
-     * @param $subscription
+     * @return array
      */
-    private function buildKlarnaOrderObject($quote, $subscription)
+    private function buildKlarnaOrderObject($quote)
     {
-               
+        $builder = new KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder;
+
+        return $builder->build($quote);
     }
 
 
