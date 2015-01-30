@@ -611,7 +611,6 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
 
         // Set the payment information
         $magentoOrder
-            ->getQuote()
             ->getPayment()
             ->setMethod('klarna_checkout')
             ->setAdditionalInformation(
