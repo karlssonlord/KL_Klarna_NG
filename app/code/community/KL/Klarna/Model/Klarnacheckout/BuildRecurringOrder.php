@@ -144,21 +144,12 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
         // Or we could get the "default shipping address" and try that, and if that fails too,
         // just iterate over the remaining ones, if any
 
-        // TODO: should we really use the default, like in this implementation? I wouldn't think so
-        // Fetch the default shipping address
-        $defaultShippingAddressId = $currentUser->getDefaultShipping();
-        if ($defaultShippingAddressId) {
+        // 1. try with quote address (notify customer if fails)
+        // 2. try with default address (notify customer)
+        // 3. fail and notify customer service
 
-            // Load the address
-            $defaultShippingAddress = $address = Mage::getModel('customer/address')->load(
-                $defaultShippingAddressId
-            );
+        $klarnaData['shipping_address']['postal_code'] = $this->getQuote()->getShippingAddress()->getPostcode();
 
-            // Prefill postcode
-            if ($defaultShippingAddress->getPostcode()) {
-                $klarnaData['shipping_address']['postal_code'] = $defaultShippingAddress->getPostcode();
-            }
-        }
 
         return $klarnaData;
     }
