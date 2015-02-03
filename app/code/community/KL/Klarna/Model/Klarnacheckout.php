@@ -5,12 +5,20 @@
  */
 class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abstract
 {
+    private $subscription;
+
     private $errorEmailMessages = array();
 
     /**
      * @var
      */
     protected $_connector;
+
+    protected function _construct()
+    {
+        $this->subscription = Mage::getModel('subscriber/subscription');
+    }
+
 
     /**
      * Get the Klarna Connector
@@ -43,7 +51,9 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
     {
         $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
 
-        return $order->fetch();
+        $order->fetch();
+
+        return $order;
     }
 
     /**
@@ -152,6 +162,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     public function acknowledge($checkoutId)
     {
+        Mage::log('DAVVE: '.$checkoutId, null, 'kl_klarna.log', true);
         $this->prepareForAcknowledgement($checkoutId);
 
         try {
@@ -441,7 +452,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
                 'orderid2' => $this->getQuote()->getId()
             )
         );
-
+Mage::log($klarnaData, null, 'kl_klarna.log', true);
         return $klarnaData;
     }
 
@@ -453,6 +464,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
     private function addValidationCallbackUrl($validationUrl, $klarnaData)
     {
         if (substr($validationUrl, 0, 5) == 'https') {
+
             $klarnaData['merchant']['validation_uri'] = $validationUrl;
         }
 
@@ -465,6 +477,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     private function orderStatusIsComplete($order)
     {
+        Mage::log(var_export($order, true), null, 'kl_klarna.log', true);
         return $order['status'] == 'checkout_complete';
     }
 
@@ -708,16 +721,14 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     private function handleRecurringToken($klarnaOrder)
     {
-        // TODO: snatch a recurring_token if available, and save it to the subscription(?)
-//        if (isset($klarnaOrder->marshal()['recurring_token'])) {
-//
-//            // load subscription and put the token there
-//
-//        }
+        if (isset($klarnaOrder['recurring_token']) && isset($klarnaOrder['merchant_reference']['orderid2'])) {
 
-        Mage::log(var_export($klarnaOrder->marshal()), null, 'system.log', true);
-        Mage::log(json_encode($klarnaOrder->marshal()), null, 'system.log', true);
-        Mage::log(json_encode($klarnaOrder), null, 'system.log', true);
+            Mage::dispatchEvent('recurring_token_was_received', array(
+                    'recurring_token' => $klarnaOrder['recurring_token'],
+                    'quote_id' => $klarnaOrder['merchant_reference']['orderid2']
+                ));
+            Mage::log('FIRE recurring_token_was_received EVENT!', null, 'kl_klarna.log', true);
+        }
     }
 
 }

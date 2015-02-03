@@ -110,6 +110,8 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
          * use it
          */
         Mage::helper('klarna/checkout')->setKlarnaCheckoutId('');
+
+        Mage::dispatchEvent('klarna_checkout_controller_success_after', array('quote' => $quote));
     }
 
 
