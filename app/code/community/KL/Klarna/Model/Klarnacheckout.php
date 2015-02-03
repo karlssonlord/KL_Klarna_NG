@@ -714,6 +714,10 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
 //            // load subscription and put the token there
 //
 //        }
+
+        Mage::log(var_export($klarnaOrder->marshal()), null, 'system.log', true);
+        Mage::log(json_encode($klarnaOrder->marshal()), null, 'system.log', true);
+        Mage::log(json_encode($klarnaOrder), null, 'system.log', true);
     }
 
 }
