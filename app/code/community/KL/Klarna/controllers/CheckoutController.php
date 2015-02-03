@@ -52,6 +52,10 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
         Mage::dispatchEvent('klarna_checkout_controller_success_before', array('quote' => $quote));
 
+        if ($quote->getIsSubscription()) {
+            $this->prepareForSubscription($quote);
+        }
+
         $quoteId = $quote->getId();
 
         /**
@@ -195,5 +199,31 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         header("HTTP/1.1 303 See Other");
         header("Location: {$location}");
         exit;
+    }
+
+    /**
+     * @param $quote
+     */
+    private function prepareForSubscription($quote)
+    {
+        $this->saveCustomerIdOnQuote($quote);
+
+        Mage::dispatchEvent('subscription_purchase_was_made', array('quote' => $quote));
+    }
+
+    /**
+     * @param $quote
+     */
+    private function saveCustomerIdOnQuote($quote)
+    {
+        $websiteId = Mage::getModel('core/store')->load($quote->getStoreId())->getWebsiteId();
+
+        $customer = Mage::getModel('customer/customer');
+        $customer->setWebsiteId($websiteId);
+        $customer->loadByEmail($quote->getCustomerEmail());
+
+        $quote->setCustomerId($customer->getId());
+        $quote->setGroupId($customer->getGroupId());
+        $quote->save();
     }
 }
