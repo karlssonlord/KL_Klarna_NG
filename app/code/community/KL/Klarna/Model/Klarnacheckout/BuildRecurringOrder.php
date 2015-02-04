@@ -39,7 +39,7 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
     private function prepareKlarnaDataObject($items)
     {
         $klarnaData = array(
-            'activate' => true,
+            'activate' => false,
             'purchase_country' => $this->getCountry(),
             'purchase_currency' => $this->getCurrency(),
             'locale' => $this->getLocale(),
@@ -90,7 +90,7 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
      */
     private function addShippingDetails($items)
     {
-        $shipping = Mage::getModel('klarna/klarnacheckout_shipping')->build();
+        $shipping = $this->buildShippingDetails();
 
         if ($shipping) {
             $items[] = $shipping;
@@ -107,11 +107,10 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
      */
     private function handleDiscounts($items)
     {
-        $discounts = Mage::getModel('klarna/klarnacheckout_discount')->build($this->getQuote());
+        $discounts = $this->buildDiscountDetails($this->getQuote());
 
         if ($discounts) {
             $items[] = $discounts;
-            return $items;
         }
 
         return $items;
@@ -191,7 +190,7 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
      */
     private function getQuote()
     {
-        // TODO:
+        return $this->quote;
     }
 
     /**
@@ -200,5 +199,88 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
     private function setQuote(KL_Subscriber_Model_Quote $quote)
     {
         $this->quote = $quote;
+    }
+
+    /**
+     * TODO: Move to new collaborator
+     *
+     * Build array with shipping information
+     *
+     * @return array
+     */
+    public function buildShippingDetails()
+    {
+        $shippingAddress = $this->getQuote()->getShippingAddress();
+
+        if (!$shippingAddress->getShippingMethod() ) {
+            // TODO: Set default shipping method if none is set
+//            Mage::helper('klarna/checkout')->setDefaultShippingMethodIfNotSet();
+
+            $shippingAddress = $this->getQuote->getShippingAddress();
+        }
+
+        // If we're still failing with no shipping method
+        if (!$shippingAddress->getShippingMethod() ) {
+            return Mage::helper('klarna')->log('Missing shipping method when trying to create Klarna recurring order!');
+        }
+
+        $shippingAddress
+            ->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->save();
+
+        // Calculate total price
+        $shippingPrice = $shippingAddress->getShippingAmount();
+
+        // Calculate shipping tax percent
+        if ($shippingPrice) {
+            $shippingTaxPercent = ($shippingAddress->getShippingTaxAmount() / ($shippingPrice - $shippingAddress->getShippingTaxAmount())) * 100;
+        } else {
+            $shippingTaxPercent = 0;
+        }
+
+        // Set the shipping name
+        $shippingName = $shippingAddress->getShippingDescription();
+
+        // If the shipping name wasn't loaded by some reason, just add a standard name
+        if (!$shippingName) {
+            $shippingName = Mage::helper('klarna')->__('Shipping');
+        }
+
+        return array(
+            'reference' => $shippingAddress->getShippingMethod(),
+            'name' => $shippingName,
+            'quantity' => 1,
+            'unit_price' => intval($shippingPrice * 100),
+            'discount_rate' => 0, // Not needed since Magento gives us the actual price
+            'tax_rate' => ceil(($shippingTaxPercent * 100)),
+            'type' => 'shipping_fee'
+        );
+    }
+
+    /**
+     * Build array
+     *
+     * @param $quoteItem
+     * @return array
+     */
+    public function buildDiscountDetails($quoteItem)
+    {
+        // Collect quote totals
+        $quoteTotals = $quoteItem->getTotals();
+
+        // Make sure any discount is set
+        if ( isset($quoteTotals['discount']) && $quoteTotals['discount']->getValue() ) {
+            return array(
+                'type' => 'discount',
+                'reference' => Mage::helper('klarna')->__('Discount'),
+                'name' => Mage::helper('klarna')->__('Discount'),
+                'quantity' => 1,
+                'unit_price' => intval($quoteTotals['discount']->getValue() * 100),
+                'tax_rate' => 0
+            );
+        }
+
+        return false;
     }
 } 

@@ -1,4 +1,4 @@
-<?php
+ackn<?php
 
 /**
  * Class KL_Klarna_Model_KlarnaCheckout
@@ -6,6 +6,8 @@
 class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abstract
 {
     private $subscription;
+
+    private $quoteId;
 
     private $errorEmailMessages = array();
 
@@ -52,6 +54,8 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
         $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
 
         $order->fetch();
+
+        $this->quoteId = $order['merchant_reference']['orderid2'];
 
         return $order;
     }
@@ -162,7 +166,6 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     public function acknowledge($checkoutId)
     {
-        Mage::log('DAVVE: '.$checkoutId, null, 'kl_klarna.log', true);
         $this->prepareForAcknowledgement($checkoutId);
 
         try {
@@ -170,10 +173,6 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
             $klarnaOrder = $this->getOrder($checkoutId);
 
             if ($this->orderStatusIsComplete($klarnaOrder)) {
-
-                // If there is a recurring_token on the order object
-                // make sure it's associated with the correct subscription
-                $this->handleRecurringToken($klarnaOrder);
 
                 // Here comes the heavy lifting
                 $this->handlePayment($checkoutId, $klarnaOrder);
@@ -478,6 +477,7 @@ Mage::log($klarnaData, null, 'kl_klarna.log', true);
     private function orderStatusIsComplete($order)
     {
         Mage::log(var_export($order, true), null, 'kl_klarna.log', true);
+
         return $order['status'] == 'checkout_complete';
     }
 
@@ -563,27 +563,25 @@ Mage::log($klarnaData, null, 'kl_klarna.log', true);
      */
     private function getMagentoOrderByKlarnaId($checkoutId)
     {
-        // Check if the order exists
+        // Precaution: Check if the order exists
         $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
             ->loadByCheckoutId($checkoutId);
 
         // What to do if the order exists
-        if ($this->orderNotFound($magentoOrder)) {
-
-            Mage::helper('klarna/log')->log(
-                null,
-                '[' . $checkoutId . '] No previous order found, trying to create...'
-            );
-
-            // Try to create the order if it was not found
-            $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')
-                ->create($checkoutId);
-            return $magentoOrder;
-
-        } else {
+        if (!$this->orderNotFound($magentoOrder)) {
             Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] Existing order found for checkout id');
             return $magentoOrder;
         }
+
+        Mage::helper('klarna/log')->log(
+            null,
+            '[' . $checkoutId . '] No previous order found, trying to create...'
+        );
+
+        // Try to create the order if it was not found
+        $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')->create($checkoutId);
+
+        return $magentoOrder;
     }
 
     /**
@@ -640,6 +638,17 @@ Mage::log($klarnaData, null, 'kl_klarna.log', true);
         $amountAuthorized = $this->getTotalAmountFrom($klarnaOrder);
 
         $this->makeMagentoPayment($klarnaOrder, $magentoOrder, $amountAuthorized);
+
+        if ($this->orderIsRecurring($klarnaOrder->marshal())) {
+            // Someone wants to become a subscriber. Tell the world!
+            Mage::dispatchEvent('recurring_order_was_created', array(
+                    'checkout_id' => $checkoutId,
+                    'recurring_token' => $klarnaOrder['recurring_token'],
+                    'order_id' => $magentoOrder->getId(),
+                    'quote_id' => $this->quoteId
+                )
+            );
+        }
 
         // Send order email
         // TODO: fire event and move this logic elsewhere
@@ -718,17 +727,11 @@ Mage::log($klarnaData, null, 'kl_klarna.log', true);
 
     /**
      * @param $klarnaOrder
+     * @return bool
      */
-    private function handleRecurringToken($klarnaOrder)
+    private function orderIsRecurring($klarnaOrder)
     {
-        if (isset($klarnaOrder['recurring_token']) && isset($klarnaOrder['merchant_reference']['orderid2'])) {
-
-            Mage::dispatchEvent('recurring_token_was_received', array(
-                    'recurring_token' => $klarnaOrder['recurring_token'],
-                    'quote_id' => $klarnaOrder['merchant_reference']['orderid2']
-                ));
-            Mage::log('FIRE recurring_token_was_received EVENT!', null, 'kl_klarna.log', true);
-        }
+        return isset($klarnaOrder['recurring_token']);
     }
 
 }

@@ -56,14 +56,16 @@ class KL_Klarna_Model_Klarnacheckout_RecurringOrder implements Klarna_Checkout_R
      * @param $quote
      * @param $subscription
      */
-    public function make(KL_Subscriber_Model_Quote $quote, KL_Subscriber_Model_SubscriptionInterface $subscription)
-    {
+    public function make(
+        KL_Subscriber_Model_Quote $quote,
+        KL_Subscriber_Model_SubscriptionInterface $subscription
+    ) {
         $this->subscription = $subscription;
 
         $this->create($this->buildKlarnaOrderObject($quote));
     }
 
-    /**
+    /**x
      * Spins up a builder object that creates the Klarna order array
      *
      * @param $quote

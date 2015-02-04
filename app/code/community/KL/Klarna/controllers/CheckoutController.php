@@ -52,10 +52,6 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
         Mage::dispatchEvent('klarna_checkout_controller_success_before', array('quote' => $quote));
 
-        if ($quote->getIsSubscription()) {
-            $this->prepareForSubscription($quote);
-        }
-
         $quoteId = $quote->getId();
 
         /**
@@ -201,15 +197,6 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         exit;
     }
 
-    /**
-     * @param $quote
-     */
-    private function prepareForSubscription($quote)
-    {
-        $this->saveCustomerIdOnQuote($quote);
-
-        Mage::dispatchEvent('subscription_purchase_was_made', array('quote' => $quote));
-    }
 
     /**
      * @param $quote
