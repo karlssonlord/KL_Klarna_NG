@@ -1,4 +1,4 @@
-ackn<?php
+<?php
 
 /**
  * Class KL_Klarna_Model_KlarnaCheckout
