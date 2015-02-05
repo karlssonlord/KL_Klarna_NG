@@ -645,7 +645,8 @@ Mage::log($klarnaData, null, 'kl_klarna.log', true);
                     'checkout_id' => $checkoutId,
                     'recurring_token' => $klarnaOrder['recurring_token'],
                     'order_id' => $magentoOrder->getId(),
-                    'quote_id' => $this->quoteId
+                    'quote_id' => $this->quoteId,
+                    'klarna_data' => $klarnaOrder->marshal()
                 )
             );
         }

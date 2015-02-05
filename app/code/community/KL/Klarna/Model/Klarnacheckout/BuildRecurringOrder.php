@@ -1,6 +1,6 @@
 <?php 
 
-class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
+class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder extends KL_Klarna_Model_Klarnacheckout_Abstract
 {
     /**
      * @var KL_Subscriber_Model_Quote
@@ -39,7 +39,6 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
     private function prepareKlarnaDataObject($items)
     {
         $klarnaData = array(
-            'activate' => false,
             'purchase_country' => $this->getCountry(),
             'purchase_currency' => $this->getCurrency(),
             'locale' => $this->getLocale(),
@@ -124,31 +123,39 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
      */
     private function setCustomerData($klarnaData)
     {
-        // TODO: Fetch current user
-        // Load the user by taking the customer_id off the subscription object
-        $currentUser = $this->quote->getCustomer();
-
         // Make sure the variable in the array is defined
         if (!isset($klarnaData['shipping_address'])) {
             $klarnaData['shipping_address'] = array();
         }
 
-        // Set the e-mail
-        // TODO: maybe fallback to getting the email off the customer object if the one on the quote is empty?
-        $klarnaData['shipping_address']['email'] = $this->quote->getCustomerEmail();
+        // Make sure the variable in the array is defined
+        if (!isset($klarnaData['billing_address'])) {
+            $klarnaData['billing_address'] = array();
+        }
 
-        // TODO: Think about where we should get the address from. Template quote or just quote?
-        // TODO: What if the address returns invalid from Klarna, do we try another address and notify the customer?
-        // I suppose we could fetch the shipping address from the original order.
-        // Or we could get the "default shipping address" and try that, and if that fails too,
-        // just iterate over the remaining ones, if any
+        $klarnaData['shipping_address']['email'] = $this->getQuote()->getCustomerEmail();
+        $klarnaData['billing_address']['email'] = $this->getQuote()->getCustomerEmail();
 
-        // 1. try with quote address (notify customer if fails)
-        // 2. try with default address (notify customer)
-        // 3. fail and notify customer service
+        $klarnaData['shipping_address']['given_name'] = $this->getQuote()->getShippingAddress()->getFirstname();
+        $klarnaData['billing_address']['given_name'] = $this->getQuote()->getBillingAddress()->getFirstname();
+
+        $klarnaData['shipping_address']['family_name'] = $this->getQuote()->getShippingAddress()->getLastname();
+        $klarnaData['billing_address']['family_name'] = $this->getQuote()->getBillingAddress()->getLastname();
+
+        $klarnaData['shipping_address']['street_address'] = $this->buildStreetAddress($this->getQuote()->getShippingAddress()->getStreet());
+        $klarnaData['billing_address']['street_address'] = $this->buildStreetAddress($this->getQuote()->getBillingAddress()->getStreet());
+
+        $klarnaData['shipping_address']['city'] = $this->getQuote()->getShippingAddress()->getCity();
+        $klarnaData['billing_address']['city'] = $this->getQuote()->getBillingAddress()->getCity();
 
         $klarnaData['shipping_address']['postal_code'] = $this->getQuote()->getShippingAddress()->getPostcode();
+        $klarnaData['billing_address']['postal_code'] = $this->getQuote()->getBillingAddress()->getPostcode();
 
+        $klarnaData['shipping_address']['phone'] = $this->getQuote()->getShippingAddress()->getTelephone();
+        $klarnaData['billing_address']['phone'] = $this->getQuote()->getBillingAddress()->getTelephone();
+
+        $klarnaData['shipping_address']['country'] = $this->getQuote()->getShippingAddress()->getCountryId();
+        $klarnaData['billing_address']['country'] = $this->getQuote()->getBillingAddress()->getCountryId();
 
         return $klarnaData;
     }
@@ -156,39 +163,7 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
     /**
      *
      */
-    private function getCountry()
-    {
-        // TODO:
-    }
-
-    /**
-     *
-     */
-    private function getCurrency()
-    {
-        // TODO:
-    }
-
-    /**
-     *
-     */
-    private function getLocale()
-    {
-        // TODO:
-    }
-
-    /**
-     *
-     */
-    private function getMerchantId()
-    {
-        // TODO:
-    }
-
-    /**
-     *
-     */
-    private function getQuote()
+    public function getQuote()
     {
         return $this->quote;
     }
@@ -216,7 +191,7 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
             // TODO: Set default shipping method if none is set
 //            Mage::helper('klarna/checkout')->setDefaultShippingMethodIfNotSet();
 
-            $shippingAddress = $this->getQuote->getShippingAddress();
+            $shippingAddress = $this->getQuote()->getShippingAddress();
         }
 
         // If we're still failing with no shipping method
@@ -282,5 +257,10 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder
         }
 
         return false;
+    }
+
+    private function buildStreetAddress(array $address)
+    {
+        return implode("\n", $address);
     }
 } 

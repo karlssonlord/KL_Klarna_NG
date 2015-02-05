@@ -1,5 +1,7 @@
 <?php
 
+require_once('Klarna/kco_php/src/Klarna/Checkout.php');
+
 /**
  * KL Implementation of the Klarna order resource
  *
@@ -12,10 +14,13 @@
  */
 class KL_Klarna_Model_Klarnacheckout_RecurringOrder implements Klarna_Checkout_ResourceInterface, ArrayAccess
 {
+    const KLARNA_HOST_NAME = "https://checkout.klarna.com";
     /**
      *  Content type header string
      */
     const CONTENT_TYPE = 'application/vnd.klarna.checkout.recurring-order-v1+json';
+
+    const ACCEPT_HEADER = 'application/vnd.klarna.checkout.recurring-order-accepted-v1+json';
 
     /**
      * @var Klarna_Checkout_ConnectorInterface
@@ -62,7 +67,7 @@ class KL_Klarna_Model_Klarnacheckout_RecurringOrder implements Klarna_Checkout_R
     ) {
         $this->subscription = $subscription;
 
-        $this->create($this->buildKlarnaOrderObject($quote));
+        return $this->create($this->buildKlarnaOrderObject($quote));
     }
 
     /**x
@@ -91,7 +96,7 @@ class KL_Klarna_Model_Klarnacheckout_RecurringOrder implements Klarna_Checkout_R
             'data' => $data
         );
 
-        $this->connector->apply('POST', $this, $options);
+        return $this->connector->apply('POST', $this, $options);
     }
 
     /**
@@ -217,9 +222,19 @@ class KL_Klarna_Model_Klarnacheckout_RecurringOrder implements Klarna_Checkout_R
      */
     private function prepareBaseUri()
     {
-        $recurringToken = $this->subscription->getPaymentToken();
+        $recurringToken = $this->subscription->getRecurringToken();
 
-        return "/checkout/recurring/{$recurringToken}/orders";
+        return self::KLARNA_HOST_NAME . "/checkout/recurring/{$recurringToken}/orders";
+    }
+
+    public function getAccept()
+    {
+        return self::ACCEPT_HEADER;
+    }
+
+    public function isRecurring()
+    {
+        return true;
     }
 
 }
