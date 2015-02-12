@@ -641,8 +641,6 @@ Mage::log($klarnaData, null, 'kl_klarna.log', true);
 
         $this->makeMagentoPayment($klarnaOrder, $magentoOrder, $amountAuthorized);
 
-        Mage::log('What should the format really be? '.var_export($klarnaOrder, true), null, 'subscriber.log', true);
-
         if ($this->orderIsRecurring($klarnaOrder->marshal())) {
             // Someone wants to become a subscriber. Tell the world!
             Mage::dispatchEvent('recurring_order_was_created', array(
