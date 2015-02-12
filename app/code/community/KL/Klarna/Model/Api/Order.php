@@ -356,6 +356,10 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         return $this;
     }
 
+    /**
+     * @param $invoiceNumber
+     * @return bool
+     */
     public function emailInvoice($invoiceNumber)
     {
         try {
@@ -369,6 +373,10 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         return true;
     }
 
+    /**
+     * @param $invoiceNumber
+     * @return bool
+     */
     public function postalInvoice($invoiceNumber)
     {
         try {
@@ -380,5 +388,34 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         }
 
         return true;
+    }
+
+    /**
+     * @param string $orderid1
+     * @param string $orderid2
+     * @param string $user
+     * @return $this
+     */
+    public function setEstoreInfo($orderid1 = "", $orderid2 = "", $user = "")
+    {
+        $this->_klarnaOrder->setEstoreInfo($orderid1, $orderid2, $user);
+
+        return $this;
+    }
+
+    /**
+     * @param $reservationId
+     * @return $this
+     * @throws InvalidArgumentException
+     */
+    public function update($reservationId)
+    {
+        if (!is_string($reservationId) && !is_integer($reservationId)) {
+            throw new InvalidArgumentException('Reservation id as string or integer only please.');
+        }
+
+        $this->_klarnaOrder->update($reservationId);
+
+        return $this;
     }
 }

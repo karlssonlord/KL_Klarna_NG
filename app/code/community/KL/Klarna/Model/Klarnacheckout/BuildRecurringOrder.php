@@ -185,45 +185,36 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder extends KL_Klarna_Model
      */
     public function buildShippingDetails()
     {
-        $shippingAddress = $this->getQuote()->getShippingAddress();
-
-        if (!$shippingAddress->getShippingMethod() ) {
+        if (!$this->getQuote()->getShippingAddress()->getShippingMethod() ) {
             // TODO: Set default shipping method if none is set
 //            Mage::helper('klarna/checkout')->setDefaultShippingMethodIfNotSet();
-
-            $shippingAddress = $this->getQuote()->getShippingAddress();
         }
 
         // If we're still failing with no shipping method
-        if (!$shippingAddress->getShippingMethod() ) {
+        if (!$this->getQuote()->getShippingAddress()->getShippingMethod() ) {
             return Mage::helper('klarna')->log('Missing shipping method when trying to create Klarna recurring order!');
         }
 
-        $shippingAddress
-            ->setCollectShippingRates(true)
-            ->collectShippingRates()
-            ->save();
-
         // Calculate total price
-        $shippingPrice = $shippingAddress->getShippingAmount();
+        $shippingPrice = (float)$this->getQuote()->getShippingAddress()->getShippingAmount();
 
         // Calculate shipping tax percent
         if ($shippingPrice) {
-            $shippingTaxPercent = ($shippingAddress->getShippingTaxAmount() / ($shippingPrice - $shippingAddress->getShippingTaxAmount())) * 100;
+            $shippingTaxAmount = (float)$this->getQuote()->getShippingAddress()->getShippingTaxAmount();
+            $shippingTaxPercent = ($shippingTaxAmount / ($shippingPrice - $shippingTaxAmount)) * 100;
         } else {
             $shippingTaxPercent = 0;
         }
 
         // Set the shipping name
-        $shippingName = $shippingAddress->getShippingDescription();
-
+        $shippingName = $this->getQuote()->getShippingAddress()->getShippingDescription();
         // If the shipping name wasn't loaded by some reason, just add a standard name
         if (!$shippingName) {
             $shippingName = Mage::helper('klarna')->__('Shipping');
         }
 
         return array(
-            'reference' => $shippingAddress->getShippingMethod(),
+            'reference' => $this->getQuote()->getShippingAddress()->getShippingMethod(),
             'name' => $shippingName,
             'quantity' => 1,
             'unit_price' => intval($shippingPrice * 100),
