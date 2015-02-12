@@ -55,7 +55,9 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
 
         $order->fetch();
 
-        $this->quoteId = $order['merchant_reference']['orderid2'];
+        if (isset($order['merchant_reference']['orderid2'])) {
+            $this->quoteId = $order['merchant_reference']['orderid2'];
+        }
 
         return $order;
     }
@@ -639,6 +641,8 @@ Mage::log($klarnaData, null, 'kl_klarna.log', true);
 
         $this->makeMagentoPayment($klarnaOrder, $magentoOrder, $amountAuthorized);
 
+        Mage::log('What should the format really be? '.var_export($klarnaOrder, true), null, 'subscriber.log', true);
+
         if ($this->orderIsRecurring($klarnaOrder->marshal())) {
             // Someone wants to become a subscriber. Tell the world!
             Mage::dispatchEvent('recurring_order_was_created', array(
@@ -732,6 +736,8 @@ Mage::log($klarnaData, null, 'kl_klarna.log', true);
      */
     private function orderIsRecurring($klarnaOrder)
     {
+        Mage::log('This token is set here: '.$klarnaOrder['recurring_token'], null, 'subscriber.log', true);
+
         return isset($klarnaOrder['recurring_token']);
     }
 
