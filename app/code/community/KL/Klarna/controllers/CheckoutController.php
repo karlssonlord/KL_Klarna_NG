@@ -32,6 +32,13 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         Mage::getModel('klarna/klarnacheckout')->prepareTotals();
 
         /**
+         * A chance for listeners to set messages on the quote items
+         */
+        Mage::dispatchEvent('time_to_set_messages_was_passed',
+            array('quote' => $this->_getQuote())
+        );
+
+        /**
          * Render layout
          */
         $this
