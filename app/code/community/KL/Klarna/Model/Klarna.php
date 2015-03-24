@@ -116,6 +116,10 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
             Mage::app()->getStore()->getCurrentCurrencyCode()
         )->getSymbol();
 
+        // This is a small hack, not to break anything else that might rely on how Magento describes
+        // NOK - 'Nkr'
+        $systemCurrency = ($systemCurrency == 'Nkr') ? 'nok' : $systemCurrency;
+
         return KlarnaCurrency::fromCode(trim($systemCurrency));
     }
 
