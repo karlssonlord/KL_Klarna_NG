@@ -230,6 +230,33 @@ class KL_Klarna_Helper_Pclass extends KL_Klarna_Helper_Abstract {
 
                             $api->fetch($klarnaModel);
                             break;
+                        case 'NO':
+                            /**
+                             * Setup custom configuration
+                             */
+                            $api = Mage::getModel('klarna/api_pclass');
+                            $klarnaModel = Mage::getModel('klarna/klarna');
+
+                            $klarnaModel
+                                ->setCountry(KlarnaCountry::NO)
+                                ->setLanguage(KlarnaLanguage::NB)
+                                ->setCurrency(KlarnaCurrency::NOK)
+                                ->setMerchantId(Mage::getStoreConfig('payment/klarna/merchant_id', $_eachStoreId))
+                                ->setSharedSecret(
+                                    Mage::getStoreConfig('payment/klarna/shared_secret', $_eachStoreId)
+                                )
+                                ->setServer($mode);
+
+                            /**
+                             * Clear old pclasses
+                             */
+                            if ( ! $clearedPclasses ) {
+                                $clearedPclasses = true;
+                                $api->clearPClasses($klarnaModel);
+                            }
+
+                            $api->fetch($klarnaModel);
+                            break;
                     }
                 }
             }
