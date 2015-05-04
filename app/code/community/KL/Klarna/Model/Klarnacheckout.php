@@ -169,6 +169,14 @@ class KL_Klarna_Model_Klarnacheckout
                         ->setStatus($orderStatus);
 
                     /**
+                     * Fire event to handle extra information
+                     */
+                    Mage::dispatchEvent('klarna_checkout_acknowledge_success', array(
+                        'order' => $magentoOrder,
+                        'klarnaInfo' => $order->marshal()
+                    ));
+
+                    /**
                      * Save order again
                      */
                     $magentoOrder->save();

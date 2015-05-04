@@ -24,3 +24,4 @@ There is a check in Model/Payment/Checkout.php that depends on Module Version. I
 
 - When adding an item (KL_Klarna_model_KlarnaCheckout_Item) get the correct discount amount (if any)
 - Handle errors when there is no shipping method available
+- Document events
