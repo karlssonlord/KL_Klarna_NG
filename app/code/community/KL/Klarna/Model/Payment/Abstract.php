@@ -235,6 +235,14 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         $return = $klarnaOrderApi->createReservation($socialSecurityNumber, $order->getBaseTotalDue(), $pclass);
 
         /**
+         * Fire event to handle extra information
+         */
+        Mage::dispatchEvent('klarna_general_authorize', array(
+            'order' => $order,
+            'socialSecurityNumber' => $socialSecurityNumber
+        ));
+
+        /**
          * Since we're here everything went just fine!
          */
         $transactionId = $return[0];
