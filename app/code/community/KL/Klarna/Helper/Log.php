@@ -70,14 +70,14 @@ class KL_Klarna_Helper_Log extends Mage_Core_Helper_Abstract
             $data = sprintf(
                 "Quote ID: %d | IP: %s | URL: %s | %s",
                 $quote->getId(),
-                $_SERVER['REMOTE_ADDR'],
+                (isset($_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']),
                 $url,
                 $message
             );
         } else {
             $data = sprintf(
                 "Quote ID: [NONE GIVEN] | IP: %s | URL: %s | %s",
-                $_SERVER['REMOTE_ADDR'],
+               (isset($_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']),
                 $url,
                 $message
             );
@@ -141,7 +141,7 @@ class KL_Klarna_Helper_Log extends Mage_Core_Helper_Abstract
             $this->getQuoteId($quote),
             $this->getOrderId($quote, $orderId),
             $this->getKlarnaCheckoutId($klarnaCheckoutId),
-            $_SERVER['REMOTE_ADDR'],
+            (isset($_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']),
             Mage::helper('core/url')->getCurrentUrl(),
             $this->getMessageString($message)
         );
