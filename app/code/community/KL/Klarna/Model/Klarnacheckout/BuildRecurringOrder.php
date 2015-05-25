@@ -47,7 +47,8 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder extends KL_Klarna_Model
             ),
             'cart' => array('items' => $items),
             'merchant_reference' => array(
-                'orderid2' => $this->getQuote()->getId()
+                'orderid2' => $this->getQuote()->getId(),
+//                'orderid1' => $this->getQuote()->getReservedOrderId()
             )
         );
 
