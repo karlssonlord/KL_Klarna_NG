@@ -60,7 +60,7 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
 
         $taxRateId = Mage::getStoreConfig('tax/classes/shipping_tax_class', $quote->getStore());
 
-        return (int)$taxCalculation->getRate($request->setProductClassId($taxRateId));
+        return $taxCalculation->getRate($request->setProductClassId($taxRateId));
     }
 
     /**
