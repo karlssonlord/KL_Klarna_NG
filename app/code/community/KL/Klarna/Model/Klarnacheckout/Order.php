@@ -35,12 +35,10 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         /**
          * Look for orders with the same checkout id
          */
-        $magentoOrderSearch = Mage::getModel('sales/order')
+        return Mage::getModel('sales/order')
             ->getCollection()
             ->addFieldToFilter('klarna_checkout', $checkoutId)
             ->getFirstItem();
-
-        return $magentoOrderSearch;
     }
 
     public function create($checkoutId = false)

@@ -8,87 +8,77 @@ class KL_Klarna_Model_Klarnacheckout_Shipping extends KL_Klarna_Model_Klarnachec
     /**
      * Build array with shipping information
      *
+     * @param Mage_Sales_Model_Quote $quote
      * @return array
      */
-    public function build()
+    public function build(Mage_Sales_Model_Quote $quote)
     {
-        $quote = Mage::helper('checkout')->getQuote();
+        $shippingAddress = $this->getShippingAddress($quote);
 
-        /**
-         * Fetch information from quote
-         */
-        $shipping = $quote->getShippingAddress();
-
-        /**
-         * Set first shipping method if none is set
-         */
-        if ( ! $shipping->getShippingMethod() ) {
-
-            /**
-             * Set default shipping method if none is set
-             */
-            Mage::helper('klarna/checkout')->setDefaultShippingMethodIfNotSet();
-
-            /**
-             * Fetch information from quote again
-             */
-            $shipping = $quote->getShippingAddress();
-
-        }
-
-        /**
-         * If we're still failing with no shipping method
-         */
-        if ( ! $shipping->getShippingMethod() ) {
+        /** If we're still failing with no shipping method */
+        if (!$shippingAddress->getShippingMethod() ) {
             Mage::helper('klarna')->log('Missing shipping method for Klarna Checkout!');
             return false;
         }
 
-        $shipping
+        $shippingAddress
             ->setCollectShippingRates(true)
             ->collectShippingRates()
-            ->save();
+            ->save()
+        ;
 
-        /**
-         * Calculate total price
-         */
-        $shippingPrice = $shipping->getShippingAmount();
-
-        /**
-         * Calculate shipping tax percent
-         */
-        if ( $shippingPrice ) {
-            $shippingTaxPercent = ( $shipping->getShippingTaxAmount() / ($shippingPrice - $shipping->getShippingTaxAmount()) ) * 100;
-        } else {
-            $shippingTaxPercent = 0;
-        }
-
-        /**
-         * Set the shipping name
-         */
-        $shippingName = $shipping->getShippingDescription();
-
-        /**
-         * If the shipping name wasn't loaded by some reason, just add a standard name
-         */
-        if (!$shippingName) {
-            $shippingName = Mage::helper('klarna')->__('Shipping');
-        }
-
-        /**
-         * Return the array
-         */
-        $shipping = array(
-            'reference' => $shipping->getShippingMethod(),
-            'name' => $shippingName,
+        return array(
+            'reference' => $shippingAddress->getShippingMethod(),
+            'name' => $this->getShippingName($shippingAddress),
             'quantity' => 1,
-            'unit_price' => intval($shippingPrice * 100),
+            'unit_price' => intval($shippingAddress->getShippingAmount() * 100),
             'discount_rate' => 0, // Not needed since Magento gives us the actual price
-            'tax_rate' => ceil(($shippingTaxPercent * 100)),
+            'tax_rate' => $this->calculateShippingTaxPercentage($quote),
             'type' => 'shipping_fee'
         );
+    }
 
-        return $shipping;
+    /**
+     * @param $shipping
+     * @return string
+     */
+    protected function getShippingName($shipping)
+    {
+        // Get the name from the quote, or if unavailable the just set a default name
+        return $shipping->getShippingDescription() ? : Mage::helper('klarna')->__('Shipping');
+    }
+
+    /**
+     * @param Mage_Sales_Model_Quote $quote
+     * @return float
+     */
+    protected function calculateShippingTaxPercentage(Mage_Sales_Model_Quote $quote)
+    {
+        $taxCalculation = Mage::getModel('tax/calculation');
+
+        $request = $taxCalculation->getRateRequest(null, null, null, $quote->getStore());
+
+        $taxRateId = Mage::getStoreConfig('tax/classes/shipping_tax_class', $quote->getStore());
+
+        return (int)$taxCalculation->getRate($request->setProductClassId($taxRateId));
+    }
+
+    /**
+     * @param $quote
+     * @return mixed
+     */
+    protected function getShippingAddress($quote)
+    {
+        $shippingAddress = $quote->getShippingAddress();
+
+        if (!$shippingAddress->getShippingMethod()) {
+
+            Mage::helper('klarna/checkout')->setDefaultShippingMethodIfNotSet();
+
+            return $quote->getShippingAddress();
+        }
+
+        return $shippingAddress;
     }
 
 }

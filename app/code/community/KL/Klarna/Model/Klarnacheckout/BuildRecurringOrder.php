@@ -178,51 +178,13 @@ class KL_Klarna_Model_Klarnacheckout_BuildRecurringOrder extends KL_Klarna_Model
     }
 
     /**
-     * TODO: Move to new collaborator
-     *
-     * Build array with shipping information
+     * Builds array with shipping information
      *
      * @return array
      */
     public function buildShippingDetails()
     {
-        if (!$this->getQuote()->getShippingAddress()->getShippingMethod() ) {
-            // TODO: Set default shipping method if none is set
-//            Mage::helper('klarna/checkout')->setDefaultShippingMethodIfNotSet();
-        }
-
-        // If we're still failing with no shipping method
-        if (!$this->getQuote()->getShippingAddress()->getShippingMethod() ) {
-            return Mage::helper('klarna')->log('Missing shipping method when trying to create Klarna recurring order!');
-        }
-
-        // Calculate total price
-        $shippingPrice = (float)$this->getQuote()->getShippingAddress()->getShippingAmount();
-
-        // Calculate shipping tax percent
-        if ($shippingPrice) {
-            $shippingTaxAmount = (float)$this->getQuote()->getShippingAddress()->getShippingTaxAmount();
-            $shippingTaxPercent = ($shippingTaxAmount / ($shippingPrice - $shippingTaxAmount)) * 100;
-        } else {
-            $shippingTaxPercent = 0;
-        }
-
-        // Set the shipping name
-        $shippingName = $this->getQuote()->getShippingAddress()->getShippingDescription();
-        // If the shipping name wasn't loaded by some reason, just add a standard name
-        if (!$shippingName) {
-            $shippingName = Mage::helper('klarna')->__('Shipping');
-        }
-
-        return array(
-            'reference' => $this->getQuote()->getShippingAddress()->getShippingMethod(),
-            'name' => $shippingName,
-            'quantity' => 1,
-            'unit_price' => intval($shippingPrice * 100),
-            'discount_rate' => 0, // Not needed since Magento gives us the actual price
-            'tax_rate' => ceil(($shippingTaxPercent * 100)),
-            'type' => 'shipping_fee'
-        );
+        return Mage::getModel('klarna/klarnacheckout_shipping')->build($this->getQuote());
     }
 
     /**

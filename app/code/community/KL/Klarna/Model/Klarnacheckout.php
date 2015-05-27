@@ -333,7 +333,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
         /**
          * Add shipping method and the cost
          */
-        $shipping = Mage::getModel('klarna/klarnacheckout_shipping')->build();
+        $shipping = Mage::getModel('klarna/klarnacheckout_shipping')->build($this->getQuote());
         if ($shipping) {
             $items[] = $shipping;
             return $items;
