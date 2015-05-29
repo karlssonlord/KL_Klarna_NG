@@ -1,14 +1,11 @@
 <?php
 
-/**
- * Class KL_Klarna_Model_Klarnacheckout_Order
- */
-class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckout_Abstract {
-
+class KL_Klarna_Model_Klarnacheckout_Order
+{
     /**
-     * @var
+     * @var KL_Klarna_Model_Klarnacheckout
      */
-    protected $_model;
+    protected $_klarnacheckout;
 
     /**
      * @var Mage_Customer_Model_Session
@@ -30,6 +27,10 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         $this->_customerSession = Mage::getSingleton('customer/session');
     }
 
+    /**
+     * @param $checkoutId
+     * @return mixed
+     */
     public function loadByCheckoutId($checkoutId)
     {
         /**
@@ -41,16 +42,18 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             ->getFirstItem();
     }
 
-    public function create($checkoutId = false)
+    /**
+     * @param null $checkoutId
+     * @return bool
+     * @throws Exception
+     */
+    public function create($checkoutId = null)
     {
-        if ($checkoutId === false) {
+        if (!$checkoutId) {
             $checkoutId = Mage::helper('klarna/checkout')->getKlarnaCheckoutId();
         }
 
-        /**
-         * Make sure it was found
-         */
-        if ( ! $checkoutId ) {
+        if (!$checkoutId) {
             throw new Exception('No checkout ID exists (at create method)');
         }
 
@@ -67,49 +70,35 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
         /**
          * Make sure nothing was found
          */
-        if ( $magentoOrderSearch->getId() ) {
+        if ($magentoOrderSearch->getId()) {
             throw new Exception('Order with checkout ID "' . $checkoutId . '" already exists (at create method)');
         }
 
-        /**
-         * Fetch the order from Klarna
-         */
+        /** Fetch the order from Klarna */
         $order = $this->_klarnacheckout->getOrder($checkoutId);
 
-        /**
-         * Fetch quote
-         */
+        /** Fetch quote */
         $quote = Mage::getModel('sales/quote')
             ->getCollection()
             ->addFieldToFilter('klarna_checkout', $checkoutId)
             ->getFirstItem();
 
-        /**
-         * Make sure quote was found
-         */
+        /** Make sure quote was found */
         if ( $quote && $quote->getId() ) {
 
-            /**
-             * Make a notice in the log
-             */
+            /** Make a notice in the log */
             Mage::helper('klarna/log')->log($quote, 'Create order', true);
 
-            /**
-             * Convert our total amount the Klarna way
-             */
+            /** Convert our total amount the Klarna way */
             $quoteTotal = intval($quote->getGrandTotal() * 100);
 
-            /**
-             * Make a note about the amounts
-             */
+            /** Make a note about the amounts */
             Mage::helper('klarna/log')->log(
                 $quote,
                 'Comparing amount quote:' . $quoteTotal . ' and Klarna ' . $order['cart']['total_price_including_tax']
             );
 
-            /**
-             * Build shipping address
-             */
+            /** Build shipping address */
             $shippingAddress = array();
             if ( isset($order['shipping_address']['care_of']) ) {
                 $shippingAddress[] = $order['shipping_address']['care_of'];
@@ -117,9 +106,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             $shippingAddress[] = $order['shipping_address']['street_address'];
             $shippingAddress = implode("\n", $shippingAddress);
 
-            /**
-             * Build billing address
-             */
+            /** Build billing address */
             $billingAddress = array();
             if ( isset($order['billing_address']['care_of']) ) {
                 $billingAddress[] = $order['billing_address']['care_of'];
@@ -127,15 +114,11 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             $billingAddress[] = $order['billing_address']['street_address'];
             $billingAddress = implode("\n", $billingAddress);
 
-            /**
-             * Fetch delivery instructions and door code
-             */
+            /** Fetch delivery instructions and door code */
             $doorCode = $quote->getShippingAddress()->getData('door_code');
             $deliveryInstructions = $quote->getShippingAddress()->getData('delivery_instructions');
 
-            /**
-             * Reconfigure the shipping address
-             */
+            /** Reconfigure the shipping address */
             $quote->getShippingAddress()
                 ->setFirstname($order['shipping_address']['given_name'])
                 ->setLastname($order['shipping_address']['family_name'])
@@ -150,9 +133,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                 ->setData('delivery_instructions', $deliveryInstructions)
                 ->save();
 
-            /**
-             * Reconfigure the billing address
-             */
+            /** Reconfigure the billing address */
             $quote->getBillingAddress()
                 ->setFirstname($order['shipping_address']['given_name'])
                 ->setLastname($order['shipping_address']['family_name'])
@@ -167,9 +148,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                 ->setData('delivery_instructions', $deliveryInstructions)
                 ->save();
 
-            /**
-             * Set payment information
-             */
+            /** Set payment information */
             $quote
                 ->getPayment()
                 ->setMethod('klarna_checkout')
@@ -178,31 +157,23 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                 ->setIsTransactionClosed(0)
                 ->save();
 
-            /**
-             * Assign customer object
-             */
+            /** Assign customer object */
             $quote
                 ->setCustomerFirstname($order['shipping_address']['given_name'])
                 ->setCustomerLastname($order['shipping_address']['family_name'])
                 ->setCustomerEmail($order['shipping_address']['email'])
                 ->save();
 
-            /**
-             * Collect totals once more
-             */
+            /** Collect totals once more */
             $quote
                 ->collectTotals()
                 ->setIsActive(0)
                 ->save();
 
-            /**
-             * Feed quote object into sales model
-             */
+            /** Feed quote object into sales model */
             $service = Mage::getModel('sales/service_quote', $quote);
 
-            /**
-             * Submit the quote and generate order
-             */
+            /** Submit the quote and generate order */
             $service->submitAll();
 
             $this->_checkoutSession
@@ -210,9 +181,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                 ->setLastSuccessQuoteId($quote->getId())
                 ->clearHelperData();
 
-            /**
-             * Fetch the Magento Order
-             */
+            /** Fetch the Magento Order */
             $magentoOrder = $service->getOrder();
 
             if ( $magentoOrder ) {
@@ -222,9 +191,7 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                     array('order' => $magentoOrder, 'quote' => $quote)
                 );
 
-                /**
-                 * Make sure delivery instructions and door code is set
-                 */
+                /** Make sure delivery instructions and door code is set */
                 $magentoOrder->getBillingAddress()
                     ->setData('door_code', $doorCode)
                     ->setData('delivery_instructions', $deliveryInstructions)
@@ -235,37 +202,26 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
                     ->setData('delivery_instructions', $deliveryInstructions)
                     ->save();
 
-                /**
-                 * Add order information to the session
-                 */
+                /** Add order information to the session */
                 $this->_checkoutSession
                     ->setLastOrderId($magentoOrder->getId())
                     ->setLastRealOrderId($magentoOrder->getIncrementId());
 
             }
 
-            /**
-             * Configure and save the order
-             */
             $magentoOrder
                 ->setState('pending')
-                ->setStatus('pending');
+                ->setStatus('pending')
+            ;
 
-            /**
-             * Save the order
-             */
             $magentoOrder->save();
 
-            /**
-             * Add order information to the session
-             */
+            /** Add order information to the session */
             Mage::getSingleton('checkout/session')
                 ->setLastOrderId($magentoOrder->getId())
                 ->setLastRealOrderId($magentoOrder->getIncrementId());
 
-            /**
-             * Add recurring profiles information to the session
-             */
+            /** Add recurring profiles information to the session */
             $profiles = $service->getRecurringPaymentProfiles();
             if ( $profiles ) {
                 $ids = array();
@@ -288,7 +244,6 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             Mage::helper('klarna')->log('Unable to find matching quote when about to create Klarna order');
 
             return false;
-
         }
 
     }
@@ -369,14 +324,8 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
 
         } catch (Exception $e) {
 
-            /**
-             * Set session message
-             */
             Mage::getSingleton('checkout/session')->addError(Mage::helper('klarna')->__('Unable to checkout order. Please try again or contact customer services.'));
 
-            /**
-             * Log the event
-             */
             Mage::helper('klarna')->log(
                 'Reservation (' . $checkoutId . ') NOT canceled at abortCreate: ' . $e->getMessage()
             );

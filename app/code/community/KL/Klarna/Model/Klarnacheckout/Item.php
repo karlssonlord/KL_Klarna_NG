@@ -1,26 +1,21 @@
 <?php
 
-/**
- * Class KL_Klarna_Model_Klarnacheckout_Item
- */
-class KL_Klarna_Model_Klarnacheckout_Item extends KL_Klarna_Model_Klarnacheckout_Abstract {
+class KL_Klarna_Model_Klarnacheckout_Item
+{
 
     /**
-     * Build array
+     * Build item array
      *
-     * @param $quoteItem
+     * @param Mage_Sales_Model_Quote_Item $quoteItem
      * @return array
      */
-    public function build($quoteItem)
+    public function build(Mage_Sales_Model_Quote_Item $quoteItem)
     {
-        /**
-         * Return the array
-         */
         return array(
             'reference' => $quoteItem->getSku(),
             'name' => $quoteItem->getName(),
             'quantity' => intval($quoteItem->getQty()),
-            'unit_price' => $this->fakeFloatToKlarnaInt($quoteItem->getPriceInclTax()),
+            'unit_price' => Mage::helper('klarna/price')->fakeFloatToKlarnaInt($quoteItem->getPriceInclTax()),
             'discount_rate' => 0, // Not needed since Magento gives us the actual price
             'tax_rate' => ($quoteItem->getTaxPercent() * 100),
             'type' => 'physical'

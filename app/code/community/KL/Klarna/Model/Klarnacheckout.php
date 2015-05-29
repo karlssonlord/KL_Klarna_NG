@@ -436,7 +436,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     private function prepareKlarnaDataObject($items)
     {
-        $klarnaData = array(
+        return array(
             'recurring' => (boolean)$this->getQuote()->getIsSubscription(),
             'purchase_country' => $this->getCountry(),
             'purchase_currency' => $this->getCurrency(),
@@ -453,8 +453,6 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
                 'orderid2' => $this->getQuote()->getId()
             )
         );
-Mage::log($klarnaData, null, 'kl_klarna.log', true);
-        return $klarnaData;
     }
 
     /**

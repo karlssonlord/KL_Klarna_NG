@@ -1,45 +1,9 @@
 <?php
-/**
- * Include Klarna Checkout library
- */
+
 require_once('Klarna/kco_php/src/Klarna/Checkout.php');
 
-/**
- * Class KL_Klarna_Model_Klarnacheckout_Abstract
- */
-class KL_Klarna_Model_Klarnacheckout_Abstract
-    extends KL_Klarna_Model_Klarna
+class KL_Klarna_Model_Klarnacheckout_Abstract extends KL_Klarna_Model_Klarna
 {
-
-    /**
-     * Convert fake float with 4 decimals to int
-     *
-     * @param $float
-     *
-     * @return int
-     */
-    public function fakeFloatToKlarnaInt($float)
-    {
-        $float = (string) $float;
-
-        /**
-         * Assure it has 4 decimals
-         */
-        $decimals = explode('.', $float);
-
-        if (count($decimals) == 1) {
-            return (int) $float * 100;
-        }
-
-        if (strlen($decimals[1]) > 1) {
-            $string = $decimals[0] . substr($decimals[1], 0, 2);
-        } else {
-            $string = $decimals[0] . substr($decimals[1], 0, 1) . 0;
-        }
-
-        return (int) $string;
-    }
-
     /**
      * Fetch country model selected
      *
