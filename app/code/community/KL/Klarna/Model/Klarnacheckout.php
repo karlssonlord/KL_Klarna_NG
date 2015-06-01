@@ -5,22 +5,25 @@
  */
 class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abstract
 {
-    private $subscription;
+    /**
+     * @var array
+     */
+    protected $items;
 
+    /**
+     * @var
+     */
     private $quoteId;
 
+    /**
+     * @var array
+     */
     private $errorEmailMessages = array();
 
     /**
      * @var
      */
     protected $_connector;
-
-    protected function _construct()
-    {
-        $this->subscription = Mage::getModel('subscriber/subscription');
-    }
-
 
     /**
      * Get the Klarna Connector
@@ -29,14 +32,9 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     protected function getKlarnaConnector()
     {
-        /**
-         * Setup the connector if not set
-         */
         if (!$this->_connector) {
-            // Configure Klarna Connector
             Klarna_Checkout_Order::$baseUri = Mage::helper('klarna/checkout')->getKlarnaBaseUri();
             Klarna_Checkout_Order::$contentType = "application/vnd.klarna.checkout.aggregated-order-v2+json";
-
             $this->_connector = Klarna_Checkout_Connector::create($this->getSharedSecret());
         }
 
@@ -140,24 +138,19 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
     {
         // The reason we are here is because either cart has been edited so the Klarna order needs update,
         // or we haven't yet created a KCO session. In any case we need to prepare the updated cart first.
-        $items = $this->prepareOrderItems();
+        $this->prepareOrderItems();
 
         // Okay so now we look for an existing order over at Klarna
         $klarnaOrder = $this->getExistingKlarnaOrder();
 
-
         if ($klarnaOrder) {
-
-            // Right, we have an order already, so I need to update this order to reflect cart changes
-            $updatedOrder = $this->updateExistingOrder($klarnaOrder, $items, $this->handleRecurringOrders());
-
+            // Right, we have an order already, so this needs to be updated to reflect cart changes
+            $updatedOrder = $this->updateExistingOrder($klarnaOrder, $this->handleRecurringOrders());
             return $this->getKlarnaHtml($updatedOrder);
         }
 
         // Okay we have a clean slate so start a new session over at Klarna
-        $newKlarnaOrder = $this->createNewOrder($items);
-
-        return $this->getKlarnaHtml($newKlarnaOrder);
+        return $this->getKlarnaHtml($this->createNewOrder());
     }
 
     /**
@@ -206,13 +199,12 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
     }
 
     /**
-     * @param $items
      * @return Klarna_Checkout_Order
      */
-    private function createNewOrder($items)
+    private function createNewOrder()
     {
         // Setup the create array
-        $klarnaData = $this->prepareKlarnaDataObject($items);
+        $klarnaData = $this->prepareKlarnaDataObject();
 
         // Set the validation URL
         $validationUrl = Mage::getUrl('klarna/checkout/validate', array('_forced_secure' => true));
@@ -248,15 +240,14 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
 
     /**
      * @param $order
-     * @param $items
      * @param $recurring
      * @return bool
      */
-    private function updateExistingOrder($order, $items, $recurring)
+    private function updateExistingOrder($order, $recurring)
     {
         // Setup the update array
         $klarnaData = array(
-            'cart' => array('items' => $items),
+            'cart' => array('items' => $this->items),
             'merchant_reference' => array(
                 'orderid2' => $this->getQuote()->getId()
             )
@@ -291,11 +282,11 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     private function prepareOrderItems()
     {
-        $items = $this->addQuoteItems();
-        $items = $this->addShippingDetails($items);
-        $items = $this->handleDiscounts($items);
-
-        return $items;
+        $this
+            ->addQuoteItems()
+            ->addShippingDetails()
+            ->handleDiscounts()
+        ;
     }
 
     /**
@@ -308,52 +299,46 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
     }
 
     /**
-     * @param $items
      * @return array
      */
-    private function handleDiscounts($items)
+    private function handleDiscounts()
     {
-        /**
-         * Handle discounts
-         */
-        $discounts = Mage::getModel('klarna/klarnacheckout_discount')->build($this->getQuote());
+        $discounts = Mage::getModel('klarna/klarnacheckout_discount')
+            ->build($this->getQuote())
+            ->getDiscounts()
+        ;
+
         if ($discounts) {
-            $items[] = $discounts;
-            return $items;
+            $this->addDiscounts($discounts);
         }
-        return $items;
     }
 
     /**
-     * @param $items
+     * Add shipping method and the cost
+     *
      * @return array
      */
-    private function addShippingDetails($items)
+    private function addShippingDetails()
     {
-        /**
-         * Add shipping method and the cost
-         */
         $shipping = Mage::getModel('klarna/klarnacheckout_shipping')->build($this->getQuote());
         if ($shipping) {
-            $items[] = $shipping;
-            return $items;
+            $this->items[] = $shipping;
         }
-        return $items;
+        return $this;
     }
 
     /**
+     * Get quote from session and import all quote items
+     *
      * @return array
      */
     private function addQuoteItems()
     {
-        $items = array();
-
-        // Add all visible items from quote
         foreach ($this->getQuote()->getAllVisibleItems() as $item) {
-            $items[] = Mage::getModel('klarna/klarnacheckout_item')->build($item);
+            $this->items[] = Mage::getModel('klarna/klarnacheckout_item')->build($item);
         }
 
-        return $items;
+        return $this;
     }
 
     /**
@@ -431,10 +416,9 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
     }
 
     /**
-     * @param $items
      * @return array
      */
-    private function prepareKlarnaDataObject($items)
+    private function prepareKlarnaDataObject()
     {
         return array(
             'recurring' => (boolean)$this->getQuote()->getIsSubscription(),
@@ -448,7 +432,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
                 'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
                 'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}'
             ),
-            'cart' => array('items' => $items),
+            'cart' => array('items' => $this->items),
             'merchant_reference' => array(
                 'orderid2' => $this->getQuote()->getId()
             )
@@ -735,6 +719,16 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
         Mage::log('This token is set here: '.$klarnaOrder['recurring_token'], null, 'subscriber.log', true);
 
         return isset($klarnaOrder['recurring_token']);
+    }
+
+    /**
+     * @param $discounts
+     */
+    private function addDiscounts($discounts)
+    {
+        foreach ($discounts as $discount) {
+            $this->items[] = $discount;
+        }
     }
 
 }

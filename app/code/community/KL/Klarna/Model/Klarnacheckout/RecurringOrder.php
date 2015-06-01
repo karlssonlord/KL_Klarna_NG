@@ -15,9 +15,7 @@ require_once('Klarna/kco_php/src/Klarna/Checkout.php');
 class KL_Klarna_Model_Klarnacheckout_RecurringOrder implements Klarna_Checkout_ResourceInterface, ArrayAccess
 {
     const KLARNA_HOST_NAME = "https://checkout.klarna.com";
-    /**
-     *  Content type header string
-     */
+
     const CONTENT_TYPE = 'application/vnd.klarna.checkout.recurring-order-v1+json';
 
     const ACCEPT_HEADER = 'application/vnd.klarna.checkout.recurring-order-accepted-v1+json';
@@ -61,10 +59,7 @@ class KL_Klarna_Model_Klarnacheckout_RecurringOrder implements Klarna_Checkout_R
      * @param $quote
      * @param $subscription
      */
-    public function make(
-        KL_Subscriber_Model_Quote $quote,
-        KL_Subscriber_Model_SubscriptionInterface $subscription
-    ) {
+    public function make(KL_Subscriber_Model_Quote $quote, KL_Subscriber_Model_SubscriptionInterface $subscription) {
         $this->subscription = $subscription;
 
         return $this->create($this->buildKlarnaOrderObject($quote));
