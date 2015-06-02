@@ -289,6 +289,30 @@
                 <name>Germany (EUR)</name>
                 <language>de-de</language>
             </de>
+            <gb>
+                <code>GB</code>
+                <currency>GBP</currency>
+                <name>United Kingdom (GBP)</name>
+                <language>en-gb</language>
+            </gb>
+            <de>
+                <code>DE</code>
+                <currency>EUR</currency>
+                <name>Germany (EUR)</name>
+                <language>de-de</language>
+            </de>
+            <at>
+                <code>AT</code>
+                <currency>EUR</currency>
+                <name>Austria (EUR)</name>
+                <language>de-at</language>
+            </at>
+            <us>
+                <code>US</code>
+                <currency>USD</currency>
+                <name>USA (USD)</name>
+                <language>en-us</language>
+            </us>
         </countries>
     </klarna_checkout>
     <default>
