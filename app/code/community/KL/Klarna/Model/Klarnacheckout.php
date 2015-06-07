@@ -485,7 +485,7 @@ class KL_Klarna_Model_Klarnacheckout
             } else {
                 $pushUri .= '?';
             }
-            $pushUri .= '?klarna_order={checkout.order.uri}';
+            $pushUri .= 'klarna_order={checkout.order.uri}';
 
             /**
              * Setup the create array
