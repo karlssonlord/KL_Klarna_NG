@@ -277,8 +277,16 @@ class KL_Klarna_Model_Klarnacheckout_Order
      */
     protected function convertToOrder(Mage_Sales_Model_Quote $quote)
     {
+        /**
+         * Collect totalts
+         */
+        $quote
+            ->collectTotals()
+            ->setIsActive(0)
+            ->save();
+
         /** Convert quote to order */
-        $service = Mage::getModel('sales/service_quote', $quote->load($quote->getId()));
+        $service = Mage::getModel('sales/service_quote', $quote);
         $service->submitAll();
 
         $this->checkoutSession
@@ -311,7 +319,6 @@ class KL_Klarna_Model_Klarnacheckout_Order
             $this->checkoutSession
                 ->setLastOrderId($magentoOrder->getId())
                 ->setLastRealOrderId($magentoOrder->getIncrementId());
-
         }
 
         $magentoOrder
