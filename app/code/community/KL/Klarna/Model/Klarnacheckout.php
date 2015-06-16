@@ -223,6 +223,9 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
         // Prefill information from current user
         $klarnaData = $this->prefillUserData($klarnaData);
 
+        // Set color scheme
+        $klarnaData = $this->setColorScheme($klarnaData);
+
         // Fetch empty Klarna order
         $order = $this->fetchNewKlarnaOrderInstance($klarnaData);
 
@@ -393,6 +396,54 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
     {
         if ($this->useMobileGui()) {
             $klarnaData['gui']['layout'] = 'mobile';
+        }
+
+        return $klarnaData;
+    }
+
+    /**
+     * Set the color scheme on options set in admin
+     *
+     * @param array $klarnaData
+     *
+     * @return array
+     */
+    public function setColorScheme($klarnaData)
+    {
+        /**
+         * Setup array with options and config mappings
+         */
+        $options = array(
+            'color_button',
+            'color_button_text',
+            'color_checkbox',
+            'color_checkbox_checkmark',
+            'color_header',
+            'color_link'
+        );
+
+        /**
+         * Loop each option
+         */
+        foreach ($options as $option) {
+
+            /**
+             * Check configuration
+             */
+            if (Mage::helper('klarna')->getConfig($option, 'checkout_design')) {
+
+                /**
+                 * Make sure array is there
+                 */
+                if (!isset($klarnaData['options'])) {
+                    $klarnaData['options'] = array();
+                }
+
+                /**
+                 * Add option to array
+                 */
+                $klarnaData['options'][$option] = Mage::helper('klarna')->getConfig($option, 'checkout_design');
+            }
         }
 
         return $klarnaData;

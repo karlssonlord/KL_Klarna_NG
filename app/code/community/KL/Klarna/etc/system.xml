@@ -313,6 +313,69 @@
                         </validation_email>
                     </fields>
                 </klarna_checkout>
+                <klarna_checkout_design>
+                    <label>Klarna Checkout design</label>
+                    <sort_order>1205</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <color_button translate="label">
+                            <label>Button color</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Sets the value for options.color_button</comment>
+                        </color_button>
+                        <color_button_text translate="label">
+                            <label>Button text color</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Sets the value for options.color_button_text</comment>
+                        </color_button_text>
+                        <color_checkbox translate="label">
+                            <label>Checkbox color</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Sets the value for options.color_checkbox</comment>
+                        </color_checkbox>
+                        <color_checkbox_checkmark translate="label">
+                            <label>Checkbox mark color</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Sets the value for options.color_checkbox_checkmark</comment>
+                        </color_checkbox_checkmark>
+                        <color_header translate="label">
+                            <label>Header color</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Sets the value for options.color_header</comment>
+                        </color_header>
+                        <color_link translate="label">
+                            <label>Link color</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Sets the value for options.color_link</comment>
+                        </color_link>
+                    </fields>
+                </klarna_checkout_design>
             </groups>
         </payment>
     </sections>
