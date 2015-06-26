@@ -53,10 +53,16 @@ class KL_Klarna_Model_Observer
      */
     public function handleOrder($observer)
     {
-        $referer  = Mage::helper('core/http')->getHttpReferer();
-        $url      = Mage::getUrl('klarna/checkout');
+        $referer = Mage::helper('core/http')->getHttpReferer();
+        $url     = Mage::getUrl('klarna/checkout');
 
-        if (strpos($url, $referer) !== false) {
+        /**
+         * Get rid of queries
+         */
+        $referer = explode($referer, '?');
+        $url     = explode($url, '?');
+
+        if ($referer[0] == $url[0]) {
             $checkout = Mage::getModel('klarna/klarnacheckout');
             $checkout->handleOrder();
         }
