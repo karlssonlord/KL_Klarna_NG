@@ -449,6 +449,14 @@ class KL_Klarna_Model_Klarnacheckout
              */
             try {
 
+                if (array_key_exists('merchant_reference', $order) && array_key_exists('orderid2', $order['merchant_reference'])) {
+                    $orderId2 = $order['merchant_reference']['orderid2'];
+
+                    if (!$orderId2 || $orderId2 != $this->getQuote()->getId()) {
+                        throw new Exception('Mismatch: orderid2/quote ID.');
+                    }
+                }
+
                 /**
                  * Update Klarna
                  */
