@@ -449,7 +449,7 @@ class KL_Klarna_Model_Klarnacheckout
              */
             try {
 
-                if (isset($oder['merchant_reference']['orderid2'])) {
+                if (isset($order['merchant_reference']['orderid2'])) {
                     $orderId2 = $order['merchant_reference']['orderid2'];
 
                     if (!$orderId2 || $orderId2 != $this->getQuote()->getId()) {
