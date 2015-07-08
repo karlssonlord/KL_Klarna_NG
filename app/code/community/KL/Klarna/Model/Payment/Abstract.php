@@ -254,9 +254,15 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         $authTrans = $payment->getAuthorizationTransaction();
 
         /**
+         * Load up the order object, to retrieve the store scope
+         */
+        $order = $payment->getOrder();
+        $order->load($order->getId());
+
+        /**
          * Get a new Klarna instance
          */
-        $klarnaOrderApi = Mage::getModel('klarna/api_order');
+        $klarnaOrderApi = Mage::getModel('klarna/api_order', array('store_id' => $order->getStoreId()));
 
         /**
          * Make sure the state is correct

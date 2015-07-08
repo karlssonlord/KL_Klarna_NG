@@ -8,12 +8,13 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
     /**
      * Fetch configuration settings for
      *
-     * @param string $key Magento setting key
+     * @param string $key  Magento setting key
      * @param string $type "invoice", "spec", "part" or "checkout". Default is "klarna"
      *
+     * @param null   $storeId
      * @return mixed
      */
-    public function getConfig($key, $type = 'klarna')
+    public function getConfig($key, $type = 'klarna', $storeId = null)
     {
         /**
          * Add prefix if missing (probably will)
@@ -25,7 +26,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         /**
          * Return configuration value
          */
-        return Mage::getStoreConfig('payment/' . $type . '/' . $key);
+        return Mage::getStoreConfig('payment/' . $type . '/' . $key, $storeId);
     }
 
     public function getConfigFlag($key, $type = 'klarna')
