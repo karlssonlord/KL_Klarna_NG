@@ -63,7 +63,7 @@ class KL_Klarna_Model_Klarnacheckout_Discount
             'reference' => Mage::helper('klarna')->__('Discount'),
             'name' => Mage::helper('klarna')->__('Discount'),
             'quantity' => 1,
-            'unit_price' => $item->getDiscountAmount() * 100,
+            'unit_price' => - ($item->getDiscountAmount() * 100),
             'tax_rate' => $item->getTaxPercent() * 100
         );
     }
