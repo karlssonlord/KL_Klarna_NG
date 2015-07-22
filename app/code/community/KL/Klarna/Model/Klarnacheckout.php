@@ -471,6 +471,17 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     private function prepareKlarnaDataObject()
     {
+        /**
+         * Generate the push URI (some times included with a ? depending on store/settings)
+         */
+        $pushUri = Mage::getUrl('klarna/checkout/push');
+        if (strpos($pushUri, '?')) {
+            $pushUri .= '&';
+        } else {
+            $pushUri .= '?';
+        }
+        $pushUri .= 'klarna_order={checkout.order.uri}';
+
         return array(
             'recurring' => (boolean)$this->getQuote()->getIsSubscription(),
             'purchase_country' => $this->getCountry(),
@@ -481,7 +492,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
                 'terms_uri' => Mage::getUrl(Mage::getStoreConfig('payment/klarna_checkout/terms_url')),
                 'checkout_uri' => Mage::getUrl('klarna/checkout'),
                 'confirmation_uri' => Mage::getUrl('klarna/checkout/success'),
-                'push_uri' => Mage::getUrl('klarna/checkout/push') . '?klarna_order={checkout.order.uri}'
+                'push_uri' => $pushUri
             ),
             'cart' => array('items' => $this->items),
             'merchant_reference' => array(
