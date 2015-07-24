@@ -348,6 +348,7 @@
             </klarna_specpayment>
             <klarna_checkout>
                 <active>0</active>
+                <title>Klarna Checkout</title>
                 <model>klarna/payment_checkout</model>
                 <acknowledged_order_status>processing</acknowledged_order_status>
             </klarna_checkout>
