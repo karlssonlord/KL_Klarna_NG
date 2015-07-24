@@ -104,12 +104,6 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             ->save();
 
         $this->renderLayout();
-
-        /*
-         * We reset checkoutId stored in the session so that we don't fetch finished order from Klarna and don't try to
-         * use it
-         */
-        Mage::helper('klarna/checkout')->setKlarnaCheckoutId('');
     }
 
 
