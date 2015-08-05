@@ -210,15 +210,39 @@ class KL_Klarna_Helper_Checkout extends KL_Klarna_Helper_Abstract {
             if ( isset($reservation['shipping_address']['care_of']) ) {
                 $shippingAddress[] = $reservation['shipping_address']['care_of'];
             }
-            $shippingAddress[] = $reservation['shipping_address']['street_address'];
-            $shippingAddress = implode("\n", $shippingAddress);
+            if ( isset($reservation['shipping_address']['street_address']) ) {
+                $shippingAddress[] = $reservation['shipping_address']['street_address'];
+                $shippingAddress = implode("\n", $shippingAddress);                
+            }
+            if ( isset($reservation['shipping_address']['street_name']) ) {
+                $street = $reservation['shipping_address']['street_name'];
+
+                if ( isset ($reservation['shipping_address']['street_number']) ) {
+                    $street .= ' ' . $reservation['shipping_address']['street_number'];
+                }
+
+                $shippingAddress[] = $street;
+                $shippingAddress = implode("\n", $shippingAddress);                
+            }
 
             $billingAddress = array();
-            if ( isset($reservation['billing_address']['care_of']) ) {
-                $billingAddress[] = $reservation['billing_address']['care_of'];
+            if ( isset($reservation['shipping_address']['care_of']) ) {
+                $billingAddress[] = $reservation['shipping_address']['care_of'];
             }
-            $billingAddress[] = $reservation['billing_address']['street_address'];
-            $billingAddress = implode("\n", $billingAddress);
+            if ( isset($reservation['shipping_address']['street_address']) ) {
+                $billingAddress[] = $reservation['shipping_address']['street_address'];
+                $billingAddress = implode("\n", $shippingAddress);                
+            }
+            if ( isset($reservation['shipping_address']['street_name']) ) {
+                $street = $reservation['shipping_address']['street_name'];
+
+                if ( isset ($reservation['shipping_address']['street_number']) ) {
+                    $street .= ' ' . $reservation['shipping_address']['street_number'];
+                }
+
+                $billingAddress[] = $street;
+                $billingAddress = implode("\n", $billingAddress);                
+            }
 
             $quote->getShippingAddress()
                 ->setFirstname($reservation['shipping_address']['given_name'])
