@@ -116,7 +116,16 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             if ( isset($order['shipping_address']['care_of']) ) {
                 $shippingAddress[] = $order['shipping_address']['care_of'];
             }
-            $shippingAddress[] = $order['shipping_address']['street_address'];
+            if ( isset($order['shipping_address']['street_address']) ) {
+                $shippingAddress[] = $order['shipping_address']['street_address'];
+            }
+            if ( isset($order['shipping_address']['street_name']) ) {
+                $street = $order['shipping_address']['street_name'];
+                if ( isset($order['shipping_address']['street_number']) ) {
+                    $street .= ' ' . $order['shipping_address']['street_number'];
+                }
+                $shippingAddress[] = $street;
+            }
             $shippingAddress = implode("\n", $shippingAddress);
 
             /**
@@ -126,9 +135,17 @@ class KL_Klarna_Model_Klarnacheckout_Order extends KL_Klarna_Model_Klarnacheckou
             if ( isset($order['billing_address']['care_of']) ) {
                 $billingAddress[] = $order['billing_address']['care_of'];
             }
-            $billingAddress[] = $order['billing_address']['street_address'];
+            if ( isset($order['billing_address']['street_address']) ) {
+                $billingAddress[] = $order['billing_address']['street_address'];
+            }
+            if ( isset($order['billing_address']['street_name']) ) {
+                $street = $order['billing_address']['street_name'];
+                if ( isset($order['billing_address']['street_number']) ) {
+                    $street .= ' ' . $order['billing_address']['street_number'];
+                }
+                $billingAddress[] = $street;
+            }
             $billingAddress = implode("\n", $billingAddress);
-
             /**
              * Fetch delivery instructions and door code
              */
