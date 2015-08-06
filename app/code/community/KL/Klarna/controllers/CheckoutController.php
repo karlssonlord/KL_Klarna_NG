@@ -103,6 +103,8 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             )
             ->save();
 
+        Mage::dispatchEvent('klarna_checkout_controller_success_after', array('quote' => $quote));
+
         $this->renderLayout();
     }
 
