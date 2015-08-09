@@ -42,7 +42,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
     /**
      * Can void transactions online?
      */
-    protected $_canVoid = false;
+    protected $_canVoid = true;
 
     /**
      * Can use this payment method in administration panel?
@@ -362,6 +362,17 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         return $this;
     }
 
+    /**
+     * Void payment abstract method
+     *
+     * @param Varien_Object $payment
+     *
+     * @return Mage_Payment_Model_Abstract
+     */
+    public function void(Varien_Object $payment)
+    {
+        return $this->cancel($payment);
+    }
 
     /**
      * Cancel payment abstract method
