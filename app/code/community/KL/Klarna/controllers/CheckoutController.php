@@ -31,12 +31,16 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
          */
         Mage::getModel('klarna/klarnacheckout')->prepareTotals();
 
+        $this->loadLayout();
+
+        $this->_initLayoutMessages('customer/session');
+        $this->_initLayoutMessages('checkout/session');
+        $this->_initLayoutMessages('core/session');
+
         /**
          * Render layout
          */
-        $this
-            ->loadLayout()
-            ->renderLayout();
+        $this->renderLayout();
     }
 
     /**
