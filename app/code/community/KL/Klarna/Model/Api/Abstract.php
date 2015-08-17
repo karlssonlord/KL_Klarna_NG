@@ -18,7 +18,7 @@ class KL_Klarna_Model_Api_Abstract extends Varien_Object {
      *
      * @return Klarna
      */
-    public function getApi($klarnaModel = null)
+    public function getApi($klarnaModel = null, $storeId = null)
     {
         /**
          * Check if we already has an instance of the API
@@ -35,7 +35,7 @@ class KL_Klarna_Model_Api_Abstract extends Varien_Object {
              * Setup a new instance of our own Klarna model
              */
             if ( is_null($klarnaModel) ) {
-                $klarnaModel = Mage::getModel('klarna/klarna');
+                $klarnaModel = Mage::getModel('klarna/klarna', array('store_id' => $storeId));
             }
 
             /**

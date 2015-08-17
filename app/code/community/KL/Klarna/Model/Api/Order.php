@@ -9,7 +9,8 @@ class KL_Klarna_Model_Api_Order extends KL_Klarna_Model_Api_Abstract {
         /**
          * Setup Klarna API
          */
-        $this->_klarnaOrder = $this->getApi();
+        $storeId = $this->getData('store_id') ? : null;
+        $this->_klarnaOrder = $this->getApi(null, $storeId);
     }
 
     /**

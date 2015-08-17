@@ -4,12 +4,14 @@ class KL_Klarna_Model_Klarna extends Varien_Object {
 
     public function __construct($customData = array())
     {
+        $storeId = isset($customData['store_id']) ? $customData['store_id'] : null;
+
         /**
          * Configure the Klarna object with default data
          */
         $this
-            ->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id'))
-            ->setSharedSecret(Mage::helper('klarna')->getConfig('shared_secret'))
+            ->setMerchantId(Mage::helper('klarna')->getConfig('merchant_id', 'klarna', $storeId))
+            ->setSharedSecret(Mage::helper('klarna')->getConfig('shared_secret', 'klarna', $storeId))
             ->setServer($this->getCurrentServer())
             ->setPclassStorage('mysql')
             ->setPclassStorageUri($this->getDbUri())

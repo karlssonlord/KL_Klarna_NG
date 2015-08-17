@@ -14,7 +14,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
      *
      * @return mixed
      */
-    public function getConfig($key, $type = 'klarna')
+    public function getConfig($key, $type = 'klarna', $storeId = null)
     {
         /**
          * Add prefix if missing (probably will)
@@ -26,7 +26,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract
         /**
          * Return configuration value
          */
-        return Mage::getStoreConfig('payment/' . $type . '/' . $key);
+        return Mage::getStoreConfig('payment/' . $type . '/' . $key, $storeId);
     }
 
     public function getConfigFlag($key, $type = 'klarna')
