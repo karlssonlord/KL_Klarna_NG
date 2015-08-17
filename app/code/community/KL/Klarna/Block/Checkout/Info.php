@@ -42,7 +42,7 @@ class KL_Klarna_Block_Checkout_Info extends KL_Klarna_Block_Info {
             /**
              * Load our Klarna Checkout model
              */
-            $checkout = Mage::getModel('klarna/klarnacheckout');
+            $checkout = Mage::getModel('klarna/klarnacheckout', array('store_id' => $this->getOrder()->getStoreId()));
 
             /**
              * Fetch the order
