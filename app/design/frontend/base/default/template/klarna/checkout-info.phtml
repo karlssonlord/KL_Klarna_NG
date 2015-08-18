@@ -1,0 +1,8 @@
+<?php if (!strpos($_SERVER['REQUEST_URI'], 'pdf')): ?>
+    <img src="<?php print $this->getLogo(); ?>" width="100"/>
+    <br />
+<?php else: ?>
+
+    <?php print Mage::helper('klarna')->__('Klarna Checkout'); ?>
+
+<?php endif; ?>

@@ -7,4 +7,3 @@ app/design/frontend/base/default/layout/*                                app/des
 skin/frontend/base/default/js/*                                          skin/frontend/base/default/js/
 app/locale/en_US/template/email/kl/*                                     app/locale/en_US/template/email/kl/
 app/locale/sv_SE/template/email/kl/*                                     app/locale/sv_SE/template/email/kl/
-app/design/adminhtml/default/default/template/klarna/checkout-info.phtml app/design/frontend/base/default/template/klarna/checkout-info.phtml
