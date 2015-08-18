@@ -222,7 +222,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         /**
          * Get a new Klarna instance
          */
-        $klarnaOrderApi = Mage::getModel('klarna/api_order');
+        $klarnaOrderApi = Mage::getModel('klarna/api_order', array('store_id' => $order->getStoreId()));
 
         /**
          * Populare Klarna order object
@@ -346,7 +346,7 @@ class KL_Klarna_Model_Payment_Abstract extends Mage_Payment_Model_Method_Abstrac
         /**
          * Get a new Klarna instance
          */
-        $klarnaOrderApi = Mage::getModel('klarna/api_order');
+        $klarnaOrderApi = Mage::getModel('klarna/api_order', array('store_id' => $payment->getOrder()->getStoreId()));
 
         /**
          * Fetch Klarna Invoice No from additional information field
