@@ -164,7 +164,7 @@ class KL_Klarna_Model_Payment_Checkout
         /**
          * Fetch Klarna API Order model
          */
-        $apiModel = Mage::getModel('klarna/api_order');
+        $apiModel = Mage::getModel('klarna/api_order', array('store_id' => $order->getStoreId()));
 
         /**
          * Activate invoice at Klarna
