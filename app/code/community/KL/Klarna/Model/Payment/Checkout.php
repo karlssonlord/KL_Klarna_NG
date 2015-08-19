@@ -194,8 +194,6 @@ class KL_Klarna_Model_Payment_Checkout
      */
     public function refund(Varien_Object $payment, $amount)
     {
-        throw new Exception('Refund online not implemented');
-        
         /**
          * Fetch the order
          */
@@ -219,7 +217,7 @@ class KL_Klarna_Model_Payment_Checkout
         /**
          * Fetch Klarna API Order model
          */
-        $apiModel = Mage::getModel('klarna/api_order');
+        $apiModel = Mage::getModel('klarna/api_order', array('store_id' => $payment->getOrder()->getStoreId()));
         $return = $apiModel->createRefund($amount, $invoiceNumber);
         if($return) {
             $payment->getOrder()
