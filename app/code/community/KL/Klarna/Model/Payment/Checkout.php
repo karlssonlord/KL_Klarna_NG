@@ -198,7 +198,7 @@ class KL_Klarna_Model_Payment_Checkout
          * Fetch the order
          */
         try {
-            $klarnaOrder = Mage::getModel('klarna/klarnacheckout')->getOrder(
+            $klarnaOrder = Mage::getModel('klarna/klarnacheckout', array('store_id' => $payment->getOrder()->getStoreId()))->getOrder(
                 $payment->getAdditionalInformation('klarnaCheckoutId')
             );
         } catch (Exception $e) {
