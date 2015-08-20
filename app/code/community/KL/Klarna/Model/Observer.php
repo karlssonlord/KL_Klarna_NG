@@ -59,8 +59,8 @@ class KL_Klarna_Model_Observer
         /**
          * Get rid of queries
          */
-        $referer = explode($referer, '?');
-        $url     = explode($url, '?');
+        $referer = explode('?', $referer);
+        $url     = explode('?', $url);
 
         if ($referer[0] == $url[0]) {
             $checkout = Mage::getModel('klarna/klarnacheckout');
