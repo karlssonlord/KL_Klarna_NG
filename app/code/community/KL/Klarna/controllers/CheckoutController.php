@@ -24,6 +24,8 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
             return $this;
         }
 
+        $quote->getShippingAddress()->setCollectShippingRates(true);
+
         $this->getOnepage()->initCheckout();
 
         /**
