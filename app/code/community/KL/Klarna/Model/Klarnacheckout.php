@@ -778,8 +778,6 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     private function orderIsRecurring($klarnaOrder)
     {
-        Mage::log('This token is set here: '.$klarnaOrder['recurring_token'], null, 'subscriber.log', true);
-
         return isset($klarnaOrder['recurring_token']);
     }
 
