@@ -52,19 +52,39 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
      */
     public function successAction()
     {
-        $quote = $this->_getQuote();
+        /**
+         * The quote we want to use for tracking will be inactive if
+         * Klarna has been able to create the order in Magento already.
+         * In order to still get hold of the right quote we use the
+         * Klarna Checkout ID to look up the right quote object. If we
+         * still fail we fallback to the old method just trying to get
+         * the quote not caring about if it's active or not (and that's
+         * where we might fail).
+         */
+        $klarnaCheckoutId = Mage::helper('klarna/checkout')->getKlarnaCheckoutId();
+
+        $quote = Mage::getModel('sales/quote')
+            ->getCollection()
+            ->addFieldToFilter('klarna_checkout', $klarnaCheckoutId)
+            ->getFirstItem();
+
+        if ($quote && is_object($quote)) {
+            $quoteId = $quote->getId();
+        } else {
+            $quote   = $this->_getQuote();
+            $quoteId = $quote->getId();
+        }
 
         Mage::helper('klarna/log')->log($quote, "successAction");
 
         Mage::dispatchEvent('klarna_checkout_controller_success_before', array('quote' => $quote));
 
-        $quoteId = $quote->getId();
-
         /**
+         * Subscribe to or unsubscribe from newsletter
          *
-         * (un)subscribe to newsletter
+         * @todo Move to observer
          */
-        $email           = $quote->getShippingAddress()->getEmail();
+        $email = $quote->getShippingAddress()->getEmail();
 
         if (Mage::getSingleton('checkout/session')->getWantsNewsletter()){
             Mage::getModel('newsletter/subscriber')->subscribe($email);
@@ -89,15 +109,19 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         $layout->getBlock('klarna_success');
 
         /*
-         * We need to deactivate the current quote manually here since the quote will be converted into an order only
-         * upon push call from Klarna to the store
+         * We need to deactivate the current quote manually here since the
+         * quote will be converted into an order only upon push call from
+         * Klarna to the store
          */
-        $quote->setIsActive(false);
-        $quote->save();
+        if ($quote->getIsActive()) {
+            $quote->setIsActive(false);
+            $quote->save();
+        }
 
         /*
-         * We create a new empty quote here for the future use. Should be considered as a precaution to avoid using
-         * old active quotes from the past.
+         * We create a new empty quote here for the future use. Should be
+         * considered as a precaution to avoid using old active quotes from
+         * the past.
          */
         Mage::getModel('sales/quote')
             ->assignCustomer(
