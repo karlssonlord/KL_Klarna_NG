@@ -168,27 +168,24 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
         $input = json_decode(file_get_contents('php://input'), true);
 
         try {
-            Mage::helper('klarna/log')->log(null, "Validation routine began");
             $this->validateRequestValidator->validate($input);
 
         } catch (KL_Klarna_Model_Exception_InsufficientStockLevel $e) {
-            Mage::helper('klarna/log')->log(null, "Validation routine KL_Klarna_Model_Exception_InsufficientStockLevel: " . $e->getMessage());
+            Mage::helper('klarna/log')->log(null, "Validation routine threw KL_Klarna_Model_Exception_InsufficientStockLevel: " . $e->getMessage());
             Mage::helper('klarna')->sendErrorEmail($e->getMessage(), null);
             $location = Mage::getUrl('klarna/checkout/failure');
             $this->send303($location);
 
         }  catch (KL_Klarna_Model_Exception_UnsalableProduct $e) {
-            Mage::helper('klarna/log')->log(null, "Validation routine KL_Klarna_Model_Exception_UnsalableProduct: " . $e->getMessage());
+            Mage::helper('klarna/log')->log(null, "Validation routine threw KL_Klarna_Model_Exception_UnsalableProduct: " . $e->getMessage());
             $location = Mage::getUrl('klarna/checkout/failure').'?is_stock=1';
             $this->send303($location);
 
         }  catch (Exception $e) {
-            Mage::helper('klarna/log')->log(null, "Validation routine Exception: " . $e->getMessage());
+            Mage::helper('klarna/log')->log(null, "Validation routine threw Exception: " . $e->getMessage());
             $location = Mage::getUrl('klarna/checkout/failure');
             $this->send303($location);
         }
-
-        Mage::helper('klarna/log')->log(null, "Validation routine end");
 
         $this->getResponse()->setHttpResponseCode(200);
     }
