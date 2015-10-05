@@ -364,6 +364,14 @@
                     <model>klarna/cron_cleanpushlocktable::clean</model>
                 </run>
             </kl_klarna>
+            <klarna_collect_emails>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>klarna/cron_quote::collectEmails</model>
+                </run>
+            </klarna_collect_emails>
         </jobs>
     </crontab>
 </config>
