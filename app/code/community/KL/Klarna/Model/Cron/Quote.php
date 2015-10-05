@@ -19,15 +19,12 @@ class KL_Klarna_Model_Cron_Quote
 
     public function collectEmails()
     {
-        
-        Mage::log('collectEmails', null, 'klarnaCollectEmails.log', true);
-
         foreach ($this->_getCollection() as $quote)
         {
             $checkoutId = $quote->getKlarnaCheckout();
 
             if ($checkoutId) {
-                $checkout = Mage::getModel('klarna/klarnacheckout')->getOrder($checkoutId);
+                $checkout = Mage::getModel('klarna/klarnacheckout', array('store_id' => $quote->getStoreId()))->getOrder($checkoutId);
 
                 if (isset($checkout['shipping_address']['email']) && $checkout['shipping_address']['email']) {
                     Mage::log($quote->getId(), null, 'klarnaCollectEmails.log', true);
