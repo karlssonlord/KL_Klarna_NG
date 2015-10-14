@@ -32,7 +32,7 @@ class KL_Klarna_Model_Klarnacheckout_Item extends KL_Klarna_Model_Klarnacheckout
             /**
              * If tax is applied after discount
              */
-            if (Mage::getStoreConfig('tax/calculation/apply_after_discount') === 1) {
+            if (Mage::getStoreConfig('tax/calculation/apply_after_discount') == 1) {
                 $taxMultiplier = 1 + ($quoteItem->getTaxPercent() / 100);
                 $unitPrice = $quoteItem->getDiscountAmount() * $taxMultiplier;
             } else {
