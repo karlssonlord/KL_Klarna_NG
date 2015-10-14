@@ -403,7 +403,8 @@ class KL_Klarna_Model_Klarnacheckout
          * Add all visible items from quote
          */
         foreach ($this->getQuote()->getAllVisibleItems() as $item) {
-            $items[] = Mage::getModel('klarna/klarnacheckout_item')->build($item);
+            $i = Mage::getModel('klarna/klarnacheckout_item')->build($item);
+            $items = array_merge($items, $i);
         }
 
         /**
@@ -412,14 +413,6 @@ class KL_Klarna_Model_Klarnacheckout
         $shipping = Mage::getModel('klarna/klarnacheckout_shipping')->build();
         if ( $shipping ) {
             $items[] = $shipping;
-        }
-
-        /**
-         * Handle discounts
-         */
-        $discounts = Mage::getModel('klarna/klarnacheckout_discount')->build($this->getQuote());
-        if ( $discounts ) {
-            $items[] = $discounts;
         }
 
         /**
