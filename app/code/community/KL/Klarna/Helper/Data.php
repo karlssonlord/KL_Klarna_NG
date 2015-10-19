@@ -66,6 +66,11 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         }
 
         /**
+         * Default level
+         */
+        $level = 'DEBUG';
+
+        /**
          * Fetch message if it's an exception
          */
         if ( $message instanceof Exception ) {
@@ -78,7 +83,28 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
              * Force logging if it's an exception
              */
             $force = true;
+
+            $level = 'EXCEPTION';
         }
+
+        if (is_string($message)) {
+            $dbMessage = $message;
+        } else {
+            $dbMessage = var_export($message, true);
+        }
+
+        /**
+         * Store message in database
+         */
+        $logModel = Mage::getModel('klarna/klarnalog')
+            ->setQuoteId()
+            ->setOrderId()
+            ->setKlarnaCheckoutId()
+            ->setMessage($dbMessage)
+            ->setLevel($level)
+            ->setIp($_SERVER['REMOTE_ADDR'])
+            ->save();
+
 
         /**
          * Add remote IP address if it's a string

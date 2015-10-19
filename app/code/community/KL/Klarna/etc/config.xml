@@ -2,7 +2,8 @@
 <config>
     <modules>
         <KL_Klarna>
-            <version>0.0.6</version>
+            <!-- Please see ./app/code/community/KL/Klarna/Model/Payment/Checkout.php -->
+            <version>0.0.7</version>
         </KL_Klarna>
     </modules>
     <frontend>
@@ -23,6 +24,60 @@
             </updates>
         </layout>
     </frontend>
+    <admin>
+        <routers>
+            <adminklarna>
+                <use>admin</use>
+                <args>
+                    <module>KL_Klarna</module>
+                    <frontName>admin_klarna</frontName>
+                </args>
+            </adminklarna>
+        </routers>
+    </admin>
+    <adminhtml>
+        <menu>
+            <adminklarna module="klarna">
+                <title>Klarna</title>
+                <sort_order>100</sort_order>
+                <children>
+                    <klarnalog module="klarna">
+                        <title>Manage Klarnalog</title>
+                        <sort_order>0</sort_order>
+                        <action>admin_klarna/adminhtml_klarnalog</action>
+                    </klarnalog>
+                </children>
+            </adminklarna>
+        </menu>
+        <acl>
+            <resources>
+                <all>
+                    <title>Allow Everything</title>
+                </all>
+                <admin>
+                    <children>
+                        <adminklarna translate="title" module="klarna">
+                            <title>Klarna</title>
+                            <sort_order>1000</sort_order>
+                            <children>
+                                <klarnalog translate="title">
+                                    <title>Manage Klarnalog</title>
+                                    <sort_order>0</sort_order>
+                                </klarnalog>
+                            </children>
+                        </adminklarna>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <adminklarna>
+                    <file>kl_klarna.xml</file>
+                </adminklarna>
+            </updates>
+        </layout>
+    </adminhtml>
     <global>
         <blocks>
             <klarna>
@@ -33,7 +88,8 @@
                     <sales_order_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Totals</sales_order_totals>
                 </rewrite>
                 <rewrite>
-                    <sales_order_invoice_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Invoice_Totals</sales_order_invoice_totals>
+                    <sales_order_invoice_totals>KL_Klarna_Block_Adminhtml_Sales_Order_Invoice_Totals
+                    </sales_order_invoice_totals>
                 </rewrite>
             </adminhtml>
             <checkout>
@@ -62,6 +118,9 @@
                     <pushlock>
                         <table>klarna_pushlock</table>
                     </pushlock>
+                    <klarnalog>
+                        <table>klarna_log</table>
+                    </klarnalog>
                 </entities>
             </klarna_resource>
         </models>

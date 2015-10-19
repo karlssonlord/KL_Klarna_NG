@@ -170,9 +170,15 @@ class KL_Klarna_Model_Payment_Checkout
          * Activate invoice at Klarna
          */
         if ( is_object($authTrans) ) {
-            if (Mage::helper('klarna')->getVersion() === '0.0.6') {
+            if (Mage::helper('klarna')->getVersion() === '0.0.6' || Mage::helper('klarna')->getVersion() === '0.0.7') {
+                /**
+                 * New way
+                 */
                 $apiModel->activateReservation($authTrans->getTxnId());
             } else {
+                /**
+                 * Old way
+                 */
                 $apiModel->activateReservation($authTrans->getTxnId(), $activate);
             }
         } else {

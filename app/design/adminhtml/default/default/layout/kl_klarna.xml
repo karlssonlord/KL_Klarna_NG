@@ -30,4 +30,9 @@
             <block type="klarna/sales_total" name="klarna_total"/>
         </reference>
     </adminhtml_sales_order_creditmemo_view>
+    <klarna_adminhtml_klarnalog_index>
+        <reference name="content">
+            <block type="klarna/adminhtml_klarnalog" name="klarnalog"/>
+        </reference>
+    </klarna_adminhtml_klarnalog_index>
 </layout>

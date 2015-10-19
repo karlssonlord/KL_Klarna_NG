@@ -49,6 +49,6 @@ $table->addColumn('eid', Varien_Db_Ddl_Table::TYPE_INTEGER, array(10), array(
 $table->setOption('charset', 'latin1');
 $table->setOption('collate', 'latin1_swedish_ci');
 
-$installer->getConnection()->createTable($table);
+#$installer->getConnection()->createTable($table);
 
 $installer->endSetup();
