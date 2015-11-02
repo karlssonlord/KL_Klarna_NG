@@ -88,11 +88,6 @@ class KL_Klarna_CheckoutController extends Mage_Checkout_OnepageController {
 
         if (Mage::getSingleton('checkout/session')->getWantsNewsletter()){
             Mage::getModel('newsletter/subscriber')->subscribe($email);
-        } else {
-            $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
-            if ($subscriber->getSubscriberStatus()){
-                $subscriber->unsubscribe();
-            }
         }
 
         /**
