@@ -137,7 +137,16 @@ class KL_Klarna_Model_Totals_Address
         /**
          * Add to totals summary if Klarna Total is set
          */
-        if ( $address->getKlarnaTotal() > 0 ) {
+        $quote = $address->getQuote();
+        $payment = $quote->getPayment();
+
+        if (is_object($payment)) {
+            $paymentCode = $payment->getMethodInstance()->getCode();
+        } else {
+            $paymentCode = false;
+        }
+
+        if ( $paymentCode == 'klarna_invoice' && $address->getKlarnaTotal() > 0 ) {
             $address->addTotal(
                 array(
                     'code' => $this->getCode(),
