@@ -72,17 +72,12 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
 
         // If not found then log and return false
         if (!$checkoutId) {
-            Mage::helper('klarna')->log('No matching checkout ID found when fetching order from Klarna.');
-
+            Mage::helper('klarna')->log('No matching checkout ID found when fetching order from Klarna.', null, null, null, $checkoutId);
             return false;
         }
 
         try {
-            Mage::helper('klarna/log')->log(
-                $this->getQuote(),
-                'Trying to fetch existing KCO order from Klarna using '
-                . Mage::helper('klarna/checkout')->getKlarnaCheckoutId()
-            );
+            Mage::helper('klarna')->log('Trying to fetch existing KCO order from Klarna', null, $this->getQuote()->getId(), null, $checkoutId);
 
             // Fetch the order
             $order = new Klarna_Checkout_Order($this->getKlarnaConnector(), $checkoutId);
@@ -90,7 +85,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
 
         } catch (Exception $e) {
             // Log the event
-            Mage::helper('klarna')->log('Unable to get existing Klarna Order ID. Error received: ' . $e->getMessage());
+            Mage::helper('klarna')->log('Unable to get existing Klarna Order ID. Error received: ' . $e->getMessage(), true, null, null, $checkoutId);
 
             return false;
         }
@@ -177,7 +172,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
                 $this->errorEmailMessages[] = $invalidOrderStatusMessage =
                     'Unable to acknowledge due to order status from Klarna: ' . $klarnaOrder['status'] . ' (' . $checkoutId . ')';
 
-                Mage::helper('klarna/log')->log(null, $invalidOrderStatusMessage);
+                Mage::helper('klarna')->log($invalidOrderStatusMessage, true, null, null, $checkoutId);
 
             }
 
@@ -190,7 +185,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
             Mage::helper('klarna')->sendErrorEmail($errorMessage);
 
             // Log error
-            Mage::helper('klarna/log')->log(null, $errorMessage);
+            Mage::helper('klarna')->log($errorMessage, true, null, null, $checkoutId);
         }
 
         if ($this->containsErrorMessage()) {
@@ -260,7 +255,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
             $klarnaData['recurring'] = true;
         }
 
-        Mage::helper('klarna')->log($klarnaData);
+        Mage::helper('klarna')->log($klarnaData, null, $this->getQuote()->getId(), null, $order->getLocation());
 
         try {
 
@@ -271,7 +266,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
 
         } catch (Exception $e) {
 
-            Mage::helper('klarna')->log($e->getMessage());
+            Mage::helper('klarna')->log($e->getMessage(), null, $this->getQuote()->getId());
 
             // Terminate the object, this will make us create a new order
             return false;
@@ -522,7 +517,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     private function orderStatusIsComplete($order)
     {
-        Mage::log(var_export($order, true), null, 'kl_klarna.log', true);
+        Mage::helper('klarna')->log('Order status is complete: ' . var_export($order, true), null, null, null, $order->getLocation());
 
         return $order['status'] == 'checkout_complete';
     }
@@ -570,7 +565,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
                 $magentoOrder->getIncrementId();
             $this->errorEmailMessages[] = $failedMessage;
 
-            Mage::helper('klarna/log')->log($magentoOrder->getQuote(), $failedMessage, true);
+            Mage::helper('klarna')->log($failedMessage, true, $magentoOrder->getQuote()->getId());
         }
     }
 
@@ -615,14 +610,12 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
 
         // What to do if the order exists
         if (!$this->orderNotFound($magentoOrder)) {
-            Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] Existing order found for checkout id');
+
+            Mage::helper('klarna')->log('Existing order found for checkout id', true, null, null, $checkoutId);
             return $magentoOrder;
         }
 
-        Mage::helper('klarna/log')->log(
-            null,
-            '[' . $checkoutId . '] No previous order found, trying to create...'
-        );
+        Mage::helper('klarna')->log('No previous order found, trying to create...', null, null, null, $checkoutId);
 
         // Try to create the order if it was not found
         $magentoOrder = Mage::getModel('klarna/klarnacheckout_order')->create($checkoutId);
@@ -642,10 +635,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
         );
 
         // Log what status and state we're setting
-        Mage::helper('klarna/log')->log(
-            $magentoOrder->getQuote(),
-            'Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId()
-        );
+        Mage::helper('klarna')->log('Setting processing/' . $orderStatus . ' on Magento ID ' . $magentoOrder->getIncrementId(), null, $magentoOrder->getQuote()->getId());
 
         // Configure and save the order
         $this->setOrderStatusOnMagentoOrder($magentoOrder, $orderStatus);
@@ -701,11 +691,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
         // TODO: fire event and move this logic elsewhere
         $this->sendOrderEmail($magentoOrder);
 
-        Mage::helper('klarna/log')->log(
-            json_encode($magentoOrder->getQuote()),
-            'Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId(),
-            true
-        );
+        Mage::helper('klarna')->log('Order acknowledged, Magento ID ' . $magentoOrder->getIncrementId(), true, $magentoOrder->getQuote()->getId());
     }
 
     /**
@@ -714,7 +700,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
     private function prepareForAcknowledgement($checkoutId)
     {
         // Make a note in the logs
-        Mage::helper('klarna/log')->log(null, '[' . $checkoutId . '] Acknowledge method called for checkout id');
+        Mage::helper('klarna')->log('Acknowledge method called for checkout id', null, null, null, $checkoutId);
 
         // Avoid timeouts in PHP to allow the script to finish
         set_time_limit(0);
@@ -754,10 +740,7 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
 
         $this->errorEmailMessages[] = $missingOrderMessage;
 
-        Mage::helper('klarna/log')->log(
-            null,
-            $missingOrderMessage
-        );
+        Mage::helper('klarna')->log($missingOrderMessage, null, null, null, $checkoutId);
     }
 
     /**
@@ -778,8 +761,6 @@ class KL_Klarna_Model_Klarnacheckout extends KL_Klarna_Model_Klarnacheckout_Abst
      */
     private function orderIsRecurring($klarnaOrder)
     {
-        Mage::log('This token is set here: '.$klarnaOrder['recurring_token'], null, 'subscriber.log', true);
-
         return isset($klarnaOrder['recurring_token']);
     }
 
