@@ -67,7 +67,7 @@ class KL_Klarna_Block_Adminhtml_Klarnalog_Grid extends Mage_Adminhtml_Block_Widg
             "ip",
             array(
                 "header" => Mage::helper("klarna")->__("IP Address"),
-                "index" => "level",
+                "index" => "ip",
             )
         );
 
