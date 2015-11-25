@@ -52,7 +52,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      *
      * @return void
      */
-    public function log($message, $force = null)
+    public function log($message, $force = null, $quoteId = null, $orderId = null, $checkoutId = null)
     {
         /**
          * Check if we should do logging or not
@@ -97,9 +97,9 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
          * Store message in database
          */
         $logModel = Mage::getModel('klarna/klarnalog')
-            ->setQuoteId()
-            ->setOrderId()
-            ->setKlarnaCheckoutId()
+            ->setQuoteId($quoteId)
+            ->setOrderId($orderId)
+            ->setKlarnaCheckoutId($checkoutId)
             ->setMessage($dbMessage)
             ->setLevel($level)
             ->setIp($_SERVER['REMOTE_ADDR'])
