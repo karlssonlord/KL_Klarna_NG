@@ -23,6 +23,8 @@ class KL_Klarna_Adminhtml_KlarnalogController extends Mage_Adminhtml_Controller_
         $this->_title($this->__("Manager Klarnalog"));
 
         $this->_initAction();
+        $this->_addContent($this->getLayout()->createBlock('klarna/adminhtml_klarnalog'));
+
         $this->renderLayout();
     }
 
