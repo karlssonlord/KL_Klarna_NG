@@ -114,9 +114,11 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         }
 
         /**
-         * Log to our Magento log file
+         * Log to our Magento log file if databas wan't there when we needed it to
          */
-        Mage::log($message, null, 'kl_klarna.log', $force);
+        if (!$logModel || !is_object($logModel) || !$logModel->getId()) {
+            Mage::log($message, null, 'kl_klarna.log', $force);
+        }
     }
 
     /**
