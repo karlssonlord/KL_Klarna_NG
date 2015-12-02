@@ -12,7 +12,13 @@ class KL_Klarna_Model_Totals_Address
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
         $helper = Mage::helper('klarna');
-        $helper->log('Preparing to collect totals');
+
+        /**
+         * Fetch the quote
+         */
+        $quote = $address->getQuote();
+
+        $helper->log('Preparing to collect totals', null, $quote->getId());
 
         parent::collect($address);
 
@@ -21,11 +27,6 @@ class KL_Klarna_Model_Totals_Address
          */
         $this->_setAmount(0);
         $this->_setBaseAmount(0);
-
-        /**
-         * Fetch the quote
-         */
-        $quote = $address->getQuote();
 
         if ($quote->getId()) {
             try {
@@ -38,7 +39,7 @@ class KL_Klarna_Model_Totals_Address
                     $paymentCode = false;
                 }
 
-                $helper->log('Quote found with ID ' . $quote->getId());
+                $helper->log('Quote found', null, $quote->getId());
 
                 /**
                  * Make sure it's a payment that has a fee and it's a shipping
@@ -47,9 +48,7 @@ class KL_Klarna_Model_Totals_Address
                 if ($address->getAddressType() == 'shipping'
                     && $paymentCode == 'klarna_invoice'
                 ) {
-                    $helper->log(
-                        'Updating quote since we\'re using ' . $paymentCode
-                    );
+                    $helper->log('Updating quote since we\'re using ' . $paymentCode, null, $quote->getId());
 
                     /**
                      * Fetch payment method invoice fee
@@ -79,7 +78,7 @@ class KL_Klarna_Model_Totals_Address
                         ->setKlarnaTotal($fee)
                         ->setBaseKlarnaTotal($fee);
 
-                    Mage::helper('klarna')->log('Set fee ' . $fee);
+                    Mage::helper('klarna')->log('Set fee "' . $fee . '"', null, $quote->getId());
                 }
 
                 /**

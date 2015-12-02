@@ -52,7 +52,7 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
      *
      * @return void
      */
-    public function log($message, $force = null)
+    public function log($message, $force = null, $quoteId = null, $orderId = null, $checkoutId = null)
     {
         /**
          * Check if we should do logging or not
@@ -64,6 +64,11 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
                 $force = false;
             }
         }
+
+        /**
+         * Default level
+         */
+        $level = 'DEBUG';
 
         /**
          * Fetch message if it's an exception
@@ -78,7 +83,28 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
              * Force logging if it's an exception
              */
             $force = true;
+
+            $level = 'EXCEPTION';
         }
+
+        if (is_string($message)) {
+            $dbMessage = $message;
+        } else {
+            $dbMessage = var_export($message, true);
+        }
+
+        /**
+         * Store message in database
+         */
+        $logModel = Mage::getModel('klarna/klarnalog')
+            ->setQuoteId($quoteId)
+            ->setOrderId($orderId)
+            ->setKlarnaCheckoutId($checkoutId)
+            ->setMessage($dbMessage)
+            ->setLevel($level)
+            ->setIp($_SERVER['REMOTE_ADDR'])
+            ->save();
+
 
         /**
          * Add remote IP address if it's a string
@@ -88,9 +114,11 @@ class KL_Klarna_Helper_Data extends KL_Klarna_Helper_Abstract {
         }
 
         /**
-         * Log to our Magento log file
+         * Log to our Magento log file if databas wan't there when we needed it to
          */
-        Mage::log($message, null, 'kl_klarna.log', $force);
+        if (!$logModel || !is_object($logModel) || !$logModel->getId()) {
+            Mage::log($message, null, 'kl_klarna.log', $force);
+        }
     }
 
     /**

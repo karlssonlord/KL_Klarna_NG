@@ -23,16 +23,14 @@ class KL_Klarna_Helper_Log extends Mage_Core_Helper_Abstract
      */
     public function message($quote, $message, $orderId = null, $klarnaCheckoutId = null, $force = null)
     {
-        Mage::log(
-            $this->buildMessageString($quote, $message, $orderId, $klarnaCheckoutId),
-            null,
-            self::LOG_FILE,
-            $this->isForced($force)
-        );
+        $message = $this->buildMessageString($quote, $message, $orderId, $klarnaCheckoutId);
+        Mage::helper('klarna')->log($message, $force, null, $orderId, $klarnaCheckoutId);
     }
 
     /**
      * Log message to our log files
+     *
+     * @deprectaded See KL_Klarna_Helper_Data::log
      *
      * @param Mage_Sales_Model_Quote $quote   Quote object
      * @param mixed                  $message Log message
@@ -74,6 +72,7 @@ class KL_Klarna_Helper_Log extends Mage_Core_Helper_Abstract
                 $url,
                 $message
             );
+            $quoteId = $quote->getId();
         } else {
             $data = sprintf(
                 "Quote ID: [NONE GIVEN] | IP: %s | URL: %s | %s",
@@ -81,12 +80,15 @@ class KL_Klarna_Helper_Log extends Mage_Core_Helper_Abstract
                 $url,
                 $message
             );
+            $quoteId = null;
         }
 
-        Mage::log($data, null, self::LOG_FILE, $force);
+        Mage::helper('klarna')->log($data, $force, $quoteId, null, null);
     }
 
     /**
+     * @deprectaded See KL_Klarna_Helper_Data::log
+     *
      * @param $quote
      * @param $orderId
      * @return string

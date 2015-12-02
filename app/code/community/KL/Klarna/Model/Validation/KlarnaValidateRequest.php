@@ -8,6 +8,7 @@ class KL_Klarna_Model_Validation_KlarnaValidateRequest
      * @var array
      */
     protected $validators = array(
+        'ShippingValidator',
         'SkuValidator',
         'AvailabilityValidator',
         'CurrencyValidator',
