@@ -398,6 +398,14 @@
                     <model>klarna/cron_cleanpushlocktable::clean</model>
                 </run>
             </kl_klarna>
+            <kl_klarna>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>klarna/cron_newsletter::subscribeCustomerToNewsletter</model>
+                </run>
+            </kl_klarna>
         </jobs>
     </crontab>
 </config>
