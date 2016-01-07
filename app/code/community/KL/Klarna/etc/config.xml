@@ -3,7 +3,7 @@
     <modules>
         <KL_Klarna>
             <!-- Please see ./app/code/community/KL/Klarna/Model/Payment/Checkout.php -->
-            <version>0.0.7</version>
+            <version>0.0.8</version>
         </KL_Klarna>
     </modules>
     <frontend>
