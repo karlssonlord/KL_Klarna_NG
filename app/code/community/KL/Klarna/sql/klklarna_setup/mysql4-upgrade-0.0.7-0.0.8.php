@@ -13,10 +13,10 @@ $attributes = array(
     ),
 );
 
-$entities = [
+$entities = array(
     'order',
     'quote'
-];
+);
 
 foreach ($entities as $entity) {
     foreach ($attributes as $attributeCode => $data) {
