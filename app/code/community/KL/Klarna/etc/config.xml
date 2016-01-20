@@ -404,14 +404,14 @@
                     <model>klarna/cron_cleanpushlocktable::clean</model>
                 </run>
             </kl_klarna>
-            <kl_klarna>
+            <kl_klarna_subscribe_customer_to_newsletter>
                 <schedule>
                     <cron_expr>*/5 * * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>klarna/cron_newsletter::subscribeCustomerToNewsletter</model>
                 </run>
-            </kl_klarna>
+            </kl_klarna_subscribe_customer_to_newsletter>
         </jobs>
     </crontab>
 </config>
