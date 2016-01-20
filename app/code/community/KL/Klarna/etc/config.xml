@@ -3,7 +3,7 @@
     <modules>
         <KL_Klarna>
             <!-- Please see ./app/code/community/KL/Klarna/Model/Payment/Checkout.php -->
-            <version>0.0.7</version>
+            <version>0.0.8</version>
         </KL_Klarna>
     </modules>
     <frontend>
@@ -396,6 +396,14 @@
                 </schedule>
                 <run>
                     <model>klarna/cron_cleanpushlocktable::clean</model>
+                </run>
+            </kl_klarna>
+            <kl_klarna>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>klarna/cron_newsletter::subscribeCustomerToNewsletter</model>
                 </run>
             </kl_klarna>
         </jobs>
