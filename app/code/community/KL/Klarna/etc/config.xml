@@ -203,6 +203,12 @@
                 <klarna_checkout>
                     <to_order>*</to_order>
                 </klarna_checkout>
+                <order_comment>
+                    <to_order>*</to_order>
+                </order_comment>
+                <newsletter_subscription>
+                    <to_order>*</to_order>
+                </newsletter_subscription>
             </sales_convert_quote>
             <sales_convert_order>
                 <base_klarna_total>
