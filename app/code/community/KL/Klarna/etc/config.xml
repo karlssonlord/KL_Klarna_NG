@@ -4,6 +4,7 @@
         <KL_Klarna>
             <!-- Please see ./app/code/community/KL/Klarna/Model/Payment/Checkout.php -->
             <version>0.0.8</version>
+            <!-- If not changed, invoiced will be incorrectly created without discounts! -->
         </KL_Klarna>
     </modules>
     <frontend>

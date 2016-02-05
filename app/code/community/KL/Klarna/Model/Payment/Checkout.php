@@ -17,7 +17,7 @@ class KL_Klarna_Model_Payment_Checkout
 
     public function __construct()
     {
-        if (Mage::helper('klarna')->getVersion() === '0.0.6') {
+        if (Mage::helper('klarna')->getVersion() === '0.0.8') {
             $this->_canCapturePartial = false;
         }
 
